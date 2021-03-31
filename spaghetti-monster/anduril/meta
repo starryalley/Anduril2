@@ -1,0 +1,12 @@
+Description: Anduril, a Narsil-inspired UI for FSM.
+    (Anduril was Aragorn's sword, the blade Narsil reforged)
+    Full-featured UI which does a bit of everything.
+Authors: ToyKeeper
+MCU: attiny85
+Button-Type: momentary
+Memory: yes
+Modes: ramp, discrete ramp,
+    battcheck, tempcheck, sunset, beacon,
+    candle, bike flasher, party strobe, tactical strobe, lightning storm,
+    soft lock, momentary, config
+Extras: ramping UI, thermal regulation, LVP, dual PWM, triple PWM

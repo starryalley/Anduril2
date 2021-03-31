@@ -1,0 +1,7 @@
+*.hex
+*.elf
+*.o
+spaghetti-monster/anduril/hex
+
+.vscode
+.DS_Store

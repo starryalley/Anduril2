@@ -1,0 +1,11 @@
+Description: Easy code base for e-switch lights, with a few example UIs.
+  SpaghettiMonster is a foundation on which to build interfaces, sort of a
+  build-your-own UI toolkit which makes the task much easier.
+  .
+  This is not a standalone firmware; it's a library to build on.
+Authors: ToyKeeper
+MCU: attiny45, attiny85
+Button-Type: momentary
+Memory:
+Modes:
+Extras: thermal regulation, LVP, dual PWM, triple PWM, quad PWM
