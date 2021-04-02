@@ -20,6 +20,8 @@
 #ifndef FSM_ADC_C
 #define FSM_ADC_C
 
+#include <stdlib.h>
+
 // override onboard temperature sensor definition, if relevant
 #ifdef USE_EXTERNAL_TEMP_SENSOR
 #ifdef ADMUX_THERM
@@ -86,7 +88,13 @@ inline void ADC_start_measurement() {
 inline void ADC_on()
 {
     #if (ATTINY == 25) || (ATTINY == 45) || (ATTINY == 85) || (ATTINY == 1634)
-        set_admux_voltage();
+        // if we are in standby and we want to measure temperature this time
+        #if defined(USE_THERMAL_REGULATION)
+        if (go_to_standby && adc_channel == 1)
+            set_admux_therm();
+        else
+        #endif
+            set_admux_voltage();
         #ifdef USE_VOLTAGE_DIVIDER
             // disable digital input on divider pin to reduce power consumption
             VOLTAGE_ADC_DIDR |= (1 << VOLTAGE_ADC);
@@ -209,8 +217,8 @@ void adc_deferred() {
         // (and the usual standby level is only ~20 uA)
         if (go_to_standby) {
             ADC_off();
-            // also, only check the battery while asleep, not the temperature
-            adc_channel = 0;
+            // check the battery and temperature one by one
+            adc_channel = !adc_channel;
         }
     #endif
 
@@ -221,13 +229,20 @@ void adc_deferred() {
         ADC_voltage_handler();
         #ifdef USE_THERMAL_REGULATION
         // set the correct type of measurement for next time
-        if (! go_to_standby) set_admux_therm();
+        set_admux_therm();
         #endif
     }
     #endif
 
     #ifdef USE_THERMAL_REGULATION
     else if (1 == adc_step) {  // temperature
+        #ifdef BLINK_BUTTON_WHEN_MEASURING_TEMP_STANDBY
+        if (go_to_standby) {
+            button_led_set(2);
+            delay_4ms(5);
+            button_led_set(0);
+        }
+        #endif
         ADC_temperature_handler();
         #ifdef USE_LVP
         // set the correct type of measurement for next time
@@ -355,11 +370,25 @@ static inline void ADC_temperature_handler() {
     // Convert ADC units to Celsius (ish)
     #ifndef USE_EXTERNAL_TEMP_SENSOR
     // onboard sensor for attiny25/45/85/1634
-    temperature = (measurement>>1) + THERM_CAL_OFFSET + (int16_t)therm_cal_offset - 275;
+    int16_t current_temperature = (measurement>>1) + THERM_CAL_OFFSET + (int16_t)therm_cal_offset - 275;
+    static int16_t standby_last_temperature = INT16_MIN;
+    if (go_to_standby) {
+        // just compare last temperature and if it doesn't change that much, use current temperature
+        if (standby_last_temperature == INT16_MIN || // first measurement
+            (standby_last_temperature != INT16_MIN && abs(current_temperature - standby_last_temperature) < 5)) {
+            temperature = current_temperature;
+            // save this measurement only for comparing in the next time
+            standby_last_temperature = current_temperature;
+        }
+    } else
+        temperature = current_temperature;
     #else
     // external sensor
     temperature = EXTERN_TEMP_FORMULA(measurement>>1) + THERM_CAL_OFFSET + (int16_t)therm_cal_offset;
     #endif
+
+    // if we are in standby, don't do the rest since we've got the current temperature now
+    if (go_to_standby) return;
 
     // how much has the temperature changed between now and a few seconds ago?
     int16_t diff;
