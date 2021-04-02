@@ -122,7 +122,7 @@ void WDT_inner() {
         if (0 != (ticks_since_last & 0x3f)) return;
 
         adc_trigger = 0;  // make sure a measurement will happen
-        ADC_on();  // enable ADC voltage measurement functions temporarily
+        ADC_on();  // enable ADC voltage/temperature measurement functions temporarily
         #endif
     }
     else {  // button handling should only happen while awake
