@@ -112,7 +112,14 @@ uint8_t lockout_state(Event event, uint16_t arg) {
         set_state(steady_state, MAX_LEVEL);
         return MISCHIEF_MANAGED;
     }
-
+    #ifdef USE_BUTTON_LED
+    // 6 clicks to toggle blinking button if temperature is out of comfort zone
+    else if (event == EV_6clicks) {
+        blink_button_comfort_temperature = !blink_button_comfort_temperature;
+        save_config();
+        return MISCHIEF_MANAGED;
+    }
+    #endif
     ////////// Every action below here is blocked in the simple UI //////////
     #ifdef USE_SIMPLE_UI
     if (simple_ui_active) {

@@ -22,6 +22,9 @@
 
 #include "aux-leds.h"
 
+#ifdef USE_BUTTON_LED
+uint8_t blink_button_comfort_temperature = 1;
+#endif
 
 #if defined(USE_INDICATOR_LED) && defined(TICK_DURING_STANDBY)
 // beacon-like mode for the indicator LED
@@ -110,6 +113,9 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
     }
 
     uint8_t pattern = (mode>>4);  // off, low, high, blinking, ... more?
+    #ifdef USE_BUTTON_LED
+    uint8_t button_pattern = pattern; //for button LED
+    #endif
     uint8_t color = mode & 0x0f;
 
     // preview in blinking mode is awkward... use high instead
@@ -164,41 +170,57 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
         }
     }
 
+    // blink button LED if ambient temperature becomes uncomfortable
+    #ifdef USE_BUTTON_LED
+    if (blink_button_comfort_temperature && go_to_standby &&
+        (temperature < BUTTON_BLINK_LOW_TEMPERATURE ||
+         temperature > BUTTON_BLINK_HIGH_TEMPERATURE)) {
+        button_pattern = 3;
+    }
+    #endif
+
+    // uses an odd length to avoid lining up with rainbow loop
+    static const uint8_t animation[] = {2, 1, 0, 0,  0, 0, 0, 0,  0,
+                                        1, 0, 0, 0,  0, 0, 0, 0,  0, 1};
     // pick a brightness from the animation sequence
+    #ifdef USE_BUTTON_LED
+    uint8_t blink_animation_done = 0;
+    #endif
     if (pattern == 3) {
-        // uses an odd length to avoid lining up with rainbow loop
-        static const uint8_t animation[] = {2, 1, 0, 0,  0, 0, 0, 0,  0,
-                                            1, 0, 0, 0,  0, 0, 0, 0,  0, 1};
         frame = (frame + 1) % sizeof(animation);
         pattern = animation[frame];
+        #ifdef USE_BUTTON_LED
+        blink_animation_done = 1;
+        #endif
     }
-    uint8_t result;
     #ifdef USE_BUTTON_LED
-    uint8_t button_led_result;
+    if (button_pattern == 3) {
+        if (blink_animation_done) {
+            button_pattern = pattern;
+        } else {
+            frame = (frame + 1) % sizeof(animation);
+            button_pattern = animation[frame];
+        }
+    }
     #endif
+
+    uint8_t result;
     switch (pattern) {
         case 0:  // off
             result = 0;
-            #ifdef USE_BUTTON_LED
-            button_led_result = 0;
-            #endif
             break;
         case 1:  // low
             result = actual_color;
-            #ifdef USE_BUTTON_LED
-            button_led_result = 1;
-            #endif
             break;
         default:  // high
             result = (actual_color << 1);
-            #ifdef USE_BUTTON_LED
-            button_led_result = 2;
-            #endif
             break;
     }
     rgb_led_set(result);
+
+    // separate button LED logic here because the button LED may blink while AUX LED doesn't
     #ifdef USE_BUTTON_LED
-    button_led_set(button_led_result);
+    button_led_set((button_pattern > 1) ? 2 : button_pattern);
     #endif
 }
 
