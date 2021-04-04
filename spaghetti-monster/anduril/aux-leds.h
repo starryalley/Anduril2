@@ -84,6 +84,10 @@ uint8_t rgb_led_off_mode = RGB_LED_OFF_DEFAULT;
 uint8_t rgb_led_lockout_mode = RGB_LED_LOCKOUT_DEFAULT;
 #endif
 
+// low/high temperature threshold in C where button LED will start to blink
+#define BUTTON_BLINK_LOW_TEMPERATURE 18
+#define BUTTON_BLINK_HIGH_TEMPERATURE 25
+
 #ifdef USE_INDICATOR_LED
     // bits 2-3 control lockout mode
     // bits 0-1 control "off" mode
