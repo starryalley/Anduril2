@@ -138,6 +138,14 @@ void set_level(uint8_t level) {
         #else  // ifdef USE_TINT_RAMPING
 
         #if PWM_CHANNELS >= 1
+            #if 0 // this won't work because moonlight 'level' it's set to 0 in KR4-nofet
+            #if defined(PWM1_TOP)
+            if (level < RAMP_SMOOTH_FLOOR) // if we are on floor (moonlight)
+                PWM1_TOP = 0x3FF << 2; // make PWM slower
+            else
+                PWM1_TOP = 0x3FF; // original 10-bit top value
+            #endif
+            #endif
         PWM1_LVL = PWM_GET(pwm1_levels, level);
         #endif
         #if PWM_CHANNELS >= 2
