@@ -27,6 +27,23 @@ void indicator_blink(uint8_t arg);
 uint8_t setting_rgb_mode_now = 0;
 void rgb_led_update(uint8_t mode, uint8_t arg);
 void rgb_led_voltage_readout(uint8_t bright);
+
+#define RGB_RED 0
+#define RGB_YELLOW 1
+#define RGB_GREEN 2
+#define RGB_CYAN 3
+#define RGB_BLUE 4
+#define RGB_PURPLE 5
+#define RGB_WHITE 6
+#define RGB_DISCO 7
+#define RGB_RAINBOW 8
+#define RGB_VOLTAGE 9
+#define RGB_TEMPERATURE 10
+#define RGB_OFF (0<<4)
+#define RGB_LOW (1<<4)
+#define RGB_HIGH (2<<4)
+#define RGB_BLINK (3<<4)
+
 /*
  * 0: R
  * 1: RG
