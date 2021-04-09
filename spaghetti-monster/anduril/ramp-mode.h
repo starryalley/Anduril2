@@ -40,7 +40,7 @@
 // TODO: Move these settings to config-default.h?
 // start in the simple UI after each factory reset?
 #ifndef SIMPLE_UI_ACTIVE
-#define SIMPLE_UI_ACTIVE 1
+#define SIMPLE_UI_ACTIVE 0
 #endif
 #ifndef SIMPLE_UI_FLOOR
 #define SIMPLE_UI_FLOOR (RAMP_SIZE*2/15)
