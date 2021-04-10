@@ -72,6 +72,28 @@ uint8_t voltage_to_rgb() {
     return pgm_read_byte(rgb_led_colors + color_num);
 }
 
+#ifdef USE_THERMAL_REGULATION
+uint8_t temperature_to_rgb() {
+    static const uint8_t temp_levels[] = {
+    // temperature in Celsius, color
+          0, 5, // 5, R + B =>pink/purple  <=12 C
+         12, 4, // 4,     B                (12,16] C
+         16, 3, // 3,   G+B =>cyan         (16,20] C
+         20, 2, // 2,   G                  (20,25] C
+         25, 1, // 1, R+G   =>yellow       (25,28] C
+         28, 0, // 0, R                    >28 C
+        255, 0, // 0, R
+    };
+    int16_t temps = temperature;
+    if (temps < 0) return 0;
+
+    uint8_t i;
+    for (i = 0; temps >= temp_levels[i]; i += 2) {}
+    uint8_t color_num = temp_levels[(i - 2) + 1];
+    return pgm_read_byte(rgb_led_colors + color_num);
+}
+#endif
+
 // do fancy stuff with the RGB aux LEDs
 // mode: 0bPPPPCCCC where PPPP is the pattern and CCCC is the color
 // arg: time slice number
@@ -123,7 +145,7 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
         }
         actual_color = pgm_read_byte(colors + rainbow);
     }
-    else {  // voltage
+    else if (color == 9) {  // voltage
         // show actual voltage while asleep...
         if (go_to_standby) {
             actual_color = voltage_to_rgb();
@@ -137,6 +159,15 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
             actual_color = pgm_read_byte(colors + (((arg>>1) % 3) << 1));
         }
     }
+    #ifdef USE_THERMAL_REGULATION
+    else {   // temperature
+        actual_color = temperature_to_rgb();
+        if (!go_to_standby) {
+            // during preview, flash current temperature's colors quickly
+            pattern = (arg >> 1) % 3;
+        }
+    }
+    #endif
 
     // pick a brightness from the animation sequence
     if (pattern == 3) {
