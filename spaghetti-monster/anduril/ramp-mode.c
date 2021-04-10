@@ -26,6 +26,65 @@
 #include "sunset-timer.h"
 #endif
 
+#ifdef USE_AUX_RGB_LEDS
+static void set_aux_led(uint8_t main_level) {
+    switch(lowlevel_aux_mode) {
+    case LOWLEVEL_AUX_HIGH:
+        set_level(main_level);
+        #ifdef USE_BUTTON_LED
+        button_led_set(1);//button led in low
+        #endif
+        break;
+    case LOWLEVEL_AUX_ON_ONLY:
+        set_level(0);
+        #ifdef USE_BUTTON_LED
+        button_led_set(1);//button led in low
+        #endif
+        break;
+    case LOWLEVEL_BUTTON_ON_ONLY:
+        set_level(0);
+        rgb_led_update(RGB_OFF, 0);
+        #ifdef USE_BUTTON_LED
+        button_led_set(2);//button led in high
+        #endif
+        return;
+    case LOWLEVEL_AUX_OFF:
+    default:
+        set_level(main_level);
+        rgb_led_update(RGB_OFF, 0);
+        #ifdef USE_BUTTON_LED
+        button_led_set(1);//button led in low
+        #endif
+        return;
+    }
+    switch(lowlevel_aux_color) {
+    case RGB_RED:
+        rgb_led_update(RGB_RED|RGB_HIGH, 0);
+        break;
+    case RGB_YELLOW:
+        rgb_led_update(RGB_YELLOW|RGB_HIGH, 0);
+        break;
+    case RGB_GREEN:
+        rgb_led_update(RGB_GREEN|RGB_HIGH, 0);
+        break;
+    case RGB_CYAN:
+        rgb_led_update(RGB_CYAN|RGB_HIGH, 0);
+        break;
+    case RGB_BLUE:
+        rgb_led_update(RGB_BLUE|RGB_HIGH, 0);
+        break;
+    case RGB_PURPLE:
+        rgb_led_update(RGB_PURPLE|RGB_HIGH, 0);
+        break;
+    case RGB_WHITE:
+        rgb_led_update(RGB_WHITE|RGB_HIGH, 0);
+        break;
+    default:
+        rgb_led_update(RGB_OFF, 0);
+    }
+}
+#endif
+
 uint8_t steady_state(Event event, uint16_t arg) {
     static int8_t ramp_direction = 1;
     #if (B_TIMING_OFF == B_RELEASE_T)
@@ -94,6 +153,10 @@ uint8_t steady_state(Event event, uint16_t arg) {
     }
     // if the timer just expired, shut off
     else if (sunset_active  &&  (! sunset_timer)) {
+        #ifdef USE_AUX_RGB_LEDS
+        lowlevel_aux_mode = LOWLEVEL_AUX_OFF;
+        rgb_led_update(RGB_OFF, 0);
+        #endif
         set_state(off_state, 0);
         return MISCHIEF_MANAGED;
     }
@@ -133,6 +196,10 @@ uint8_t steady_state(Event event, uint16_t arg) {
     // 1 click: off
     else if (event == EV_1click) {
         set_state(off_state, 0);
+        #ifdef USE_AUX_RGB_LEDS
+        // reset aux mode
+        lowlevel_aux_mode = LOWLEVEL_AUX_OFF;
+        #endif
         return MISCHIEF_MANAGED;
     }
     // 2 clicks: go to/from highest level
@@ -433,6 +500,44 @@ uint8_t steady_state(Event event, uint16_t arg) {
         set_level_and_therm_target(actual_level + 1);
         return MISCHIEF_MANAGED;
     }
+
+    #ifdef USE_AUX_RGB_LEDS
+    // 6H: set AUX LED color and turn on AUX LED (if not already) to mix tint with the main emitter
+    else if (event == EV_click6_hold) {
+        if (0 == (arg & 0x3f)) {
+            if (actual_level <= AUX_ON_LOWLEVEL) {
+                // reset aux mode to high if aux led is off
+                if (lowlevel_aux_mode == LOWLEVEL_AUX_OFF || lowlevel_aux_mode == LOWLEVEL_BUTTON_ON_ONLY)
+                    lowlevel_aux_mode = LOWLEVEL_AUX_HIGH;
+                // go to the next lowlevel auxled color
+                lowlevel_aux_color = (lowlevel_aux_color+1) % LOWLEVEL_AUX_COUNT;
+                set_aux_led(memorized_level);
+            } else {
+                // blink in RED to indicate error (we are not within low level threshold so this is ignored)
+                rgb_led_update(RGB_RED|RGB_HIGH, 0);
+                delay_4ms(3);
+                rgb_led_update(RGB_OFF, 0);
+            }
+        }
+        return MISCHIEF_MANAGED;
+    }
+    else if (event == EV_click6_hold_release) {
+        return MISCHIEF_MANAGED;
+    }
+    // 6C: cycle through AUX LED mode
+    else if (event == EV_6clicks) {
+        if (actual_level <= AUX_ON_LOWLEVEL) {
+            // go to the next auxled mode
+            lowlevel_aux_mode = (lowlevel_aux_mode+1) % LOWLEVEL_AUX_MODE_COUNT;
+            set_aux_led(memorized_level);
+        } else {
+            // blink in RED to indicate error (we are not within low level threshold so this is ignored)
+            rgb_led_update(RGB_RED|RGB_HIGH, 0);
+            delay_4ms(3);
+            rgb_led_update(RGB_OFF, 0);
+        }
+    }
+    #endif
 
     #ifdef USE_RAMP_CONFIG
     // 7H: configure this ramp mode
