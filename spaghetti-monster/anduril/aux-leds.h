@@ -52,8 +52,10 @@ void rgb_led_voltage_readout(uint8_t bright);
  * 4:   B
  * 5: R B
  * 6: RGB
- * 7: rainbow
- * 8: voltage
+ * 7: disco
+ * 8: rainbow
+ * 9: voltage
+ * 10: temperature
  */
 const PROGMEM uint8_t rgb_led_colors[] = {
     0b00000001,  // 0: red
@@ -64,8 +66,6 @@ const PROGMEM uint8_t rgb_led_colors[] = {
     0b00010001,  // 5: purple
     0b00010101,  // 6: white
 };
-// intentionally 1 higher than total modes, to make "voltage" easier to reach
-// (at Hank's request)
 #define RGB_LED_NUM_COLORS 11
 #define RGB_LED_NUM_PATTERNS 4
 #ifndef RGB_LED_OFF_DEFAULT
