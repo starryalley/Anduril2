@@ -20,6 +20,8 @@
 #ifndef RAMP_MODE_H
 #define RAMP_MODE_H
 
+#include "aux-leds.h"
+
 #ifndef RAMP_LENGTH
 #define RAMP_LENGTH 150  // default, if not overridden in a driver cfg file
 #endif
@@ -192,5 +194,17 @@ uint8_t ramp_stepss[] = {
     };
 uint8_t ramp_discrete_step_size;  // don't set this
 
+#ifdef USE_AUX_RGB_LEDS
+// use RGB_RED...RGB_WHITE (value 0 to 6, total 7)
+#define LOWLEVEL_AUX_COUNT 7
+uint8_t lowlevel_aux_color = RGB_RED;
+
+#define LOWLEVEL_AUX_OFF 0        // main emitters on,  aux off,  button low
+#define LOWLEVEL_BUTTON_ON_ONLY 1 // main emitters off, aux off,  button high
+#define LOWLEVEL_AUX_ON_ONLY 2    // main emitters off, aux high, button low
+#define LOWLEVEL_AUX_HIGH 3       // main emitters on,  aux high, button low
+#define LOWLEVEL_AUX_MODE_COUNT 4
+uint8_t lowlevel_aux_mode = LOWLEVEL_AUX_OFF;
+#endif
 
 #endif
