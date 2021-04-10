@@ -69,11 +69,13 @@ const PROGMEM uint8_t rgb_led_colors[] = {
 #define RGB_LED_NUM_COLORS 11
 #define RGB_LED_NUM_PATTERNS 4
 #ifndef RGB_LED_OFF_DEFAULT
-#define RGB_LED_OFF_DEFAULT 0x19  // low, voltage
+#define RGB_LED_OFF_DEFAULT 0x1a  // low, temperature
+//#define RGB_LED_OFF_DEFAULT 0x19  // low, voltage
 //#define RGB_LED_OFF_DEFAULT 0x18  // low, rainbow
 #endif
 #ifndef RGB_LED_LOCKOUT_DEFAULT
-#define RGB_LED_LOCKOUT_DEFAULT 0x37  // blinking, disco
+#define RGB_LED_LOCKOUT_DEFAULT 0x2a  // high, temperature
+//#define RGB_LED_LOCKOUT_DEFAULT 0x37  // blinking, disco
 #endif
 #ifndef RGB_RAINBOW_SPEED
 #define RGB_RAINBOW_SPEED 0x0f  // change color every 16 frames
