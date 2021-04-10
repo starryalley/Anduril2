@@ -142,8 +142,8 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         return MISCHIEF_MANAGED;
     }
     #ifdef USE_MOMENTARY_MODE
-    // 5 clicks: go to momentary mode (momentary strobe)
-    else if (event == EV_5clicks) {
+    // 8 clicks: go to momentary mode (momentary strobe)
+    else if (event == EV_8clicks) {
         set_state(momentary_state, 0);
         set_level(0);
         return MISCHIEF_MANAGED;

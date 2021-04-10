@@ -420,8 +420,8 @@ uint8_t steady_state(Event event, uint16_t arg) {
     #endif  // ifndef USE_TINT_RAMPING
 
     #ifdef USE_MOMENTARY_MODE
-    // 5 clicks: shortcut to momentary mode
-    else if (event == EV_5clicks) {
+    // 8 clicks: shortcut to momentary mode
+    else if (event == EV_8clicks) {
         set_level(0);
         set_state(momentary_state, 0);
         return MISCHIEF_MANAGED;
