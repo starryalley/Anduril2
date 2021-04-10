@@ -21,6 +21,7 @@
 #define STROBE_MODES_H
 
 // internal numbering for strobe modes
+// order: candle->lightning storm->bike flasher->party->tactical
 #ifdef USE_STROBE_STATE
 typedef enum {
     #ifdef USE_PARTY_STROBE_MODE
@@ -29,11 +30,11 @@ typedef enum {
     #ifdef USE_TACTICAL_STROBE_MODE
     tactical_strobe_e,
     #endif
-    #ifdef USE_LIGHTNING_MODE
-    lightning_storm_e,
-    #endif
     #ifdef USE_CANDLE_MODE
     candle_mode_e,
+    #endif
+    #ifdef USE_LIGHTNING_MODE
+    lightning_storm_e,
     #endif
     #ifdef USE_BIKE_FLASHER_MODE
     bike_flasher_e,
