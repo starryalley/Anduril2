@@ -248,8 +248,8 @@ uint8_t off_state(Event event, uint16_t arg) {
     }
     #endif
     #ifdef USE_MOMENTARY_MODE
-    // 5 clicks: momentary mode
-    else if (event == EV_5clicks) {
+    // 8 clicks: momentary mode
+    else if (event == EV_8clicks) {
         blink_once();
         set_state(momentary_state, 0);
         return MISCHIEF_MANAGED;
