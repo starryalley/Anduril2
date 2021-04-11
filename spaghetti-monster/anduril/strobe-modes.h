@@ -76,6 +76,12 @@ inline void party_tactical_strobe_mode_iter(uint8_t st);
 #endif
 
 #ifdef USE_LIGHTNING_MODE
+#ifndef LIGHTNING_BUSY_FACTOR
+#define LIGHTNING_BUSY_FACTOR 14 // max 16384ms (max ~16 sec interval)
+#endif
+uint8_t lightning_busy_factor = LIGHTNING_BUSY_FACTOR;
+#define LIGHTNING_BUSY_FACTOR_MAX 16 // max 65536ms (max ~65 sec interval)
+#define LIGHTNING_BUSY_FACTOR_MIN 12 // max 4096ms (max ~4 sec interval)
 inline void lightning_storm_iter();
 #endif
 
