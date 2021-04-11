@@ -58,6 +58,12 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         save_config();
         return MISCHIEF_MANAGED;
     }
+    // 3 clicks: rotate back through strobe/flasher modes
+    else if (event == EV_3clicks) {
+        strobe_type = (st - 1 + NUM_STROBES) % NUM_STROBES;
+        save_config();
+        return MISCHIEF_MANAGED;
+    }
     // hold: change speed (go faster)
     //       or change brightness (brighter)
     else if (event == EV_click1_hold) {
@@ -156,6 +162,37 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         if (arg == AUTO_REVERSE_TIME) ramp_direction = 1;
 
         pseudo_rand_seed += arg;
+        return MISCHIEF_MANAGED;
+    }
+    // 4C: turning down busy factor (less busy) of lightning mode
+    else if (event == EV_4clicks) {
+        if (st == lightning_storm_e) {
+            lightning_busy_factor++;
+            if (lightning_busy_factor > LIGHTNING_BUSY_FACTOR_MAX)
+                lightning_busy_factor = LIGHTNING_BUSY_FACTOR_MAX;
+            save_config();
+            blink_once();
+        }
+        return MISCHIEF_MANAGED;
+    }
+    // 5C: turning up busy factor (busier) of lightning mode
+    else if (event == EV_5clicks) {
+        if (st == lightning_storm_e) {
+            lightning_busy_factor--;
+            if (lightning_busy_factor < LIGHTNING_BUSY_FACTOR_MIN)
+                lightning_busy_factor = LIGHTNING_BUSY_FACTOR_MIN;
+            save_config();
+            blink_once();
+        }
+        return MISCHIEF_MANAGED;
+    }
+    // 6C: reset lightning busy factor to default
+    else if (event == EV_6clicks) {
+        if (st == lightning_storm_e) {
+            lightning_busy_factor = LIGHTNING_BUSY_FACTOR;
+            save_config();
+            blink_once();
+        }
         return MISCHIEF_MANAGED;
     }
     #endif
@@ -258,9 +295,9 @@ inline void lightning_storm_iter() {
     }
 
     // turn the emitter off,
-    // for a random amount of time between 1ms and 8192ms
+    // for a random amount of time between 1ms and 8192ms (default busy factor)
     // (with a low bias)
-    rand_time = 1 << (pseudo_rand() % 13);
+    rand_time = 1 << (pseudo_rand() % lightning_busy_factor);
     rand_time += pseudo_rand() % rand_time;
     set_level(0);
     nice_delay_ms(rand_time);  // no return check necessary on final delay
