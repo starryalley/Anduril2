@@ -28,5 +28,5 @@ uint8_t candle_mode_state(Event event, uint16_t arg);
 // moved to fsm-misc.c because it's also used for tint ramping power correction
 //uint8_t triangle_wave(uint8_t phase);
 
-
+uint8_t candle_amplitude = CANDLE_AMPLITUDE;
 #endif
