@@ -23,5 +23,6 @@
 // when the light is "off" or in standby
 uint8_t off_state(Event event, uint16_t arg);
 
+extern uint8_t blink_brightness;
 
 #endif
