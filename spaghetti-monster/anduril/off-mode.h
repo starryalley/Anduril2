@@ -24,5 +24,7 @@
 uint8_t off_state(Event event, uint16_t arg);
 
 extern uint8_t blink_brightness;
-
+#ifdef USE_BUTTON_LED
+extern uint8_t blink_button_comfort_temperature;
+#endif
 #endif

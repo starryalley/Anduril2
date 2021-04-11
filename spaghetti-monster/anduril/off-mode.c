@@ -198,6 +198,14 @@ uint8_t off_state(Event event, uint16_t arg) {
         return MISCHIEF_MANAGED;
     }
     #endif
+    #ifdef USE_BUTTON_LED
+    // 6 clicks to toggle blinking button if temperature is out of comfort zone
+    else if (event == EV_6clicks) {
+        blink_button_comfort_temperature = !blink_button_comfort_temperature;
+        save_config();
+        return MISCHIEF_MANAGED;
+    }
+    #endif
     #if defined(USE_FACTORY_RESET) && defined(USE_SOFT_FACTORY_RESET)
     // 13 clicks and hold the last click: invoke factory reset (reboot)
     else if (event == EV_click13_hold) {

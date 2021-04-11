@@ -27,6 +27,8 @@ uint8_t lockout_state(Event event, uint16_t arg);
 uint8_t autolock_time = 0;
 uint8_t autolock_config_state(Event event, uint16_t arg);
 #endif
-
+#ifdef USE_BUTTON_LED
+extern uint8_t blink_button_comfort_temperature;
+#endif
 
 #endif

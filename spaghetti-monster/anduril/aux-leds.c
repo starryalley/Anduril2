@@ -22,6 +22,9 @@
 
 #include "aux-leds.h"
 
+#ifdef USE_BUTTON_LED
+uint8_t blink_button_comfort_temperature = 1;
+#endif
 
 #if defined(USE_INDICATOR_LED) && defined(TICK_DURING_STANDBY)
 // beacon-like mode for the indicator LED
@@ -169,8 +172,9 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
 
     // blink button LED if ambient temperature becomes uncomfortable
     #ifdef USE_BUTTON_LED
-    if (go_to_standby && (temperature < BUTTON_BLINK_LOW_TEMPERATURE ||
-                          temperature > BUTTON_BLINK_HIGH_TEMPERATURE)) {
+    if (blink_button_comfort_temperature && go_to_standby &&
+        (temperature < BUTTON_BLINK_LOW_TEMPERATURE ||
+         temperature > BUTTON_BLINK_HIGH_TEMPERATURE)) {
         button_pattern = 3;
     }
     #endif

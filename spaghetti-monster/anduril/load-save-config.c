@@ -76,6 +76,9 @@ void load_config() {
         #ifdef USE_AUTOLOCK
         autolock_time = eeprom[autolock_time_e];
         #endif
+        #ifdef USE_BUTTON_LED
+        blink_button_comfort_temperature = eeprom[blink_button_comfort_temperature_e];
+        #endif
     }
     #ifdef START_AT_MEMORIZED_LEVEL
     if (load_eeprom_wl()) {
@@ -136,7 +139,9 @@ void save_config() {
     #ifdef USE_AUTOLOCK
     eeprom[autolock_time_e] = autolock_time;
     #endif
-
+    #ifdef USE_BUTTON_LED
+    eeprom[blink_button_comfort_temperature_e] = blink_button_comfort_temperature;
+    #endif
     save_eeprom();
 }
 
