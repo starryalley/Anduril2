@@ -50,7 +50,7 @@ uint8_t blink_digit(uint8_t num) {
     if (!num) { ontime = 8; num ++; }
 
     for (; num>0; num--) {
-        set_level(BLINK_BRIGHTNESS);
+        set_level(blink_brightness);
         nice_delay_ms(ontime);
         set_level(0);
         nice_delay_ms(BLINK_SPEED * 3 / 12);

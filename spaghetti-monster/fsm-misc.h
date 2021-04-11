@@ -28,6 +28,7 @@ void auto_clock_speed();
 #ifndef BLINK_BRIGHTNESS
 #define BLINK_BRIGHTNESS (MAX_LEVEL/6)
 #endif
+uint8_t blink_brightness = BLINK_BRIGHTNESS;
 uint8_t blink_digit(uint8_t num);
 #endif
 
