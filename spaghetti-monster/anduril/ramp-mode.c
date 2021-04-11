@@ -342,8 +342,8 @@ uint8_t steady_state(Event event, uint16_t arg) {
     }
     #endif
 
-    // 3 clicks: toggle smooth vs discrete ramping
-    else if (event == EV_3clicks) {
+    // 9 clicks: toggle smooth vs discrete ramping
+    else if (event == EV_9clicks) {
         ramp_style = !ramp_style;
         save_config();
         #ifdef START_AT_MEMORIZED_LEVEL
@@ -380,6 +380,27 @@ uint8_t steady_state(Event event, uint16_t arg) {
         return MISCHIEF_MANAGED;
     }
     #endif
+
+    // 3 clicks: increase level by just one
+    else if (event == EV_3clicks) {
+        if (actual_level <= mode_min) {
+            set_level_and_therm_target(actual_level + 1);
+        } else {
+            #if PWM_CHANNELS >= 1
+            PWM1_LVL++;
+            #endif
+            #if PWM_CHANNELS >= 2
+            PWM2_LVL++;
+            #endif
+            #if PWM_CHANNELS >= 3
+            PWM3_LVL++;
+            #endif
+            #if PWM_CHANNELS >= 4
+            PWM4_LVL++;
+            #endif
+        }
+        return MISCHIEF_MANAGED;
+    }
 
     #ifdef USE_RAMP_CONFIG
     // 7H: configure this ramp mode
