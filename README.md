@@ -29,7 +29,7 @@ Add an additional mode "temperature" in AUX LED mode (for standby/lockout) after
 
 ## Button LED blinking if ambient temperature is out of comfort zone
 
-If temperature reading (standby or lockout) is out of comfort zone (`18-25C`), button LED will blink (if not in blinking AUX LED mode).
+If temperature reading (standby or lockout) is out of comfort zone (`18-25C`), button LED will blink (if not in blinking AUX LED mode). Use 6C in standby or lockout mode to toggle the setting to blink button LED or not. This configuration is saved.
 
 
 ## Allow the use of AUX LED in moonlight (lowest) level (5C/6C while light is on)
@@ -51,15 +51,43 @@ No extra state is defined and the AUX LED on is temporary (not remembered) so if
 Instead of blinking the main emitter, blink the AUX green LED at high power to indicate it's powered on.
 Original idea from [here](https://bazaar.launchpad.net/~dnelson1901/flashlight-firmware/flashlight-firmware/revision/267)
 
+## Make blinking brightness dynamic
+
+When main emitters are blinking for showing information (such as voltage or temperature), the blinking brightness is now dynamically determined and is only slightly above the current memorised level. For example, if the memorised level is moonlight, the blinking brightness will just be a bit brighter in case we want to check temperature during the middle of the night without blinding the eyes.
+
+## Strobe mode can cycle back to the previous state by 3C
+
+2C is to cycle to the next strobe state. Add 3C to cycle back to the previous state. The purpose of this is that the most used strobe states are candle and lightning mode. If I'm already at lightning mode but want to go to candle mode, there was no option but to go through the blinding tactical strobe or party mode. While I don't want to disable tactical strobe nor party mode, let's add an option to just go back to the previous state.
+
+## More configurable lightning mode 
+
+In lightning mode, add the following options which are saved:
+- `4C`: turn down busy factor so the lightning is less busy (less frequent)
+- `5C`: turn up busy factor so the lightning is busier (more frequent)
+- `6C`: reset to default (which is max 16sec until the next lightning strike, originally it's about 8sec)
+
+## More configurable candle mode
+
+In candle mode, add the following options which are saved:
+- `4C`: making candle amplitude smaller (candle in sort of a more stillness, calmer)
+- `5C`: making candle amplitude bigger (candle in the wind)
+- `6C`: reset to default (which is a bit calmer then the stock one)
+
+## When in lockout mode, unlock will go to off state
+
+In Anduril2 lockout state will always unlock to steady state (on state). Modify it so that unlocking will go to off state instead. Original idea from [here](https://github.com/mkong1/anduril/pull/13/files)
+
 # Configuration changes
 
 - Smooth floor level set to 1 (lowest but unstable moonlight)
 - Default level set to smooth floor level (moonlight)
 - Simple UI is inactive by default (Advanced UI is the default now)
-- Reording strobe mode: Candle->Lightning Storm->Bike Flasher->Party Strobe->Tactical Strobe. (Candle and Lightning storm are my most used strobe modes, hence why)
+- Reordering strobe mode: Candle->Lightning Storm->Bike Flasher->Party Strobe->Tactical Strobe. (Candle and Lightning storm are my most used strobe modes, hence why)
 - Disable Biker Flasher (I'm not using D4v2 for biking)
 - Use 8C instead of 5C for momentary mode (not used often so make it harder to enter)
 - Default AUX LED mode in standby/lockout mode set to show current temperature with low/high setting respectively
+- Lower default candle mode amplitude from 32 to 28 so it is a calmer candle light
+- Lower default lightning mode max possible interval from around 8sec to 16sec so it will appear less busy
 
 # Other changes to the codebase
 
@@ -71,6 +99,17 @@ Original idea from [here](https://bazaar.launchpad.net/~dnelson1901/flashlight-f
 ## Breathing button LED during standby/lock
 
 Breathing button LED during standby/lockout. But the button LED only has 3 levels (off, low, high) so not sure if it's possible to simulate the pulsing effect.
+
+## Improving button LED blinking when temperature is out of comfort zone
+
+- Comfortable zone button blink and work when aux led is set to high. Make it blink by turning off and on instead.
+- Comfortable zone button blink can work in moonlight mode as well. 
+
+
+## Turn the flashlight into a countdown timer
+
+When timeout, buzz it. Sort of.
+
 
 # Other useful commits
 
