@@ -77,6 +77,12 @@ In candle mode, add the following options which are saved:
 
 In Anduril2 lockout state will always unlock to steady state (on state). Modify it so that unlocking will go to off state instead. Original idea from [here](https://github.com/mkong1/anduril/pull/13/files)
 
+## Allow fine ramping up (smallest increment of brightness) using 3C in ramp mode
+
+Ramp up main emitters output in smallest increment using `3C`. This doesn't get saved and when use 1H to ramp up/down it will just revert to the original level and ramp up/down from there. 
+
+Use `9C` to switch between smooth and discrete ramp style. Not being used often by me so make it harder to reach.
+
 # Configuration changes
 
 - Smooth floor level set to 1 (lowest but unstable moonlight)
@@ -88,6 +94,7 @@ In Anduril2 lockout state will always unlock to steady state (on state). Modify 
 - Default AUX LED mode in standby/lockout mode set to show current temperature with low/high setting respectively
 - Lower default candle mode amplitude from 32 to 28 so it is a calmer candle light
 - Lower default lightning mode max possible interval from around 8sec to 16sec so it will appear less busy
+- Use 9C in ramp mode to switch ramp style (smooth or discrete)
 
 # Other changes to the codebase
 
