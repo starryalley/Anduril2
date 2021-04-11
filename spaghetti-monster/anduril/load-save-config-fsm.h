@@ -82,6 +82,9 @@ typedef enum {
     #ifdef USE_LIGHTNING_MODE
     lightning_busy_factor_e,
     #endif
+    #ifdef USE_CANDLE_MODE
+    candle_amplitude_e,
+    #endif
     eeprom_indexes_e_END
 } eeprom_indexes_e;
 #define EEPROM_BYTES eeprom_indexes_e_END

@@ -26,20 +26,32 @@
 #include "sunset-timer.h"
 #endif
 
+#define CANDLE_AMPLITUDE_MAX 60
+#define CANDLE_AMPLITUDE_MIN 10
+
+#define MAX_CANDLE_LEVEL (RAMP_LENGTH-CANDLE_AMPLITUDE-15)
+static uint8_t max_candle_level = MAX_CANDLE_LEVEL;
+// these should add up to 100
+#define CANDLE_WAVE1_MAXDEPTH 30
+#define CANDLE_WAVE2_MAXDEPTH 45
+#define CANDLE_WAVE3_MAXDEPTH 25
+static uint8_t candle_wave1_depth;
+static uint8_t candle_wave2_depth;
+static uint8_t candle_wave3_depth;
+
+static inline void update_parameters() {
+    max_candle_level = RAMP_LENGTH-candle_amplitude-15;
+    candle_wave1_depth = CANDLE_WAVE1_MAXDEPTH * candle_amplitude / 100;
+    candle_wave2_depth = CANDLE_WAVE2_MAXDEPTH * candle_amplitude / 100;
+    candle_wave3_depth = CANDLE_WAVE3_MAXDEPTH * candle_amplitude / 100;
+}
+
 uint8_t candle_mode_state(Event event, uint16_t arg) {
     static int8_t ramp_direction = 1;
-    #define MAX_CANDLE_LEVEL (RAMP_LENGTH-CANDLE_AMPLITUDE-15)
     static uint8_t candle_wave1 = 0;
     static uint8_t candle_wave2 = 0;
     static uint8_t candle_wave3 = 0;
     static uint8_t candle_wave2_speed = 0;
-    // these should add up to 100
-    #define CANDLE_WAVE1_MAXDEPTH 30
-    #define CANDLE_WAVE2_MAXDEPTH 45
-    #define CANDLE_WAVE3_MAXDEPTH 25
-    static const uint8_t candle_wave1_depth = CANDLE_WAVE1_MAXDEPTH * CANDLE_AMPLITUDE / 100;
-    static uint8_t candle_wave2_depth       = CANDLE_WAVE2_MAXDEPTH * CANDLE_AMPLITUDE / 100;
-    static uint8_t candle_wave3_depth       = CANDLE_WAVE3_MAXDEPTH * CANDLE_AMPLITUDE / 100;
     static uint8_t candle_mode_brightness = 24;
 
     #ifdef USE_SUNSET_TIMER
@@ -59,6 +71,7 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
 
     if (event == EV_enter_state) {
         ramp_direction = 1;
+        update_parameters();
         return MISCHIEF_MANAGED;
     }
     #ifdef USE_SUNSET_TIMER
@@ -74,13 +87,13 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
     else if (event == EV_click1_hold) {
         // ramp away from extremes
         if (! arg) {
-            if (candle_mode_brightness >= MAX_CANDLE_LEVEL) { ramp_direction = -1; }
+            if (candle_mode_brightness >= max_candle_level) { ramp_direction = -1; }
             else if (candle_mode_brightness <= 1) { ramp_direction = 1; }
         }
         // change brightness, but not too far
         candle_mode_brightness += ramp_direction;
         if (candle_mode_brightness < 1) candle_mode_brightness = 1;
-        else if (candle_mode_brightness > MAX_CANDLE_LEVEL) candle_mode_brightness = MAX_CANDLE_LEVEL;
+        else if (candle_mode_brightness > max_candle_level) candle_mode_brightness = max_candle_level;
         return MISCHIEF_MANAGED;
     }
     // reverse ramp direction on hold release
@@ -93,6 +106,32 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
         ramp_direction = 1;
         if (candle_mode_brightness > 1)
             candle_mode_brightness --;
+        return MISCHIEF_MANAGED;
+    }
+    // 4C: making candle amplitude smaller (candle in sort of stillness)
+    else if (event == EV_4clicks) {
+        candle_amplitude -= 5;
+        if (candle_amplitude < CANDLE_AMPLITUDE_MIN)
+            candle_amplitude = CANDLE_AMPLITUDE_MIN;
+        update_parameters();
+        save_config();
+        return MISCHIEF_MANAGED;
+    }
+    // 5C: making candle amplitude bigger (candle in the wind)
+    else if (event == EV_5clicks) {
+        candle_amplitude += 5;
+        if (candle_amplitude > CANDLE_AMPLITUDE_MAX)
+            candle_amplitude = CANDLE_AMPLITUDE_MAX;
+        update_parameters();
+        save_config();
+        return MISCHIEF_MANAGED;
+    }
+    // 6C: reset candle amplitude
+    else if (event == EV_6clicks) {
+        candle_amplitude = CANDLE_AMPLITUDE;
+        update_parameters();
+        save_config();
+        blink_once();
         return MISCHIEF_MANAGED;
     }
     // clock tick: animate candle brightness
@@ -134,8 +173,8 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
         // random sawtooth retrigger
         if (pseudo_rand() == 0) {
             // random amplitude
-            //candle_wave2_depth = 2 + (pseudo_rand() % ((CANDLE_WAVE2_MAXDEPTH * CANDLE_AMPLITUDE / 100) - 2));
-            candle_wave2_depth = pseudo_rand() % (CANDLE_WAVE2_MAXDEPTH * CANDLE_AMPLITUDE / 100);
+            //candle_wave2_depth = 2 + (pseudo_rand() % ((CANDLE_WAVE2_MAXDEPTH * candle_amplitude / 100) - 2));
+            candle_wave2_depth = pseudo_rand() % (CANDLE_WAVE2_MAXDEPTH * candle_amplitude / 100);
             //candle_wave3_depth = 5;
             candle_wave2 = 0;
         }
@@ -144,8 +183,8 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
             candle_wave3_depth --;
         if ((pseudo_rand() & 0b01111111) == 0)
             // random amplitude
-            //candle_wave3_depth = 2 + (pseudo_rand() % ((CANDLE_WAVE3_MAXDEPTH * CANDLE_AMPLITUDE / 100) - 2));
-            candle_wave3_depth = pseudo_rand() % (CANDLE_WAVE3_MAXDEPTH * CANDLE_AMPLITUDE / 100);
+            //candle_wave3_depth = 2 + (pseudo_rand() % ((CANDLE_WAVE3_MAXDEPTH * candle_amplitude / 100) - 2));
+            candle_wave3_depth = pseudo_rand() % (CANDLE_WAVE3_MAXDEPTH * candle_amplitude / 100);
         return MISCHIEF_MANAGED;
     }
     return EVENT_NOT_HANDLED;
