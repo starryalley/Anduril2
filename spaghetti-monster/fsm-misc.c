@@ -28,11 +28,11 @@ void auto_clock_speed() {
         // run at quarter speed
         // note: this only works when executed as two consecutive instructions
         // (don't try to combine them or put other stuff between)
-        clock_prescale_set(clock_div_8);
+        clock_prescale_set(clock_div_4);
     }
     else if (level < HALFSPEED_LEVEL) {
         // run at half speed
-        clock_prescale_set(clock_div_4);
+        clock_prescale_set(clock_div_2);
     } else {
         // run at full speed
         clock_prescale_set(clock_div_1);
