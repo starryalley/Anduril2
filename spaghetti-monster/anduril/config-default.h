@@ -143,6 +143,9 @@
 
 // enable a mode for locking the light for safe carry
 #define USE_LOCKOUT_MODE
+// enable unlock to off mode (default Anduril 1 behavior) instead of turning on
+// #define USE_UNLOCK_TO_OFF
+
 // should lockout mode function as a momentary moon mode?
 #define USE_MOON_DURING_LOCKOUT_MODE
 // add an optional setting to lock the light after being off for a while
