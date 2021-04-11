@@ -79,6 +79,9 @@ void load_config() {
         #ifdef USE_BUTTON_LED
         blink_button_comfort_temperature = eeprom[blink_button_comfort_temperature_e];
         #endif
+        #ifdef USE_LIGHTNING_MODE
+        lightning_busy_factor = eeprom[lightning_busy_factor_e];
+        #endif
     }
     #ifdef START_AT_MEMORIZED_LEVEL
     if (load_eeprom_wl()) {
@@ -141,6 +144,9 @@ void save_config() {
     #endif
     #ifdef USE_BUTTON_LED
     eeprom[blink_button_comfort_temperature_e] = blink_button_comfort_temperature;
+    #endif
+    #ifdef USE_LIGHTNING_MODE
+    eeprom[lightning_busy_factor_e] = lightning_busy_factor;
     #endif
     save_eeprom();
 }

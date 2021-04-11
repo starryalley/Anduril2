@@ -79,6 +79,9 @@ typedef enum {
     #ifdef USE_BUTTON_LED
     blink_button_comfort_temperature_e,
     #endif
+    #ifdef USE_LIGHTNING_MODE
+    lightning_busy_factor_e,
+    #endif
     eeprom_indexes_e_END
 } eeprom_indexes_e;
 #define EEPROM_BYTES eeprom_indexes_e_END
