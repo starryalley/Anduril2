@@ -43,7 +43,7 @@
 
 
 // make candle mode wobble more
-#define CANDLE_AMPLITUDE 32
+#define CANDLE_AMPLITUDE 28
 
 // slow down party strobe; this driver can't pulse for 1ms or less
 // (only needed on no-FET build)
