@@ -148,7 +148,7 @@ void set_level_and_therm_target(uint8_t level);
 
 
 // brightness control
-uint8_t memorized_level = DEFAULT_LEVEL;
+uint8_t memorized_level = RAMP_SMOOTH_FLOOR;
 #ifdef USE_MANUAL_MEMORY
 #ifndef DEFAULT_MANUAL_MEMORY
 #define DEFAULT_MANUAL_MEMORY 0
