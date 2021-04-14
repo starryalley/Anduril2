@@ -116,7 +116,43 @@ Breathing button LED during standby/lockout. But the button LED only has 3 level
 
 ## Turn the flashlight into a countdown timer
 
-When timeout, buzz it. Sort of.
+Slowly ramping up the light. When timeout, buzz it. Sort of. Maybe alarm clock as well? But I am not really going to use it anyway.
+
+## Low power (night) mode
+
+11C/11H to go to this mode and back to advanced mode. 
+
+In this mode:
+- blink brightness is lowered
+- default brightness in candle/lightning mode is lowered to min
+- max ramp brightness can be only 5 or 10 with button LED configurable off/low/high
+- moonlight can be just lighting up button LED on low or high. Trust me, on high level my amber button LED alone is more than enough in pitch black. (I already have a mode which only turns on button LED on high).
+- The next level after moonlight can be red AUX on high, and then goes yellow on high, white on high, and then the real level 1 on main emitters. (according to my visual comparison with my zebralight, the level 1 on my E21A 2700/2000mix is around 0.1~0.2lm which is still too bright for me).
+- easier control of button LED and AUX LED in this mode
+- disable some other settings which can possibly blind dark adapted eyes.
+
+## Improved Candle Mode with AUX LED mix
+
+Maybe in candle mode, we can randomly light up the yellow or red AUX led along with the main emitters. It may help and mix well with 2000~2700k emitters. 
+
+## Low Voltage AUX LED pulsing
+
+AUX Led will slowly pulse when the voltage hits a setpoint (say 3.0 V?). Original idea from [here](https://www.reddit.com/r/flashlight/comments/mpj36p/im_doing_a_d4v2_with_anduril_2_giveaway/)
+
+
+## Exit momentary mode without physically disconnect?
+
+15C to exit? But I don't use momentary mode at all.
+
+
+## Configurable ramp up/down speed (or make it slower by default)
+
+See this [commit](https://github.com/mkong1/anduril/commit/1a9d2aae6d54d60d4352dcd6119df9ce433bc12c)
+
+
+## Fireplace mode
+
+It can be a bit different from candle mode given the flickering may be more "regular" (in essence maybe it is more like a lot of candles lighting up at the same time and viewed from afar?)
 
 
 # Other useful commits
