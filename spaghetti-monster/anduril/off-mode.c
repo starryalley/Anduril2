@@ -40,7 +40,7 @@ uint8_t off_state(Event event, uint16_t arg) {
         if (memorized_level >= BLINK_BRIGHTNESS - 2)
             blink_brightness = BLINK_BRIGHTNESS; // default brightness
         else
-            blink_brightness = memorized_level + 2;
+            blink_brightness = BLINK_BRIGHTNESS >> 2; // reduced brightness
         #ifdef USE_INDICATOR_LED
         indicator_led(indicator_led_mode & 0x03);
         #elif defined(USE_AUX_RGB_LEDS)
