@@ -239,8 +239,9 @@ void adc_deferred() {
         #ifdef BLINK_BUTTON_WHEN_MEASURING_TEMP_STANDBY
         if (go_to_standby) {
             button_led_set(2);
-            delay_4ms(5);
+            delay_4ms(10);
             button_led_set(0);
+            delay_4ms(10);
         }
         #endif
         ADC_temperature_handler();
