@@ -456,23 +456,29 @@ uint8_t steady_state(Event event, uint16_t arg) {
     }
 
     #ifdef USE_AUX_RGB_LEDS
-    // 5 clicks: set AUX LED color and turn on AUX LED (if not already) to mix tint with the main emitter
-    else if (event == EV_5clicks) {
-        if (actual_level <= mode_min) {
-            // reset aux mode to high if aux led is off
-            if (lowlevel_aux_mode == LOWLEVEL_AUX_OFF || lowlevel_aux_mode == LOWLEVEL_BUTTON_ON_ONLY)
-                lowlevel_aux_mode = LOWLEVEL_AUX_HIGH;
-            // go to the next lowlevel auxled color
-            lowlevel_aux_color = (lowlevel_aux_color+1) % LOWLEVEL_AUX_COUNT;
-            set_aux_led(mode_min);
-        } else {
-            // blink in RED to indicate error (we are not within low level threshold so this is ignored)
-            rgb_led_update(RGB_RED|RGB_HIGH, 0);
-            delay_4ms(3);
-            rgb_led_update(RGB_OFF, 0);
+    // 6H: set AUX LED color and turn on AUX LED (if not already) to mix tint with the main emitter
+    else if (event == EV_click6_hold) {
+        if (0 == (arg & 0x3f)) {
+            if (actual_level <= mode_min) {
+                // reset aux mode to high if aux led is off
+                if (lowlevel_aux_mode == LOWLEVEL_AUX_OFF || lowlevel_aux_mode == LOWLEVEL_BUTTON_ON_ONLY)
+                    lowlevel_aux_mode = LOWLEVEL_AUX_HIGH;
+                // go to the next lowlevel auxled color
+                lowlevel_aux_color = (lowlevel_aux_color+1) % LOWLEVEL_AUX_COUNT;
+                set_aux_led(mode_min);
+            } else {
+                // blink in RED to indicate error (we are not within low level threshold so this is ignored)
+                rgb_led_update(RGB_RED|RGB_HIGH, 0);
+                delay_4ms(3);
+                rgb_led_update(RGB_OFF, 0);
+            }
         }
+        return MISCHIEF_MANAGED;
     }
-    // 6 clicks: cycle through AUX LED mode
+    else if (event == EV_click6_hold_release) {
+        return MISCHIEF_MANAGED;
+    }
+    // 6C: cycle through AUX LED mode
     else if (event == EV_6clicks) {
         if (actual_level <= mode_min) {
             // go to the next auxled mode
