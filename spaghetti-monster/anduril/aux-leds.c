@@ -112,7 +112,7 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
         return;
     }
 
-    uint8_t pattern = (mode>>4);  // off, low, high, blinking, ... more?
+    uint8_t pattern = (mode>>4);  // off, low, high, blinking, breathing
     #ifdef USE_BUTTON_LED
     uint8_t button_pattern = pattern; //for button LED
     #endif
@@ -175,13 +175,15 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
     if (blink_button_comfort_temperature && go_to_standby &&
         (temperature < BUTTON_BLINK_LOW_TEMPERATURE ||
          temperature > BUTTON_BLINK_HIGH_TEMPERATURE)) {
-        button_pattern = 3;
+        button_pattern = 4;
     }
     #endif
 
     // uses an odd length to avoid lining up with rainbow loop
     static const uint8_t animation[] = {2, 1, 0, 0,  0, 0, 0, 0,  0,
                                         1, 0, 0, 0,  0, 0, 0, 0,  0, 1};
+    static const uint8_t animation_breath[] = {0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 1, 1,  2, 2,
+                                               2, 1, 1, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0};
     // pick a brightness from the animation sequence
     #ifdef USE_BUTTON_LED
     uint8_t blink_animation_done = 0;
@@ -189,6 +191,12 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
     if (pattern == 3) {
         frame = (frame + 1) % sizeof(animation);
         pattern = animation[frame];
+        #ifdef USE_BUTTON_LED
+        blink_animation_done = 1;
+        #endif
+    } else if (pattern == 4) {
+        frame = (frame + 1) % sizeof(animation_breath);
+        pattern = animation_breath[frame];
         #ifdef USE_BUTTON_LED
         blink_animation_done = 1;
         #endif
@@ -200,6 +208,13 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
         } else {
             frame = (frame + 1) % sizeof(animation);
             button_pattern = animation[frame];
+        }
+    } else if (button_pattern == 4) {
+        if (blink_animation_done) {
+            button_pattern = pattern;
+        } else {
+            frame = (frame + 1) % sizeof(animation_breath);
+            button_pattern = animation_breath[frame];
         }
     }
     #endif
