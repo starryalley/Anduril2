@@ -43,6 +43,7 @@ void rgb_led_voltage_readout(uint8_t bright);
 #define RGB_LOW (1<<4)
 #define RGB_HIGH (2<<4)
 #define RGB_BLINK (3<<4)
+#define RGB_BREATH (4<<4)
 
 /*
  * 0: R
