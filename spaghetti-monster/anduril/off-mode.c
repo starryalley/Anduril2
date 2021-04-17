@@ -77,7 +77,10 @@ uint8_t off_state(Event event, uint16_t arg) {
             indicator_blink(arg);
         }
         #elif defined(USE_AUX_RGB_LEDS)
-        rgb_led_update(rgb_led_off_mode, arg);
+        if (voltage < VOLTAGE_LOW_SAFE)
+            rgb_led_update(RGB_RED|RGB_BREATH, arg);
+        else
+            rgb_led_update(rgb_led_off_mode, arg);
         #endif
 
         #ifdef USE_AUTOLOCK
