@@ -38,6 +38,11 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     // (the code is in its own pseudo-state to keep things cleaner)
     if (st == candle_mode_e) {
         candle_mode_state(event, arg);
+    } else {
+        #ifdef USE_AUX_RGB_LEDS
+        aux_led_reset = 1;
+        #endif
+        PWM1_TOP = PWM_TOP;
     }
     #endif
 
@@ -50,6 +55,10 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     // 1 click: off
     else if (event == EV_1click) {
         set_state(off_state, 0);
+        #ifdef USE_AUX_RGB_LEDS
+        aux_led_reset = 1;
+        #endif
+        PWM1_TOP = PWM_TOP;
         return MISCHIEF_MANAGED;
     }
     // 2 clicks: rotate through strobe/flasher modes
