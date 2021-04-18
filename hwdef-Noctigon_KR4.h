@@ -41,8 +41,9 @@
 #include <avr/io.h>
 
 #define PWM_CHANNELS 2
-#define PWM_BITS 10  // 0 to 1023 at 4 kHz, not 0 to 255 at 16 kHz
-#define PWM_TOP 1023
+#define PWM_BITS 12  // 0 to 4095 at 1kHz (was 0 to 1023 at 4 kHz, not 0 to 255 at 16 kHz)
+#undef PWM_TOP
+#define PWM_TOP 0xFFF //4095, 12-bit PWM
 
 #define SWITCH_PIN   PB2     // pin 17
 #define SWITCH_PCINT PCINT10 // pin 17 pin change interrupt
@@ -140,8 +141,8 @@ inline void hwdef_setup() {
           | (1<<WGM13)  | (0<<WGM12)  // phase-correct PWM (DS table 12-5)
           ;
 
-  // default to 10-bit cycle
-  ICR1 = 0x3FF;
+  // set default PWM
+  ICR1 = PWM_TOP;
 
   // set up e-switch
   //PORTB = (1 << SWITCH_PIN);  // TODO: configure PORTA / PORTB / PORTC?
