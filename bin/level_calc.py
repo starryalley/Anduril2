@@ -8,7 +8,7 @@ interactive = False
 # supported shapes: ninth, seventh, fifth, cube, square, log
 #ramp_shape = 'cube'
 
-max_pwm = 255
+max_pwm = 1023
 
 
 def main(args):
@@ -24,7 +24,7 @@ def main(args):
             (str, 'type', '7135', 'Type of channel - 7135 or FET:'),
             (int, 'pwm_min', 6, 'Lowest visible PWM level:'),
             (float, 'lm_min', 0.25, 'How bright is the lowest level, in lumens?'),
-            #(int, 'pwm_max', max_pwm, 'Highest PWM level:'),
+            (int, 'pwm_max', max_pwm, 'Highest PWM level:'),
             (float, 'lm_max', 1000, 'How bright is the highest level, in lumens?'),
             ]
 
