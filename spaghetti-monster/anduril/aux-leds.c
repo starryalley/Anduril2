@@ -235,7 +235,8 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
 
     // separate button LED logic here because the button LED may blink while AUX LED doesn't
     #ifdef USE_BUTTON_LED
-    button_led_set((button_pattern > 1) ? 2 : button_pattern);
+    if (aux_led_reset)
+        button_led_set((button_pattern > 1) ? 2 : button_pattern);
     #endif
 }
 
