@@ -30,6 +30,9 @@ uint8_t off_state(Event event, uint16_t arg) {
 
     // turn emitter off when entering state
     if (event == EV_enter_state) {
+        #ifdef USE_AUX_RGB_LEDS
+        aux_led_reset = 1;
+        #endif
         set_level(0);
         #ifdef USE_INDICATOR_LED
         indicator_led(indicator_led_mode & 0x03);
