@@ -180,6 +180,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             if (lightning_busy_factor > LIGHTNING_BUSY_FACTOR_MAX)
                 lightning_busy_factor = LIGHTNING_BUSY_FACTOR_MAX;
             save_config();
+            blink_once();
         }
         return MISCHIEF_MANAGED;
     }
@@ -190,6 +191,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             if (lightning_busy_factor < LIGHTNING_BUSY_FACTOR_MIN)
                 lightning_busy_factor = LIGHTNING_BUSY_FACTOR_MIN;
             save_config();
+            blink_once();
         }
         return MISCHIEF_MANAGED;
     }
