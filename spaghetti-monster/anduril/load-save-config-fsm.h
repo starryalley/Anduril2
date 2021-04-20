@@ -100,6 +100,10 @@ typedef enum {
     #endif
     #ifdef USE_CANDLE_MODE
     candle_amplitude_e,
+    candle_wobble_style_e,
+    #ifdef USE_AUX_RGB_LEDS
+    candle_use_aux_e,
+    #endif
     #endif
     eeprom_indexes_e_END
 } eeprom_indexes_e;
