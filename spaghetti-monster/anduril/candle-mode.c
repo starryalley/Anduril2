@@ -56,11 +56,12 @@ static inline void reset_parameters() {
         #endif
         break;
     case fireplace_fast_wobble_e:
-        //use wave3 only
+        //use wave2/wave3 only
         candle_wave1_depth = candle_wave1_maxdepth = 0;
-        candle_wave2_depth = candle_wave2_maxdepth = 0;
-        candle_wave3_maxdepth = 100;
-        candle_wave3_depth = candle_amplitude;
+        candle_wave2_maxdepth = 20;
+        candle_wave3_maxdepth = 80;
+        candle_wave2_depth = candle_wave2_maxdepth * candle_amplitude / 100;
+        candle_wave3_depth = candle_wave3_maxdepth * candle_amplitude / 100;
         #ifdef USE_AUX_RGB_LEDS
         aux_led_reset = 0;
         rgb_led_update(RGB_YELLOW|RGB_HIGH, 0);
@@ -252,12 +253,12 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
         // TODO: make wave slower and more erratic?
         if (wobble_style != fireplace_fast_wobble_e){
             if ((arg & 1) == 0) candle_wave1 += pseudo_rand() & 1;
-            // wave2: medium-speed erratic LFO
-            candle_wave2 += candle_wave2_speed;
         }
+        // wave2: medium-speed erratic LFO
+        candle_wave2 += candle_wave2_speed;
         // wave3: erratic fast wave
         if (wobble_style == fireplace_fast_wobble_e)
-            candle_wave3 += pseudo_rand() % 27; //slightly slower
+            candle_wave3 += pseudo_rand() % 31; //slightly slower
         else
             candle_wave3 += pseudo_rand() % 37;
         // S&H on wave2 frequency to make it more erratic
@@ -267,7 +268,7 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
         if ((candle_wave2_depth > 0) && ((pseudo_rand() & 0b00111111) == 0))
             candle_wave2_depth --;
         // less random factor when we are in fireplace wobble mode
-        if (wobble_style == fireplace_slow_wobble_e || wobble_style == fireplace_fast_wobble_e) {
+        if (wobble_style > candle_wobble_e) {
             if (0 == (arg & 0x7f))
                 reset_parameters();
             return MISCHIEF_MANAGED;
