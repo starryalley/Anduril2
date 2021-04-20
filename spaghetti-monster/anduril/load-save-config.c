@@ -84,6 +84,10 @@ void load_config() {
         #endif
         #ifdef USE_CANDLE_MODE
         candle_amplitude = eeprom[candle_amplitude_e];
+        wobble_style = eeprom[candle_wobble_style_e];
+        #ifdef USE_AUX_RGB_LEDS
+        candle_use_aux = eeprom[candle_use_aux_e];
+        #endif
         #endif
     }
     #ifdef START_AT_MEMORIZED_LEVEL
@@ -153,6 +157,10 @@ void save_config() {
     #endif
     #ifdef USE_CANDLE_MODE
     eeprom[candle_amplitude_e] = candle_amplitude;
+    eeprom[candle_wobble_style_e] = wobble_style;
+    #ifdef USE_AUX_RGB_LEDS
+    eeprom[candle_use_aux_e] = candle_use_aux;
+    #endif
     #endif
     save_eeprom();
 }
