@@ -9,7 +9,7 @@ For toyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 Since I plan to only work with my Emisar D4v2, I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs there.
 
-This repo contains my own changes to Anduril2 firmware on my Bbrass Emisar D4v2. (7.5A KR4 nofet driver with E21A 2000/2700K mix, amber button LED).
+This repo contains my own changes to Anduril2 firmware on my brass Emisar D4v2. (7.5A KR4 nofet driver with E21A 2000/2700K mix, amber button LED).
 
 # Features
 
@@ -32,28 +32,28 @@ Add an additional mode "temperature" in AUX LED mode (for standby/lockout) after
 If temperature reading (standby or lockout) is out of comfort zone (`18-25C`), button LED will blink (if not in blinking AUX LED mode). Use 6C in standby or lockout mode to toggle the setting to blink button LED or not. This configuration is saved.
 
 
-## Allow the use of AUX LED in moonlight (lowest) level (5C/6C while light is on)
+## Allow the use of AUX LED in moonlight (lowest) level (6C/6H while light is on)
 
 When in moon mode (lowest level), optionally we can turn on AUX LED along with main emitters.
 
-5C: in lowest level (ramp floor), allow AUX colour LED to be turned on along with main emitters for possible tint mix. 5C changes AUX colour from RED to WHITE (total 7 colours).
+6C: in lowest level (ramp floor), allow AUX colour LED to be turned on along with main emitters for possible tint mix. 6H changes AUX colour from RED to WHITE (total 7 colours).
     
 6C: in lowest level, cycle through these additional states:
-  - main emitters on, aux high, button low
-  - main emitters off, aux high, button low
   - main emitters off, aux off, button high (lowest possible/useful light)
+  - main emitters off, aux high, button low
+  - main emitters on, aux high, button low
   - back to default (main emitters on, aux off, button low)
 
-No extra state is defined and the AUX LED on is temporary (not remembered) so if there is any button event (ramp up for example), AUX LED will be off. If later user enters moonlight, only main emitters will be lit (default). You need to re-enable this through 5C or 6C. The current AUX LED colour is remembered until reboot(factory reset).
+No extra state is defined and the AUX LED on is temporary (not remembered) so if there is any button event (ramp up for example), AUX LED will be off. If later user enters moonlight, only main emitters will be lit (default). You need to re-enable this through 6C or 6H. The current AUX LED colour is remembered until reboot(factory reset).
 
 ## Blink AUX green LED when powered on
 
 Instead of blinking the main emitter, blink the AUX green LED at high power to indicate it's powered on.
 Original idea from [here](https://bazaar.launchpad.net/~dnelson1901/flashlight-firmware/flashlight-firmware/revision/267)
 
-## Make blinking brightness dynamic
+## Make blinking brightness 2-stage
 
-When main emitters are blinking for showing information (such as voltage or temperature), the blinking brightness is now dynamically determined and is only slightly above the current memorised level. For example, if the memorised level is moonlight, the blinking brightness will just be a bit brighter in case we want to check temperature during the middle of the night without blinding the eyes.
+When main emitters are blinking for showing information (such as voltage or temperature), the blinking brightness has 2 stage: high or low. When memorised level is below 25, blinking brightness will be low (around level 6). Otherwise it is default (around 23) In case we want to check temperature during the middle of the night, the low blinking brightness helps.
 
 ## Strobe mode can cycle back to the previous state by 3C
 
@@ -83,6 +83,21 @@ Ramp up main emitters output in smallest increment using `3C`. This doesn't get 
 
 Use `9C` to switch between smooth and discrete ramp style. Not being used often by me so make it harder to reach.
 
+
+## When it's time to change battery, blink red in standby/lockout mode
+
+When voltage is <3.4V, the original off/lockout AUX mode will not activate. Instead, the AUX red LED will blink. Original idea from reddit user [connorkmiec93](https://www.reddit.com/user/connorkmiec93/) at this [post](https://www.reddit.com/r/flashlight/comments/mpj36p/im_doing_a_d4v2_with_anduril_2_giveaway/).
+
+The blinking is in a pattern called breathing (although it's only low/high mode in AUX LED) so it's less distracting to the original blinking and one can tell the difference to the normal blinking in RED mode.
+
+
+## Fireplace mode (in Candle mode)
+
+2 additional wobble styles: fireplace_slow and fireplace_fast. Use 3H to cycle through all 3 wobble styles. This is a saved configuration. 
+
+In candle wobble style (default/stock) we can additional use 7C to toggle if we want to use aux led to assist in tint mixing. Red or yellow aux LED will light up along with the wobbling light.
+
+
 # Configuration changes
 
 - Smooth floor level set to 1 (lowest but unstable moonlight)
@@ -103,10 +118,6 @@ Use `9C` to switch between smooth and discrete ramp style. Not being used often 
 - in standby (battery connected, main emitters off) both voltage and temperature (instead of just voltage) is updated regularly. This allows UI to read up-to-date temperature as well as voltage.
 
 # Planned modification/features
-
-## Breathing button LED during standby/lock
-
-Breathing button LED during standby/lockout. But the button LED only has 3 levels (off, low, high) so not sure if it's possible to simulate the pulsing effect.
 
 ## Improving button LED blinking when temperature is out of comfort zone
 
@@ -131,28 +142,14 @@ In this mode:
 - easier control of button LED and AUX LED in this mode
 - disable some other settings which can possibly blind dark adapted eyes.
 
-## Improved Candle Mode with AUX LED mix
-
-Maybe in candle mode, we can randomly light up the yellow or red AUX led along with the main emitters. It may help and mix well with 2000~2700k emitters. 
-
-## Low Voltage AUX LED pulsing
-
-AUX Led will slowly pulse when the voltage hits a setpoint (say 3.0 V?). Original idea from [here](https://www.reddit.com/r/flashlight/comments/mpj36p/im_doing_a_d4v2_with_anduril_2_giveaway/)
-
 
 ## Exit momentary mode without physically disconnect?
 
 15C to exit? But I don't use momentary mode at all.
 
+## Fireworks strobe mode
 
-## Configurable ramp up/down speed (or make it slower by default)
-
-See this [commit](https://github.com/mkong1/anduril/commit/1a9d2aae6d54d60d4352dcd6119df9ce433bc12c)
-
-
-## Fireplace mode
-
-It can be a bit different from candle mode given the flickering may be more "regular" (in essence maybe it is more like a lot of candles lighting up at the same time and viewed from afar?)
+Simulate fireworks (similar to the effect of main emitters when doing factory reset). If we have multiple Anduril lights with different color temperature emitters it would be fun.
 
 
 # Other useful commits
