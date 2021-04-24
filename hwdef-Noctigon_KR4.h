@@ -58,6 +58,7 @@
 
 #define PWM1_PIN PB3        // pin 16, Opamp reference
 #define PWM1_LVL OCR1A      // OCR1A is the output compare register for PB3
+#define PWM1_TOP ICR1       // ICR1 is the input compare regsister
 
 #define PWM2_PIN PA6        // pin 1, DD FET PWM
 #define PWM2_LVL OCR1B      // OCR1B is the output compare register for PA6
@@ -127,17 +128,20 @@ inline void hwdef_setup() {
   // configure PWM
   // Setup PWM. F_pwm = F_clkio / 2 / N / TOP, where N = prescale factor, TOP = top of counter
   // pre-scale for timer: N = 1
-  // WGM1[3:0]: 0,0,1,1: PWM, Phase Correct, 10-bit (DS table 12-5)
+  // WGM1[3:0]: 1,0,1,0: PWM, Phase Correct, max 16-bit (DS table 12-5)
   // CS1[2:0]:    0,0,1: clk/1 (No prescaling) (DS table 12-6)
   // COM1A[1:0]:    1,0: PWM OC1A in the normal direction (DS table 12-4)
   // COM1B[1:0]:    1,0: PWM OC1B in the normal direction (DS table 12-4)
-  TCCR1A  = (1<<WGM11)  | (1<<WGM10)   // 10-bit (TOP=0x03FF) (DS table 12-5)
+  TCCR1A  = (1<<WGM11)  | (0<<WGM10)   // 16-bit (TOP=ICR1) (DS table 12-5)
           | (1<<COM1A1) | (0<<COM1A0)  // PWM 1A in normal direction (DS table 12-4)
           | (1<<COM1B1) | (0<<COM1B0)  // PWM 1B in normal direction (DS table 12-4)
           ;
   TCCR1B  = (0<<CS12)   | (0<<CS11) | (1<<CS10)  // clk/1 (no prescaling) (DS table 12-6)
-          | (0<<WGM13)  | (0<<WGM12)  // phase-correct PWM (DS table 12-5)
+          | (1<<WGM13)  | (0<<WGM12)  // phase-correct PWM (DS table 12-5)
           ;
+
+  // default to 10-bit cycle
+  ICR1 = 0x3FF;
 
   // set up e-switch
   //PORTB = (1 << SWITCH_PIN);  // TODO: configure PORTA / PORTB / PORTC?
