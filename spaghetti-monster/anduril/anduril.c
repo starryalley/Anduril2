@@ -213,6 +213,9 @@ void setup() {
 
         // regular e-switch light, no hard clicky power button
 
+        // reset PWM to the default
+        PWM1_TOP = PWM_TOP;
+
         // blink green at power-on to let user know power is connected
         #if defined(USE_AUX_RGB_LEDS)
         rgb_led_update(RGB_GREEN|RGB_HIGH, 0);
