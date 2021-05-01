@@ -6,12 +6,6 @@
 #define MODEL_NUMBER "0212"
 // ATTINY: 1634
 
-// use 12-bit PWM at 1kHz
-#undef PWM_BITS
-#define PWM_BITS 12
-#undef PWM_TOP
-#define PWM_TOP 0xFFF //4095
-
 // brightness w/ SST-20 4000K LEDs:
 // 0/1023: 0.35 lm
 // 1/1023: 2.56 lm
