@@ -71,3 +71,10 @@
 
 // can't reset the normal way because power is connected before the button
 #define USE_SOFT_FACTORY_RESET
+
+#define USE_UNLOCK_TO_OFF
+
+// disable unused strobe modes
+#undef USE_BIKE_FLASHER_MODE
+#undef USE_PARTY_STROBE_MODE
+#undef USE_TACTICAL_STROBE_MODE
