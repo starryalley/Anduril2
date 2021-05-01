@@ -108,9 +108,10 @@ inline void ADC_on();
 inline void ADC_off();
 inline void ADC_start_measurement();
 
-// when in standby, blink button LED when measuring temperature
+
 #ifdef USE_BUTTON_LED
-#define BLINK_BUTTON_WHEN_MEASURING_TEMP_STANDBY
+// when in standby, blink button LED when measuring temperature
+//#define BLINK_BUTTON_WHEN_MEASURING_TEMP_STANDBY
 #endif
 
 #endif
