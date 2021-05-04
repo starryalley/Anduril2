@@ -199,6 +199,8 @@ uint8_t ramp_discrete_step_size;  // don't set this
 #define LOWLEVEL_AUX_COUNT 7
 uint8_t lowlevel_aux_color = RGB_RED;
 
+#define AUX_ON_LOWLEVEL 10 // if level is less than this level we can turn on aux LED
+
 #define LOWLEVEL_AUX_OFF 0        // main emitters on,  aux off,  button low
 #define LOWLEVEL_BUTTON_ON_ONLY 1 // main emitters off, aux off,  button high
 #define LOWLEVEL_AUX_ON_ONLY 2    // main emitters off, aux high, button low
