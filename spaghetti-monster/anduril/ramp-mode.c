@@ -27,6 +27,7 @@
 #endif
 
 uint8_t steady_state(Event event, uint16_t arg) {
+    static uint16_t pwm_top = 0x3FF; //10-bit by default
     static int8_t ramp_direction = 1;
     #if (B_TIMING_OFF == B_RELEASE_T)
     // if the user double clicks, we need to abort turning off,
@@ -133,11 +134,23 @@ uint8_t steady_state(Event event, uint16_t arg) {
         return MISCHIEF_MANAGED;
     }
 
-    #ifdef USE_LOCKOUT_MODE
+    #if 0 //def USE_LOCKOUT_MODE
     // 4 clicks: shortcut to lockout mode
     else if (event == EV_4clicks) {
         set_level(0);
         set_state(lockout_state, 0);
+        return MISCHIEF_MANAGED;
+    }
+    #else
+    // 4 clicks: increase PWM by 1-bit (half the frequency)
+    else if (event == EV_4clicks) {
+        if (pwm_top >= 0xFFFF)
+            return MISCHIEF_MANAGED;
+        pwm_top = (pwm_top << 1) | 1;
+        set_level(0);
+        PWM1_TOP = pwm_top;
+        set_level_and_therm_target(memorized_level);
+        blip();
         return MISCHIEF_MANAGED;
     }
     #endif
@@ -372,11 +385,23 @@ uint8_t steady_state(Event event, uint16_t arg) {
     }
     #endif  // ifndef USE_TINT_RAMPING
 
-    #ifdef USE_MOMENTARY_MODE
+    #if 0 //USE_MOMENTARY_MODE
     // 5 clicks: shortcut to momentary mode
     else if (event == EV_5clicks) {
         set_level(0);
         set_state(momentary_state, 0);
+        return MISCHIEF_MANAGED;
+    }
+    #else
+    // 5 clicks: decrease PWM by 1-bit (double the frequency)
+    else if (event == EV_5clicks) {
+        if (pwm_top <= 0x3FF)
+            return MISCHIEF_MANAGED;
+        pwm_top >>= 1;
+        set_level(0);
+        PWM1_TOP = pwm_top;
+        set_level_and_therm_target(memorized_level);
+        blip();
         return MISCHIEF_MANAGED;
     }
     #endif
