@@ -76,6 +76,7 @@ static void set_aux_led(uint8_t main_level) {
 }
 
 uint8_t steady_state(Event event, uint16_t arg) {
+    static uint16_t pwm_top = PWM_TOP;
     static int8_t ramp_direction = 1;
     #if (B_TIMING_OFF == B_RELEASE_T)
     // if the user double clicks, we need to abort turning off,
@@ -526,6 +527,29 @@ uint8_t steady_state(Event event, uint16_t arg) {
         return MISCHIEF_MANAGED;
     }
     #endif  // ifdef USE_MANUAL_MEMORY
+
+    // increase PWM by 1-bit (half the frequency)
+    else if (event == EV_11clicks) {
+        if (pwm_top >= 0xFFFF)
+            return MISCHIEF_MANAGED;
+        pwm_top = (pwm_top << 1) | 1;
+        set_level(0);
+        PWM1_TOP = pwm_top;
+        set_level_and_therm_target(memorized_level);
+        blip();
+        return MISCHIEF_MANAGED;
+    }
+    // decrease PWM by 1-bit (double the frequency)
+    else if (event == EV_12clicks) {
+        if (pwm_top <= 0x3FF)
+            return MISCHIEF_MANAGED;
+        pwm_top >>= 1;
+        set_level(0);
+        PWM1_TOP = pwm_top;
+        set_level_and_therm_target(memorized_level);
+        blip();
+        return MISCHIEF_MANAGED;
+    }
 
     return EVENT_NOT_HANDLED;
 }
