@@ -4,7 +4,7 @@ UI=anduril
 
 date '+#define VERSION_NUMBER "%Y%m%d"' > version.h
 
-TARGETS=(cfg-noctigon-kr4-nofet.h cfg-noctigon-kr4.h)
+TARGETS=(cfg-noctigon-kr4-nofet.h cfg-noctigon-kr4.h cfg-noctigon-kr4-219b.h)
 
 mkdir -p hex
 
