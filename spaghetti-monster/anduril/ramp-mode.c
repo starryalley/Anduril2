@@ -508,6 +508,9 @@ uint8_t steady_state(Event event, uint16_t arg) {
     else if (event == EV_10clicks) {
         // turn on manual memory and save current brightness
         manual_memory = actual_level;
+        #ifdef USE_TINT_RAMPING
+        manual_memory_tint = tint;  // remember tint too
+        #endif
         save_config();
         blink_once();
         return MISCHIEF_MANAGED;
@@ -560,7 +563,9 @@ void ramp_config_save(uint8_t step, uint8_t value) {
 
     // 0 = smooth ramp, 1 = stepped ramp, 2 = simple UI's ramp
     uint8_t style = ramp_style;
+    #ifdef USE_SIMPLE_UI
     if (current_state == simple_ui_config_state)  style = 2;
+    #endif
 
     // save adjusted value to the correct slot
     if (value) {
@@ -615,7 +620,11 @@ uint8_t nearest_level(int16_t target) {
     // bounds check
     uint8_t mode_min = ramp_floor;
     uint8_t mode_max = ramp_ceil;
-    uint8_t num_steps = ramp_stepss[1 + simple_ui_active];
+    uint8_t num_steps = ramp_stepss[1
+    #ifdef USE_SIMPLE_UI
+        + simple_ui_active
+    #endif
+        ];
     // special case for 1-step ramp... use halfway point between floor and ceiling
     if (ramp_style && (1 == num_steps)) {
         uint8_t mid = (mode_max + mode_min) >> 1;
@@ -643,7 +652,9 @@ uint8_t nearest_level(int16_t target) {
 // ensure ramp globals are correct
 void ramp_update_config() {
     uint8_t which = ramp_style;
+    #ifdef USE_SIMPLE_UI
     if (simple_ui_active) { which = 2; }
+    #endif
 
     ramp_floor = ramp_floors[which];
     ramp_ceil = ramp_ceils[which];
