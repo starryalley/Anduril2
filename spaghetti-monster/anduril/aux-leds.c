@@ -23,7 +23,7 @@
 #include "aux-leds.h"
 
 #ifdef USE_BUTTON_LED
-uint8_t blink_button_comfort_temperature = 1;
+uint8_t blink_button_comfort_temperature = 0;
 #endif
 
 #if defined(USE_INDICATOR_LED) && defined(TICK_DURING_STANDBY)
