@@ -54,6 +54,6 @@
 
 // stop panicking at ~90% power or ~1600 lm
 #undef THERM_FASTER_LEVEL
-#define THERM_FASTER_LEVEL 230
+#define THERM_FASTER_LEVEL 180
 #undef MIN_THERM_STEPDOWN
 #define MIN_THERM_STEPDOWN DEFAULT_LEVEL
