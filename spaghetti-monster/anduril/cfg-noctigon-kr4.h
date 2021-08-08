@@ -75,3 +75,6 @@
 #undef USE_BIKE_FLASHER_MODE
 #undef USE_PARTY_STROBE_MODE
 #undef USE_TACTICAL_STROBE_MODE
+
+// additional strobe modes
+#define USE_FIREWORK_MODE

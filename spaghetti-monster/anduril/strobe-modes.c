@@ -235,6 +235,12 @@ inline void strobe_state_iter() {
             bike_flasher_iter();
             break;
         #endif
+
+        #ifdef USE_FIREWORK_MODE
+        case firework_mode_e:
+            firework_iter();
+            break;
+        #endif
     }
 }
 #endif  // ifdef USE_STROBE_STATE
@@ -326,6 +332,39 @@ inline void bike_flasher_iter() {
     }
     nice_delay_ms(720);  // no return check necessary on final delay
     set_level(0);
+}
+#endif
+
+#ifdef USE_FIREWORK_MODE
+#define FIREWORK_DEFAULT_STAGE_COUNT 64
+#define FIREWORK_DEFAULT_INTERVAL (2500/FIREWORK_DEFAULT_STAGE_COUNT)
+uint8_t firework_stage = 0;
+uint8_t firework_stage_count = FIREWORK_DEFAULT_STAGE_COUNT;
+uint8_t step_interval = FIREWORK_DEFAULT_INTERVAL;
+// code is copied and modified from factory-reset.c
+inline void firework_iter() {
+    if (firework_stage == firework_stage_count) {
+        // explode, and reset stage
+        firework_stage = 0;
+        for (uint8_t brightness = MAX_LEVEL; brightness > 0; brightness--) {
+            set_level(brightness);
+            nice_delay_ms(step_interval/4);
+            set_level((uint16_t)brightness*7/8);
+            nice_delay_ms(step_interval/(1+(pseudo_rand()%5)));
+        }
+        // off for 1 to 5 seconds
+        set_level(0);
+        nice_delay_ms(1000 + (pseudo_rand() % 5) * 1000);
+        // set next stage count (16 to 64 in increment of 8)
+        firework_stage_count = 16 + 8 * (pseudo_rand() % 7);
+        return;
+    }
+    // wind up to explode
+    set_level(firework_stage);
+    nice_delay_ms(step_interval/3);
+    set_level((uint16_t)firework_stage*2/3);
+    nice_delay_ms(step_interval/3);
+    firework_stage++;
 }
 #endif
 

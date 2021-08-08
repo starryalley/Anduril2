@@ -36,6 +36,9 @@ typedef enum {
     #ifdef USE_LIGHTNING_MODE
     lightning_storm_e,
     #endif
+    #ifdef USE_FIREWORK_MODE
+    firework_mode_e,
+    #endif
     #ifdef USE_BIKE_FLASHER_MODE
     bike_flasher_e,
     #endif
@@ -90,6 +93,10 @@ inline void lightning_storm_iter();
 #define MAX_BIKING_LEVEL 120  // should be 127 or less
 uint8_t bike_flasher_brightness = MAX_1x7135;
 inline void bike_flasher_iter();
+#endif
+
+#ifdef USE_FIREWORK_MODE
+inline void firework_iter();
 #endif
 
 #ifdef USE_CANDLE_MODE
