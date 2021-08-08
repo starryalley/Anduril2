@@ -72,7 +72,6 @@
 #define USE_UNLOCK_TO_OFF
 
 // disable unused strobe modes
-#undef USE_BIKE_FLASHER_MODE
 #undef USE_PARTY_STROBE_MODE
 #undef USE_TACTICAL_STROBE_MODE
 
