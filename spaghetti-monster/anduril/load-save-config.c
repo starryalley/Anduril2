@@ -85,6 +85,9 @@ void load_config() {
         #ifdef USE_LIGHTNING_MODE
         lightning_busy_factor = eeprom[lightning_busy_factor_e];
         #endif
+        #ifdef USE_FIREWORK_MODE
+        firework_brightness = eeprom[firework_brightness_e];
+        #endif
         #ifdef USE_CANDLE_MODE
         candle_amplitude = eeprom[candle_amplitude_e];
         wobble_style = eeprom[candle_wobble_style_e];
@@ -160,6 +163,9 @@ void save_config() {
     #endif
     #ifdef USE_LIGHTNING_MODE
     eeprom[lightning_busy_factor_e] = lightning_busy_factor;
+    #endif
+    #ifdef USE_FIREWORK_MODE
+    eeprom[firework_brightness_e] = firework_brightness;
     #endif
     #ifdef USE_CANDLE_MODE
     eeprom[candle_amplitude_e] = candle_amplitude;

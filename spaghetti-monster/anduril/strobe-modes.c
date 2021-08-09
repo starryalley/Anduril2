@@ -107,7 +107,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             set_level(bike_flasher_brightness);
         }
         #endif
-
+        
         return MISCHIEF_MANAGED;
     }
     // reverse ramp direction on hold release
@@ -173,35 +173,70 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         pseudo_rand_seed += arg;
         return MISCHIEF_MANAGED;
     }
-    // 4C: turning down busy factor (less busy) of lightning mode
+    // 4C: turning down busy factor (less busy) of lightning mode,
+    //  or turning down firework brightness by 12
     else if (event == EV_4clicks) {
-        if (st == lightning_storm_e) {
+        if (0) {}  // placeholder
+        #ifdef USE_LIGHTNING_MODE
+        else if (st == lightning_storm_e) {
             lightning_busy_factor++;
             if (lightning_busy_factor > LIGHTNING_BUSY_FACTOR_MAX)
                 lightning_busy_factor = LIGHTNING_BUSY_FACTOR_MAX;
             save_config();
             blink_once();
         }
+        #endif
+        #ifdef USE_FIREWORK_MODE
+        else if (st == firework_mode_e) {
+            firework_brightness -= 12;
+            if (firework_brightness < MIN_FIREWORK_LEVEL)
+                firework_brightness = MIN_FIREWORK_LEVEL;
+            save_config();
+            blink_once();
+        }
+        #endif
         return MISCHIEF_MANAGED;
     }
-    // 5C: turning up busy factor (busier) of lightning mode
+    // 5C: turning up busy factor (busier) of lightning mode,
+    //  or turning up firework brightness by 12
     else if (event == EV_5clicks) {
-        if (st == lightning_storm_e) {
+        if (0) {}  // placeholder
+        #ifdef USE_LIGHTNING_MODE
+        else if (st == lightning_storm_e) {
             lightning_busy_factor--;
             if (lightning_busy_factor < LIGHTNING_BUSY_FACTOR_MIN)
                 lightning_busy_factor = LIGHTNING_BUSY_FACTOR_MIN;
             save_config();
             blink_once();
         }
+        #endif
+        #ifdef USE_FIREWORK_MODE
+        else if (st == firework_mode_e) {
+            firework_brightness += 12;
+            if (firework_brightness > MAX_LEVEL)
+                firework_brightness = MAX_LEVEL;
+            save_config();
+            blink_once();
+        }
+        #endif
         return MISCHIEF_MANAGED;
     }
-    // 6C: reset lightning busy factor to default
+    // 6C: reset lightning busy factor to default,
+    //  or reset firework brightness to default
     else if (event == EV_6clicks) {
-        if (st == lightning_storm_e) {
+        if (0) {}  // placeholder
+        #ifdef USE_LIGHTNING_MODE
+        else if (st == lightning_storm_e) {
             lightning_busy_factor = LIGHTNING_BUSY_FACTOR;
             save_config();
             blink_once();
         }
+        #endif
+        #ifdef USE_FIREWORK_MODE
+        else if (st == firework_mode_e) {
+            firework_brightness = MAX_1x7135;
+        }
+        #endif
         return MISCHIEF_MANAGED;
     }
     #endif
@@ -346,7 +381,7 @@ inline void firework_iter() {
     if (firework_stage == firework_stage_count) {
         // explode, and reset stage
         firework_stage = 0;
-        for (uint8_t brightness = MAX_LEVEL; brightness > 0; brightness--) {
+        for (uint8_t brightness = firework_brightness; brightness > 0; brightness--) {
             set_level(brightness);
             nice_delay_ms(step_interval/4);
             set_level((uint16_t)brightness*7/8);
@@ -365,6 +400,9 @@ inline void firework_iter() {
     set_level((uint16_t)firework_stage*2/3);
     nice_delay_ms(step_interval/3);
     firework_stage++;
+    // we've reached our max brightness for firework mode, let's explode in the next iteration
+    if (firework_stage > firework_brightness)
+        firework_stage = firework_stage_count;
 }
 #endif
 
