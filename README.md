@@ -7,9 +7,20 @@ For toyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 # What's here
 
-Since I plan to only work with my Emisar D4v2, I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs there.
+Since I plan to only work with my Emisar D4v2, I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware on my brass Emisar D4v2. (7.5A KR4 nofet driver with E21A 2000/2700K mix, amber button LED).
+This repo contains my own changes to Anduril2 firmware for my 5 D4v2 (as of Aug 2021):
+kr4-nofet:
+- brass, 7.5A CC driver with Nichia E21A 2000/2700K mix
+
+kr4:
+- aluminum, 5A CC driver with Luminus SST-20 4000k 
+- titanium, 5A CC driver with Cree XP-L HI T6 8D 2800k
+
+kr4-219b (50% FET):
+- antique brass, 9A CC driver with Nichia 219b SW35
+- aluminum, 9A CC driver with Nichia 219b SW45k
+
 
 # Features
 
@@ -97,16 +108,25 @@ The blinking is in a pattern called breathing (although it's only low/high mode 
 
 In candle wobble style (default/stock) we can additional use 7C to toggle if we want to use aux led to assist in tint mixing. Red or yellow aux LED will light up along with the wobbling light.
 
+## Fireworks mode
+
+There is an additional strobe mode called Fireworks, right after Lightning mode. The main emitters will light up like fireworks. 
+
+Adjust firework brightness (explosion brightness):
+- `4C`: decrease brightness by 12
+- `5C`: increase brightness by 12
+- `6C`: reset brightness to default (max regulated level, which is MAX_1x7135)
+
 
 # Configuration changes
 
+- Ramp length is changed from `150` to `200` for kr4 variants. The PWM levels in channel 0 and 1 are changed accordingly so it responds better in lower levels, and also allows for better candle modes.
 - Smooth floor level set to 1 (lowest but unstable moonlight)
 - Default level set to smooth floor level (moonlight)
 - Simple UI is inactive by default (Advanced UI is the default now)
-- Reordering strobe mode: Candle->Lightning Storm->Bike Flasher->Party Strobe->Tactical Strobe. (Candle and Lightning storm are my most used strobe modes, hence why)
-- Disable Biker Flasher (I'm not using D4v2 for biking)
+- Reordering strobe mode: Candle -> Lightning Storm -> Fireworks -> Bike Flasher -> Party Strobe -> Tactical Strobe. (Candle and Lightning storm are my most used strobe modes, hence why)
 - Use 8C instead of 5C for momentary mode (not used often so make it harder to enter)
-- Default AUX LED mode in standby/lockout mode set to show current temperature with low/high setting respectively
+- Default AUX LED mode in standby/lockout mode set to show current temperature
 - Lower default candle mode amplitude from 32 to 28 so it is a calmer candle light
 - Lower default lightning mode max possible interval from around 8sec to 16sec so it will appear less busy
 - Use a quarter of clock speed instead of half, and 1/8 of clock speed insteead of a quarter when in lower levels.
@@ -147,10 +167,6 @@ In this mode:
 
 15C to exit? But I don't use momentary mode at all.
 
-## Fireworks strobe mode
-
-Simulate fireworks (similar to the effect of main emitters when doing factory reset). If we have multiple Anduril lights with different color temperature emitters it would be fun.
-
 
 # Other useful commits
 
@@ -162,7 +178,11 @@ Simulate fireworks (similar to the effect of main emitters when doing factory re
 
 # Usage
 
-I've only included a build script for KR4-nofet (`spaghetti-monster/anduril/build-kr4-nofet.sh`) because that's the only light I own. Modify as needed if you have a different light. 
+I've included a build script for KR4 variants (`spaghetti-monster/anduril/build-kr4.sh`) and 3 flashing scripts (`flash-kr4.sh`, `flash-kr4-nofet.sh`, and `flash-kr4-219b.sh`) there as well.
+
+Modify as needed if you have a different light. 
+
+Please note that I've changed ramp length in kr4 base config. If you plan to use this for other lights (k9.3 or the regular 1x7135 D4v2) please also change the PWM levels to have ramp length 200. If you don't make this change, the ramping will not work correctly as there are missing ramp levels there (used to be 150).
 
 # Development environment
 
