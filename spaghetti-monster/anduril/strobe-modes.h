@@ -21,7 +21,7 @@
 #define STROBE_MODES_H
 
 // internal numbering for strobe modes
-// order: candle->lightning storm->bike flasher->party->tactical
+// order: candle->lightning storm->firework->bike flasher->party->tactical
 #ifdef USE_STROBE_STATE
 typedef enum {
     #ifdef USE_PARTY_STROBE_MODE
@@ -103,6 +103,8 @@ inline void bike_flasher_iter();
 #endif
 
 #ifdef USE_FIREWORK_MODE
+#define MIN_FIREWORK_LEVEL DEFAULT_LEVEL // max is always MAX_LEVEL
+uint8_t firework_brightness = MAX_1x7135;
 inline void firework_iter();
 #endif
 

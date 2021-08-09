@@ -98,6 +98,9 @@ typedef enum {
     #ifdef USE_LIGHTNING_MODE
     lightning_busy_factor_e,
     #endif
+    #ifdef USE_FIREWORK_MODE
+    firework_brightness_e,
+    #endif
     #ifdef USE_CANDLE_MODE
     candle_amplitude_e,
     candle_wobble_style_e,
