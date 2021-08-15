@@ -1,6 +1,6 @@
 # ToyKeeper's Anduril flashlight firmware fork
 
-This is a clone from [ToyKeeper's Flashlight Firmware](https://code.launchpad.net/flashlight-firmware) from branch [anduril2](https://code.launchpad.net/~toykeeper/flashlight-firmware/anduril2), revision [598](https://bazaar.launchpad.net/~toykeeper/flashlight-firmware/anduril2/revision/598)
+This is a clone from [ToyKeeper's Flashlight Firmware](https://code.launchpad.net/flashlight-firmware) from branch [anduril2](https://code.launchpad.net/~toykeeper/flashlight-firmware/anduril2), revision [610](https://bazaar.launchpad.net/~toykeeper/flashlight-firmware/anduril2/revision/610)
 
 For toyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
@@ -9,7 +9,9 @@ For toyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 Since I plan to only work with my Emisar D4v2, I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware for my 5 D4v2 (as of Aug 2021):
+This repo contains my own changes to Anduril2 firmware for my 5 D4v2 (as of Aug 2021)
+
+
 kr4-nofet:
 - brass, 7.5A CC driver with Nichia E21A 2000/2700K mix
 
@@ -120,7 +122,7 @@ Adjust firework brightness (explosion brightness):
 
 # Configuration changes
 
-- Ramp length is changed from `150` to `200` for kr4 variants. The PWM levels in channel 0 and 1 are changed accordingly so it responds better in lower levels, and also allows for better candle modes.
+- Ramp length is changed from `150` to `200` for kr4 variants with `USE_DYN_PWM`. This also allows for better candle modes.
 - Smooth floor level set to 1 (lowest but unstable moonlight)
 - Default level set to smooth floor level (moonlight)
 - Simple UI is inactive by default (Advanced UI is the default now)
@@ -134,7 +136,7 @@ Adjust firework brightness (explosion brightness):
 
 # Other changes to the codebase
 
-- Define PWM1_TOP so we can modify PWM cycles if needed (currently using 10-bit PWM on KR4-nofet firmware). Original idea from [16-bit PWM dimmer moonlight on d4v2](https://bazaar.launchpad.net/~dnelson1901/flashlight-firmware/flashlight-firmware/revision/278)
+- (this is also implemented by Toykeepr since reversion 604 upstream on 8/2021) Define PWM1_TOP so we can modify PWM cycles if needed (currently using 10-bit PWM on KR4-nofet firmware). Original idea from [16-bit PWM dimmer moonlight on d4v2](https://bazaar.launchpad.net/~dnelson1901/flashlight-firmware/flashlight-firmware/revision/278)
 - in standby (battery connected, main emitters off) both voltage and temperature (instead of just voltage) is updated regularly. This allows UI to read up-to-date temperature as well as voltage.
 
 # Planned modification/features
