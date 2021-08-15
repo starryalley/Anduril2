@@ -24,6 +24,10 @@
 #undef PWM_TOP
 #define PWM_TOP 0xFFF //4095
 
+// use 55 degree thermal regulation
+#undef DEFAULT_THERM_CEIL
+#define DEFAULT_THERM_CEIL 55
+
 // brightness w/ SST-20 4000K LEDs:
 // 0/1023: 0.35 lm
 // 1/1023: 2.56 lm
