@@ -83,6 +83,12 @@ PROGMEM const PWM_DATATYPE pwm3_levels[] = { PWM3_LEVELS };
 PROGMEM const PWM_DATATYPE pwm4_levels[] = { PWM4_LEVELS };
 #endif
 
+// pulse frequency modulation, a.k.a. dynamic PWM
+// (different ceiling / frequency at each ramp level)
+#ifdef USE_DYN_PWM
+PROGMEM const PWM_DATATYPE pwm_tops[] = { PWM_TOPS };
+#endif
+
 // default / example ramps
 #ifndef PWM1_LEVELS
 #if PWM_CHANNELS == 1
