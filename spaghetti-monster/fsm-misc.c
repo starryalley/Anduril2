@@ -49,7 +49,7 @@ uint8_t blink_digit(uint8_t num) {
     uint8_t ontime = BLINK_SPEED * 2 / 12;
     if (!num) {
         // if we use reduced blink brightness, let's prolong zero digit's ontime or it won't actually blink
-        ontime = (blink_brightness < BLINK_BRIGHTNESS) ? 72 : 24;
+        ontime = (blink_brightness < BLINK_BRIGHTNESS) ? 84 : 24;
         num ++;
     }
 

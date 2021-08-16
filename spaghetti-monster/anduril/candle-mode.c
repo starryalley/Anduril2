@@ -113,7 +113,9 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
         #ifdef USE_AUX_RGB_LEDS
         aux_led_reset = 0;
         #endif
+        #ifndef USE_DYN_PWM
         PWM1_TOP = 0x3FFF; //about 0x3ff << 4
+        #endif
         return MISCHIEF_MANAGED;
     }
     #ifdef USE_SUNSET_TIMER

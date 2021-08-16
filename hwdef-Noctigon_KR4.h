@@ -41,11 +41,10 @@
 #include <avr/io.h>
 
 #define PWM_CHANNELS 2
-//#define PWM_BITS 10  // 0 to 1023 at 4 kHz, not 0 to 255 at 16 kHz
-//#define PWM_TOP 1023
+
 #define PWM_BITS 16  // data type needs 16 bits, not 8
 #define PWM_TOP  255 // highest value used in top half of ramp
-// #define USE_DYN_PWM  // dynamic frequency and speed, not enabled
+#define USE_DYN_PWM  // dynamic frequency and speed, not enabled
 
 #define SWITCH_PIN   PB2     // pin 17
 #define SWITCH_PCINT PCINT10 // pin 17 pin change interrupt
