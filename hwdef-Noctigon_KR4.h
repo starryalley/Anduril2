@@ -137,12 +137,12 @@ inline void hwdef_setup() {
   // CS1[2:0]:    0,0,1: clk/1 (No prescaling) (DS table 12-6)
   // COM1A[1:0]:    1,0: PWM OC1A in the normal direction (DS table 12-4)
   // COM1B[1:0]:    1,0: PWM OC1B in the normal direction (DS table 12-4)
-  TCCR1A  = (1<<WGM11)  | (0<<WGM10)   // adjustable PWM (TOP=ICR1) (DS table 12-5)
+  TCCR1A  = (0<<WGM11)  | (0<<WGM10)   // phase and frequency correct (DS table 12-5)
           | (1<<COM1A1) | (0<<COM1A0)  // PWM 1A in normal direction (DS table 12-4)
           | (1<<COM1B1) | (0<<COM1B0)  // PWM 1B in normal direction (DS table 12-4)
           ;
   TCCR1B  = (0<<CS12)   | (0<<CS11) | (1<<CS10)  // clk/1 (no prescaling) (DS table 12-6)
-          | (1<<WGM13)  | (0<<WGM12)  // phase-correct adjustable PWM (DS table 12-5)
+          | (1<<WGM13)  | (0<<WGM12)  // adjustable PWM (TOP=ICR1)  (DS table 12-5)
           ;
 
   // set PWM resolution

@@ -154,30 +154,24 @@ void set_level(uint8_t level) {
 
         #endif  // ifdef USE_TINT_RAMPING
 
-       #ifdef USE_DYN_PWM
+        #ifdef USE_DYN_PWM
             uint16_t top = PWM_GET(pwm_tops, level);
-            #ifdef PWM1_CNT
-            // wait to ensure compare match won't be missed
-            // (causes visible flickering when missed, because the counter
-            //  goes all the way to 65535 before returning)
-            // (see attiny1634 reference manual page 103 for a warning about
-            //  the timing of changing the TOP value (section 12.8.4))
-            // to be safe, allow at least 64 cycles to update TOP
-            while(PWM1_CNT > (top - 64)) {}
-            #endif
             // pulse frequency modulation, a.k.a. dynamic PWM
             PWM1_TOP = top;
-
+            #ifdef PWM1_CNT
+            // reset phase if it's out of range
+            if (PWM1_CNT >= top) PWM1_CNT = top - 1;
+            #endif
             // repeat for other channels if necessary
             #ifdef PMW2_TOP
                 #ifdef PWM2_CNT
-                while(PWM2_CNT > (top - 64)) {}
+                if (PWM2_CNT >= top) PWM2_CNT = top - 1;
                 #endif
                 PWM2_TOP = top;
             #endif
             #ifdef PMW3_TOP
                 #ifdef PWM3_CNT
-                while(PWM3_CNT > (top - 64)) {}
+                if (PWM3_CNT >= top) PWM3_CNT = top - 1;
                 #endif
                 PWM3_TOP = top;
             #endif
