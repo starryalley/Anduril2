@@ -24,6 +24,18 @@
 #ifdef USE_RAMPING
 
 void set_level(uint8_t level) {
+    #ifdef USE_JUMP_START
+    // maybe "jump start" the engine, if it's prone to slow starts
+    // (pulse the output high for a moment to wake up the power regulator)
+    // (only do this when starting from off and going to a low level)
+    if ((! actual_level)
+            && level
+            && (level < jump_start_level)) {
+        set_level(jump_start_level);
+        delay_4ms(JUMP_START_TIME/4);
+    }
+    #endif  // ifdef USE_JUMP_START
+
     actual_level = level;
 
     #ifdef USE_SET_LEVEL_GRADUALLY
@@ -59,6 +71,11 @@ void set_level(uint8_t level) {
     #ifdef OVERRIDE_SET_LEVEL
         set_level_override(level);
     #else
+
+    #ifdef PWM1_CNT
+    static uint8_t prev_level = 0;
+    uint8_t api_level = level;
+    #endif
 
     //TCCR0A = PHASE;
     if (level == 0) {
@@ -99,6 +116,7 @@ void set_level(uint8_t level) {
         LED2_ENABLE_PORT |= (1 << LED2_ENABLE_PIN);
         #endif
 
+        // PWM array index = level - 1
         level --;
 
         #ifdef USE_TINT_RAMPING
@@ -176,7 +194,23 @@ void set_level(uint8_t level) {
                 PWM3_TOP = top;
             #endif
         #endif  // ifdef USE_DYN_PWM
+        #ifdef PWM1_CNT
+            // force reset phase when turning on from zero
+            // (because otherwise the initial response is inconsistent)
+            if (! prev_level) {
+                PWM1_CNT = 0;
+                #ifdef PWM2_CNT
+                PWM2_CNT = 0;
+                #endif
+                #ifdef PWM3_CNT
+                PWM3_CNT = 0;
+                #endif
+            }
+        #endif
     }
+    #ifdef PWM1_CNT
+    prev_level = api_level;
+    #endif
     #endif  // ifdef OVERRIDE_SET_LEVEL
     #ifdef USE_DYNAMIC_UNDERCLOCKING
     auto_clock_speed();

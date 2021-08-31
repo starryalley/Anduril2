@@ -194,6 +194,11 @@ uint8_t ramp_stepss[] = {
     };
 uint8_t ramp_discrete_step_size;  // don't set this
 
+#ifdef USE_GLOBALS_CONFIG
+void globals_config_save(uint8_t step, uint8_t value);
+uint8_t globals_config_state(Event event, uint16_t arg);
+#endif
+
 #ifdef USE_AUX_RGB_LEDS
 // use RGB_RED...RGB_WHITE (value 0 to 6, total 7)
 #define LOWLEVEL_AUX_COUNT 7
