@@ -161,6 +161,7 @@
 #define USE_TACTICAL_STROBE_MODE
 #define USE_LIGHTNING_MODE
 #define USE_CANDLE_MODE
+#define USE_FIREWORK_MODE
 
 // boring strobes nobody really likes, but sometimes flashlight companies want
 // (these replace the fun strobe group,
