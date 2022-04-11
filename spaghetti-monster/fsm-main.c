@@ -23,6 +23,9 @@
 #include "fsm-main.h"
 
 #if PWM_CHANNELS == 4
+#ifdef AVRXMEGA3  // ATTINY816, 817, etc
+#error 4-channel PWM not currently set up for the AVR 1-Series
+#endif
 // 4th PWM channel requires manually turning the pin on/off via interrupt :(
 ISR(TIMER1_OVF_vect) {
     //bitClear(PORTB, 3);
@@ -43,16 +46,29 @@ static inline void hw_setup() {
     DDRB |= (1 << PWM1_PIN);
     TCCR0B = 0x01; // pre-scaler for timer (1 => 1, 2 => 8, 3 => 64...)
     TCCR0A = PHASE;
-    #endif
-    #if PWM_CHANNELS >= 2
-    DDRB |= (1 << PWM2_PIN);
-    #endif
-    #if PWM_CHANNELS >= 3
-    // Second PWM counter is ... weird
-    DDRB |= (1 << PWM3_PIN);
+    #if (PWM1_PIN == PB4) // Second PWM counter is ... weird
     TCCR1 = _BV (CS10);
     GTCCR = _BV (COM1B1) | _BV (PWM1B);
     OCR1C = 255;  // Set ceiling value to maximum
+    #endif
+    #endif
+    // tint ramping needs second channel enabled,
+    // despite PWM_CHANNELS being only 1
+    #if (PWM_CHANNELS >= 2) || defined(USE_TINT_RAMPING)
+    DDRB |= (1 << PWM2_PIN);
+    #if (PWM2_PIN == PB4) // Second PWM counter is ... weird
+    TCCR1 = _BV (CS10);
+    GTCCR = _BV (COM1B1) | _BV (PWM1B);
+    OCR1C = 255;  // Set ceiling value to maximum
+    #endif
+    #endif
+    #if PWM_CHANNELS >= 3
+    DDRB |= (1 << PWM3_PIN);
+    #if (PWM3_PIN == PB4) // Second PWM counter is ... weird
+    TCCR1 = _BV (CS10);
+    GTCCR = _BV (COM1B1) | _BV (PWM1B);
+    OCR1C = 255;  // Set ceiling value to maximum
+    #endif
     #endif
     #if PWM_CHANNELS >= 4
     // 4th PWM channel is ... not actually supported in hardware  :(
@@ -68,7 +84,7 @@ static inline void hw_setup() {
     PORTB = (1 << SWITCH_PIN);  // e-switch is the only input
     PCMSK = (1 << SWITCH_PIN);  // pin change interrupt uses this pin
 }
-#elif (ATTINY == 1634)
+#elif (ATTINY == 1634) || defined(AVRXMEGA3)  // ATTINY816, 817, etc
 static inline void hw_setup() {
     // this gets tricky with so many pins...
     // ... so punt it to the hwdef file
@@ -82,7 +98,11 @@ static inline void hw_setup() {
 //#ifdef USE_REBOOT
 static inline void prevent_reboot_loop() {
     // prevent WDT from rebooting MCU again
+    #ifdef AVRXMEGA3  // ATTINY816, 817, etc
+    RSTCTRL.RSTFR &= ~(RSTCTRL_WDRF_bm);  // reset status flag
+    #else
     MCUSR &= ~(1<<WDRF);  // reset status flag
+    #endif
     wdt_disable();
 }
 //#endif

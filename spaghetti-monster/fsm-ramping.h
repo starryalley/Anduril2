@@ -42,22 +42,32 @@ inline void set_level_gradually(uint8_t lvl);
 void gradual_tick();
 #endif
 
+#if defined(USE_TINT_RAMPING) && (!defined(TINT_RAMP_TOGGLE_ONLY))
+void update_tint();
+#endif
+
 // auto-detect the data type for PWM tables
 #ifndef PWM_BITS
-#define PWM_BITS 8
-#define PWM_TOP 255
+    #define PWM_BITS 8
+    #define PWM_TOP 255
 #endif
 #if PWM_BITS <= 8
-#define PWM_DATATYPE uint8_t
-#define PWM_TOP 255
-#define PWM_GET(x,y) pgm_read_byte(x+y)
+    #define PWM_DATATYPE uint8_t
+    #define PWM_DATATYPE2 uint16_t
+    #define PWM_TOP 255
+    #define PWM_GET(x,y) pgm_read_byte(x+y)
 #else
-#define PWM_DATATYPE uint16_t
-#define PWM_TOP 1023  // 10 bits by default
-// pointer plus 2*y bytes
-//#define PWM_GET(x,y) pgm_read_word(x+(2*y))
-// nope, the compiler was already doing the math correctly
-#define PWM_GET(x,y) pgm_read_word(x+y)
+    #define PWM_DATATYPE uint16_t
+    #ifndef PWM_DATATYPE2
+        #define PWM_DATATYPE2 uint32_t
+    #endif
+    #ifndef PWM_TOP
+        #define PWM_TOP 1023  // 10 bits by default
+    #endif
+    // pointer plus 2*y bytes
+    //#define PWM_GET(x,y) pgm_read_word(x+(2*y))
+    // nope, the compiler was already doing the math correctly
+    #define PWM_GET(x,y) pgm_read_word(x+y)
 #endif
 
 // use UI-defined ramp tables if they exist
@@ -72,6 +82,22 @@ PROGMEM const PWM_DATATYPE pwm3_levels[] = { PWM3_LEVELS };
 #endif
 #ifdef PWM4_LEVELS
 PROGMEM const PWM_DATATYPE pwm4_levels[] = { PWM4_LEVELS };
+#endif
+
+// pulse frequency modulation, a.k.a. dynamic PWM
+// (different ceiling / frequency at each ramp level)
+#ifdef USE_DYN_PWM
+PROGMEM const PWM_DATATYPE pwm_tops[] = { PWM_TOPS };
+#endif
+
+#ifdef USE_JUMP_START
+#ifndef JUMP_START_TIME
+#define JUMP_START_TIME 8  // in ms, should be 4, 8, or 12
+#endif
+#ifndef DEFAULT_JUMP_START_LEVEL
+#define DEFAULT_JUMP_START_LEVEL 10
+#endif
+uint8_t jump_start_level = DEFAULT_JUMP_START_LEVEL;
 #endif
 
 // default / example ramps

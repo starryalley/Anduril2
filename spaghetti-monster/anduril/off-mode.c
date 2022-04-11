@@ -27,11 +27,6 @@
 #endif
 
 uint8_t off_state(Event event, uint16_t arg) {
-    #ifdef USE_MANUAL_MEMORY_TIMER
-    // keep track of how long the light was off,
-    // so we can do different things on waking, depending on how long asleep
-    static uint16_t off_time = 0;
-    #endif
 
     // turn emitter off when entering state
     if (event == EV_enter_state) {
@@ -65,7 +60,14 @@ uint8_t off_state(Event event, uint16_t arg) {
     // blink the indicator LED, maybe
     else if (event == EV_sleep_tick) {
         #ifdef USE_MANUAL_MEMORY_TIMER
-        off_time = arg;
+        // reset to manual memory level when timer expires
+        if (manual_memory &&
+                (arg >= (manual_memory_timer * SLEEP_TICKS_PER_MINUTE))) {
+            memorized_level = manual_memory;
+            #ifdef USE_TINT_RAMPING
+            tint = manual_memory_tint;
+            #endif
+        }
         #endif
         #ifdef USE_INDICATOR_LED
         if ((indicator_led_mode & 0b00000011) == 0b00000011) {
@@ -76,17 +78,11 @@ uint8_t off_state(Event event, uint16_t arg) {
         #endif
 
         #ifdef USE_AUTOLOCK
-        // lock the light after being off for N minutes
-        #ifdef USE_SIMPLE_UI
-        if (! simple_ui_active) {  // no auto-lock in Simple UI
-        #endif
+            // lock the light after being off for N minutes
             uint16_t ticks = autolock_time * SLEEP_TICKS_PER_MINUTE;
             if ((autolock_time > 0)  && (arg > ticks)) {
                 set_state(lockout_state, 0);
             }
-        #ifdef USE_SIMPLE_UI
-        }
-        #endif
         #endif  // ifdef USE_AUTOLOCK
         return MISCHIEF_MANAGED;
     }
@@ -110,6 +106,11 @@ uint8_t off_state(Event event, uint16_t arg) {
         #else  // B_RELEASE_T or B_TIMEOUT_T
         set_level(nearest_level(1));
         #endif
+        #ifdef USE_RAMP_AFTER_MOON_CONFIG
+        if (dont_ramp_after_moon) {
+            return MISCHIEF_MANAGED;
+        }
+        #endif
         // don't start ramping immediately;
         // give the user time to release at moon level
         //if (arg >= HOLD_TIMEOUT) {  // smaller
@@ -126,18 +127,15 @@ uint8_t off_state(Event event, uint16_t arg) {
     #if (B_TIMING_ON != B_TIMEOUT_T)
     // 1 click (before timeout): go to memorized level, but allow abort for double click
     else if (event == EV_click1_release) {
-        #ifdef USE_MANUAL_MEMORY
-        // for full manual memory, set manual_memory_timer to 0
-        if (manual_memory
-            #ifdef USE_MANUAL_MEMORY_TIMER
-            && (off_time >= (manual_memory_timer * SLEEP_TICKS_PER_MINUTE))
-            #endif
-            ) {
-                #if defined(USE_MANUAL_MEMORY_TIMER_FOR_TINT) && defined(USE_TINT_RAMPING) && defined(TINT_RAMP_TOGGLE_ONLY)
-                tint = 0;
+        #if defined(USE_MANUAL_MEMORY) && !defined(USE_MANUAL_MEMORY_TIMER)
+            // this clause probably isn't used by any configs any more
+            // but is included just in case someone configures it this way
+            if (manual_memory) {
+                memorized_level = manual_memory;
+                #ifdef USE_TINT_RAMPING
+                tint = manual_memory_tint;
                 #endif
-                set_level(nearest_level(manual_memory));
-        } else
+            }
         #endif
         set_level(nearest_level(memorized_level));
         return MISCHIEF_MANAGED;
@@ -157,11 +155,29 @@ uint8_t off_state(Event event, uint16_t arg) {
     }
     // click, hold: momentary at ceiling or turbo
     else if (event == EV_click2_hold) {
-        if (simple_ui_active) {
-            set_level(nearest_level(MAX_LEVEL));
-        } else {
-            set_level(MAX_LEVEL);
-        }
+        uint8_t turbo_level;  // how bright is "turbo"?
+
+        #if defined(USE_2C_STYLE_CONFIG)  // user can choose 2C behavior
+            uint8_t style_2c = ramp_2c_style;
+            #ifdef USE_SIMPLE_UI
+            // simple UI has its own turbo config
+            if (simple_ui_active) style_2c = ramp_2c_style_simple;
+            #endif
+            // 0  = ceiling
+            // 1+ = full power
+            if (0 == style_2c) turbo_level = nearest_level(MAX_LEVEL);
+            else turbo_level = MAX_LEVEL;
+        #else
+            // simple UI: ceiling
+            // full UI: full power
+            #ifdef USE_SIMPLE_UI
+            if (simple_ui_active) turbo_level = nearest_level(MAX_LEVEL);
+            else
+            #endif
+            turbo_level = MAX_LEVEL;
+        #endif
+
+        set_level(turbo_level);
         return MISCHIEF_MANAGED;
     }
     else if (event == EV_click2_hold_release) {
@@ -301,6 +317,14 @@ uint8_t off_state(Event event, uint16_t arg) {
         return MISCHIEF_MANAGED;
     }
     #endif  // end 7 clicks
+
+    #ifdef USE_GLOBALS_CONFIG
+    // 9 clicks, but hold last click: configure misc global settings
+    else if ((event == EV_click9_hold) && (!arg)) {
+        push_state(globals_config_state, 0);
+        return MISCHIEF_MANAGED;
+    }
+    #endif
     return EVENT_NOT_HANDLED;
 }
 

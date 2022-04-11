@@ -9,11 +9,29 @@ interactive = False
 #ramp_shape = 'cube'
 
 max_pwm = 255
+max_pwms = []
+dyn_pwm = False
 
 
 def main(args):
     """Calculates PWM levels for visually-linear steps.
     """
+    cli_answers = []
+    global max_pwm, max_pwms, dyn_pwm
+    pwm_arg = str(max_pwm)
+
+    i = 0
+    while i < len(args):
+        a = args[i]
+        if a in ('--pwm',):
+            i += 1
+            pwm_arg = args[i]
+        else:
+            #print('unrecognized option: "%s"' % (a,))
+            cli_answers.append(a)
+
+        i += 1
+
     # Get parameters from the user
     questions_main = [
             (str, 'ramp_shape', 'cube', 'Ramp shape? [cube, square, fifth, seventh, ninth, log, N.NN]'),
@@ -30,7 +48,7 @@ def main(args):
 
     def ask(questions, ans):
         for typ, name, default, text in questions:
-            value = get_value(text, default, args)
+            value = get_value(text, default, cli_answers)
             if not value:
                 value = default
             else:
@@ -40,14 +58,39 @@ def main(args):
     answers = Empty()
     ask(questions_main, answers)
 
-    global ramp_shape 
+    if pwm_arg:
+        if pwm_arg.startswith('dyn:'):
+            dyn_pwm = True
+            parts = pwm_arg.split(':')
+            dpwm_steps = int(parts[1])
+            dpwn_max = int(parts[2])
+            dpwn_min = int(parts[3])
+            dpwm_shape = 'linear'
+            if parts[4]:
+                dpwm_shape = float(parts[4])
+            max_pwms = [dpwn_min] * answers.num_levels
+            for i in range(dpwm_steps):
+                span = dpwn_max - dpwn_min
+                if dpwm_shape == 'linear':
+                    x = dpwn_min + (span * (float(dpwm_steps - i) / dpwm_steps))
+                else:  # variable curve
+                    x = dpwn_min + (span * ((float(dpwm_steps - i) / dpwm_steps) ** dpwm_shape))
+                max_pwms[i] = int(x)
+            max_pwm = dpwn_min
+
+        else:
+            val = int(pwm_arg)
+            max_pwm = val
+            max_pwms = [val] * answers.num_levels
+
+    global ramp_shape
     ramp_shape = answers.ramp_shape
 
     channels = []
-    if not args:
+    if not answers:
         print('Describe the channels in order of lowest to highest power.')
     for chan_num in range(answers.num_channels):
-        if not args:
+        if not answers:
             print('===== Channel %s =====' % (chan_num+1))
         chan = Empty()
         chan.pwm_max = max_pwm
@@ -119,32 +162,60 @@ def multi_pwm(answers, channels):
                     channel.modes.append(0.0)
                 # Normal non-turbo mode or non-FET turbo
                 else:
-                    channel.modes.append(channel.pwm_max)
+                    channel.modes.append(max_pwms[i])
             # This channel's active ramp-up range
             #elif goal_lm > (channel.prev_lm + channel.lm_min):
             elif goal_lm > channel.prev_lm:
                 # assume 7135 channels all add together
                 if channel.type == '7135':
-                    diff = channel.lm_max - channel.lm_min
+                    lm_avail = channel.lm_max - channel.lm_min
                 # assume FET channel gets higher output on its own
                 elif channel.type == 'FET':
-                    diff = channel.lm_max - channel.prev_lm - channel.lm_min
+                    lm_avail = channel.lm_max - channel.prev_lm - channel.lm_min
 
-                needed = goal_lm - channel.prev_lm - channel.lm_min
+                lm_needed = goal_lm - channel.prev_lm - channel.lm_min
 
-                ratio = needed / diff * (channel.pwm_max-channel.pwm_min)
-                pwm = max(0, ratio + channel.pwm_min)
+                pwm_top = max_pwms[i]
+                pwm_avail = pwm_top - channel.pwm_min
+                pwm_needed = pwm_avail * lm_needed / lm_avail
+                if dyn_pwm and (pwm_top > max_pwm):
+                    this_step = max(1, math.floor(pwm_needed))
+                    next_step = this_step + 1
+                    fpart = pwm_needed - math.floor(pwm_needed)
+                    correction = (next_step - fpart) / next_step
+                    pwm_top = int(pwm_avail * correction) + channel.pwm_min
+                    pwm_avail = pwm_top - channel.pwm_min
+                    pwm_needed = pwm_avail * lm_needed / lm_avail
+                    max_pwms[i] = pwm_top
+                # save the result
+                pwm = max(0, pwm_needed + channel.pwm_min)
                 channel.modes.append(pwm)
+                # how close did we get?
+                #ptop = int(round(pwm - channel.pwm_min))
+                #pbot = pwm_top - channel.pwm_min
+                #print('%.3f%% needed, %.3f%% actual' % (
+                #    100.0 * lm_needed / lm_avail,
+                #    100.0 * ptop / pbot,
+                #    ))
             # This channel isn't active yet, output too low
             else:
                 channel.modes.append(0)
 
     # Show individual levels in detail
+    prev_ratios = [0.0] * len(channels)
     for i in range(answers.num_levels):
         goal_vis, goal_lm = goals[i]
         pwms = []
-        for channel in channels:
-            pwms.append('%.2f/%i' % (channel.modes[i], channel.pwm_max))
+        for c, channel in enumerate(channels):
+            top = channel.modes[i] - channel.pwm_min
+            if top < 0: top = 0
+            bot = max_pwms[i] - channel.pwm_min
+            ratio = 100 * (int(round(top)) / float(bot))
+            top, bot = channel.modes[i], max_pwms[i]
+            pwms.append('%.2f/%i (%.3f%%)' % (top, bot, ratio))
+            if (ratio < prev_ratios[c]) and (ratio > 0):
+                pwms.append('WARN')
+            prev_ratios[c] = ratio
         print('%i: visually %.2f (%.2f lm): %s' % 
               (i+1, goal_vis, goal_lm, ', '.join(pwms)))
 
@@ -154,15 +225,19 @@ def multi_pwm(answers, channels):
                 (cnum+1,
                  ','.join([str(int(round(i))) for i in channel.modes])))
 
+    # Show PFM values (PWM TOP)
+    if dyn_pwm:
+        print('PWM_TOP: %s' % (','.join(str(x) for x in max_pwms)))
+
     # Show highest level for each channel before next channel starts
     for cnum, channel in enumerate(channels[:-1]):
         prev = 0
         i = 1
         while (i < answers.num_levels) \
-                and (channel.modes[i] >= channel.modes[i-1]) \
                 and (channels[cnum+1].modes[i] == 0):
+                #and (channel.modes[i] >= channel.modes[i-1]) \
             i += 1
-        print('Ch%i max: %i (%.2f/%s)' % (cnum, i, channel.modes[i-1], max_pwm))
+        print('Ch%i max: %i (%.2f/%s)' % (cnum, i, channel.modes[i-1], max_pwms[i]))
 
 
 def get_value(text, default, args):

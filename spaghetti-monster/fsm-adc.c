@@ -37,6 +37,9 @@ static inline void set_admux_therm() {
     #elif (ATTINY == 841)  // FIXME: not tested
         ADMUXA = ADMUXA_THERM;
         ADMUXB = ADMUXB_THERM;
+    #elif defined(AVRXMEGA3)  // ATTINY816, 817, etc
+        ADC0.MUXPOS = ADC_MUXPOS_TEMPSENSE_gc;  // read temperature
+        ADC0.CTRLC = ADC_SAMPCAP_bm | ADC_PRESC_DIV64_gc | ADC_REFSEL_INTREF_gc; // Internal ADC reference
     #else
         #error Unrecognized MCU type
     #endif
@@ -66,6 +69,15 @@ inline void set_admux_voltage() {
             ADMUXA = ADMUXA_VCC;
             ADMUXB = ADMUXB_VCC;
         #endif
+    #elif defined(AVRXMEGA3)  // ATTINY816, 817, etc
+        #ifdef USE_VOLTAGE_DIVIDER  // 1.1V / ADC input pin
+            // verify that this is correct!!!  untested
+            ADC0.MUXPOS = ADMUX_VOLTAGE_DIVIDER;  // read the requested ADC pin
+            ADC0.CTRLC = ADC_SAMPCAP_bm | ADC_PRESC_DIV64_gc | ADC_REFSEL_INTREF_gc; // Use internal ADC reference
+        #else  // VCC / 1.1V reference
+            ADC0.MUXPOS = ADC_MUXPOS_INTREF_gc;  // read internal reference
+            ADC0.CTRLC = ADC_SAMPCAP_bm | ADC_PRESC_DIV64_gc | ADC_REFSEL_VDDREF_gc; // Vdd (Vcc) be ADC reference
+        #endif
     #else
         #error Unrecognized MCU type
     #endif
@@ -77,6 +89,9 @@ inline void set_admux_voltage() {
 inline void ADC_start_measurement() {
     #if (ATTINY == 25) || (ATTINY == 45) || (ATTINY == 85) || (ATTINY == 841) || (ATTINY == 1634)
         ADCSRA |= (1 << ADSC) | (1 << ADIE);
+    #elif defined(AVRXMEGA3)  // ATTINY816, 817, etc
+        ADC0.INTCTRL |= ADC_RESRDY_bm; // enable interrupt
+        ADC0.COMMAND |= ADC_STCONV_bm; // Start the ADC conversions
     #else
         #error unrecognized MCU type
     #endif
@@ -108,13 +123,22 @@ inline void ADC_on()
         // enable, start, auto-retrigger, prescale
         ADCSRA = (1 << ADEN) | (1 << ADSC) | (1 << ADATE) | ADC_PRSCL;
         //ADCSRA |= (1 << ADSC);  // start measuring
+    #elif defined(AVRXMEGA3)  // ATTINY816, 817, etc
+        set_admux_voltage();
+        VREF.CTRLA |= VREF_ADC0REFSEL_1V1_gc; // Set Vbg ref to 1.1V
+        ADC0.CTRLA = ADC_ENABLE_bm | ADC_FREERUN_bm; // Enabled, free-running (aka, auto-retrigger)
+        ADC0.COMMAND |= ADC_STCONV_bm; // Start the ADC conversions    
     #else
         #error Unrecognized MCU type
     #endif
 }
 
 inline void ADC_off() {
-    ADCSRA &= ~(1<<ADEN); //ADC off
+    #ifdef AVRXMEGA3  // ATTINY816, 817, etc
+        ADC0.CTRLA &= ~(ADC_ENABLE_bm);  // disable the ADC 
+    #else
+        ADCSRA &= ~(1<<ADEN); //ADC off
+    #endif
 }
 
 #ifdef USE_VOLTAGE_DIVIDER
@@ -140,8 +164,15 @@ static inline uint8_t calc_voltage_divider(uint16_t value) {
 #define ADC_CYCLES_PER_SECOND 2
 #endif
 
+#ifdef AVRXMEGA3  // ATTINY816, 817, etc
+#define ADC_vect ADC0_RESRDY_vect
+#endif
 // happens every time the ADC sampler finishes a measurement
 ISR(ADC_vect) {
+
+    #ifdef AVRXMEGA3  // ATTINY816, 817, etc
+    ADC0.INTFLAGS = ADC_RESRDY_bm; // clear the interrupt
+    #endif
 
     if (adc_sample_count) {
 
@@ -150,7 +181,23 @@ ISR(ADC_vect) {
         uint8_t channel = adc_channel;
 
         // update the latest value
+        #ifdef AVRXMEGA3  // ATTINY816, 817, etc
+        // Use the factory calibrated values in SIGROW.TEMPSENSE0 and SIGROW.TEMPSENSE1
+        // to calculate a temperature reading in Kelvin, then left-align it. 
+        if (channel == 1) { // thermal, convert ADC reading to left-aligned Kelvin
+            int8_t sigrow_offset = SIGROW.TEMPSENSE1; // Read signed value from signature row
+            uint8_t sigrow_gain = SIGROW.TEMPSENSE0; // Read unsigned value from signature row
+            uint32_t temp = ADC0.RES - sigrow_offset;
+            temp *= sigrow_gain; // Result might overflow 16 bit variable (10bit+8bit)
+            temp += 0x80; // Add 1/2 to get correct rounding on division below
+            temp >>= 8; // Divide result to get Kelvin
+            m = (temp << 6); // left align it
+        } 
+        else { m = (ADC0.RES << 6); } // voltage, force left-alignment
+
+        #else
         m = ADC;
+        #endif
         adc_raw[channel] = m;
 
         // lowpass the value
@@ -181,7 +228,11 @@ void adc_deferred() {
     // real-world entropy makes this a true random, not pseudo
     // Why here instead of the ISR?  Because it makes the time-critical ISR
     // code a few cycles faster and we don't need crypto-grade randomness.
+    #ifdef AVRXMEGA3  // ATTINY816, 817, etc
+    pseudo_rand_seed += ADC0.RESL; // right aligned, not left... so should be equivalent?
+    #else
     pseudo_rand_seed += (ADCL >> 6) + (ADCH << 2);
+    #endif
     #endif
 
     // the ADC triggers repeatedly when it's on, but we only need to run the
@@ -255,10 +306,28 @@ static inline void ADC_voltage_handler() {
     uint16_t measurement;
 
     // latest ADC value
-    if (adc_reset) {  // while asleep, or just after waking, don't lowpass
+    if (adc_reset) {  // just after waking, don't lowpass
         measurement = adc_raw[0];
-        adc_smooth[0] = measurement;  // no lowpass while asleep
+        adc_smooth[0] = measurement;  // no lowpass, just use the latest value
     }
+    #ifdef USE_LOWPASS_WHILE_ASLEEP
+    else if (go_to_standby) {  // weaker lowpass while asleep
+        // occasionally the aux LED color can oscillate during standby,
+        // while using "voltage" mode ... so try to reduce the oscillation
+        uint16_t m = adc_raw[0];
+        uint16_t v = adc_smooth[0];
+        #if 0
+        // fixed-rate lowpass, slow, more stable but takes longer to settle
+        if (m < v) { v -= 64; }
+        if (m > v) { v += 64; }
+        #else
+        // weighted lowpass, faster but less stable
+        v = (m>>1) + (v>>1);
+        #endif
+        adc_smooth[0] = v;
+        measurement = v;
+    }
+    #endif
     else measurement = adc_smooth[0];
 
     // values stair-step between intervals of 64, with random variations
@@ -290,7 +359,11 @@ static inline void ADC_voltage_handler() {
     if (lvp_timer) {
         lvp_timer --;
     } else {  // it has been long enough since the last warning
+    	#ifdef DUAL_VOLTAGE_FLOOR
+    	if (((voltage < VOLTAGE_LOW) && (voltage > DUAL_VOLTAGE_FLOOR)) || (voltage < DUAL_VOLTAGE_LOW_LOW)) {
+    	#else
         if (voltage < VOLTAGE_LOW) {
+        #endif
             // send out a warning
             emit(EV_voltage_low, 0);
             // reset rate-limit counter

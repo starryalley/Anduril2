@@ -153,7 +153,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     // clock tick: bump the random seed
     else if (event == EV_tick) {
         // un-reverse after 1 second
-        if (arg == TICKS_PER_SECOND) ramp_direction = 1;
+        if (arg == AUTO_REVERSE_TIME) ramp_direction = 1;
 
         pseudo_rand_seed += arg;
         return MISCHIEF_MANAGED;
@@ -215,7 +215,7 @@ inline void party_tactical_strobe_mode_iter(uint8_t st) {
         nice_delay_ms(del >> 1);
     }
     #endif
-    set_level(0);
+    set_level(STROBE_OFF_LEVEL);
     nice_delay_ms(del);  // no return check necessary on final delay
 }
 #endif

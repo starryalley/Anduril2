@@ -29,15 +29,9 @@ void indicator_blink(uint8_t arg) {
     // turn off aux LEDs when battery is empty
     if (voltage < VOLTAGE_LOW) { indicator_led(0); return; }
 
-    #ifdef USE_FANCIER_BLINKING_INDICATOR
+    #ifdef USE_OLD_BLINKING_INDICATOR
 
-    // fancy blink, set off/low/high levels here:
-    static const uint8_t seq[] = {0, 1, 2, 1,  0, 0, 0, 0,
-                                  0, 0, 1, 0,  0, 0, 0, 0};
-    indicator_led(seq[arg & 15]);
-
-    #else  // basic blink, 1/8th duty cycle
-
+    // basic blink, 1/8th duty cycle
     if (! (arg & 7)) {
         indicator_led(2);
     }
@@ -45,7 +39,14 @@ void indicator_blink(uint8_t arg) {
         indicator_led(0);
     }
 
-    #endif
+    #else
+
+    // fancy blink, set off/low/high levels here:
+    static const uint8_t seq[] = {0, 1, 2, 1,  0, 0, 0, 0,
+                                  0, 0, 1, 0,  0, 0, 0, 0};
+    indicator_led(seq[arg & 15]);
+
+    #endif  // ifdef USE_OLD_BLINKING_INDICATOR
 }
 #endif
 
@@ -63,7 +64,7 @@ uint8_t voltage_to_rgb() {
         255, 6, // 7, R+G+B
     };
     uint8_t volts = voltage;
-    if (volts < 29) return 0;
+    if (volts < VOLTAGE_LOW) return 0;
 
     uint8_t i;
     for (i = 0;  volts >= levels[i];  i += 2) {}
