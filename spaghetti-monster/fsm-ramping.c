@@ -126,7 +126,15 @@ void set_level(uint8_t level) {
         level --;
 
         #if PWM_CHANNELS >= 1
+        #ifdef USE_DYN_PWM
+        if (use_static_pwm) {
+            PWM1_LVL = PWM_GET(pwm1_levels_strobe, level);
+        } else {
+            PWM1_LVL = PWM_GET(pwm1_levels, level);
+        }
+        #else
         PWM1_LVL = PWM_GET(pwm1_levels, level);
+        #endif
         #endif
         #if PWM_CHANNELS >= 2
         PWM2_LVL = PWM_GET(pwm2_levels, level);
@@ -139,34 +147,36 @@ void set_level(uint8_t level) {
         #endif
 
         #ifdef USE_DYN_PWM
-            uint16_t top = PWM_GET(pwm_tops, level);
-            #ifdef PWM1_CNT
-            // wait to ensure compare match won't be missed
-            // (causes visible flickering when missed, because the counter
-            //  goes all the way to 65535 before returning)
-            // (see attiny1634 reference manual page 103 for a warning about
-            //  the timing of changing the TOP value (section 12.8.4))
-            // (but don't wait when turning on from zero, because
-            //  it'll reset the phase below anyway)
-            // to be safe, allow at least 32 cycles to update TOP
-            while(prev_level && (PWM1_CNT > (top - 32))) {}
-            #endif
-            // pulse frequency modulation, a.k.a. dynamic PWM
-            PWM1_TOP = top;
+            if (!use_static_pwm) {
+                uint16_t top = PWM_GET(pwm_tops, level);
+                #ifdef PWM1_CNT
+                // wait to ensure compare match won't be missed
+                // (causes visible flickering when missed, because the counter
+                //  goes all the way to 65535 before returning)
+                // (see attiny1634 reference manual page 103 for a warning about
+                //  the timing of changing the TOP value (section 12.8.4))
+                // (but don't wait when turning on from zero, because
+                //  it'll reset the phase below anyway)
+                // to be safe, allow at least 32 cycles to update TOP
+                while(prev_level && (PWM1_CNT > (top - 32))) {}
+                #endif
+                // pulse frequency modulation, a.k.a. dynamic PWM
+                PWM1_TOP = top;
 
-            // repeat for other channels if necessary
-            #ifdef PMW2_TOP
-                #ifdef PWM2_CNT
-                while(prev_level && (PWM2_CNT > (top - 32))) {}
+                // repeat for other channels if necessary
+                #ifdef PMW2_TOP
+                    #ifdef PWM2_CNT
+                    while(prev_level && (PWM2_CNT > (top - 32))) {}
+                    #endif
+                    PWM2_TOP = top;
                 #endif
-                PWM2_TOP = top;
-            #endif
-            #ifdef PMW3_TOP
-                #ifdef PWM3_CNT
-                while(prev_level && (PWM3_CNT > (top - 32))) {}
+                #ifdef PMW3_TOP
+                    #ifdef PWM3_CNT
+                    while(prev_level && (PWM3_CNT > (top - 32))) {}
+                    #endif
+                    PWM3_TOP = top;
                 #endif
-                PWM3_TOP = top;
-            #endif
+            }
         #endif  // ifdef USE_DYN_PWM
         #ifdef PWM1_CNT
             // force reset phase when turning on from zero

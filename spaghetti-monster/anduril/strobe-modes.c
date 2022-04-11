@@ -22,6 +22,21 @@
 
 #include "strobe-modes.h"
 
+
+void strobe_set_dyn_pwm() {
+#ifdef USE_DYN_PWM
+    if (strobe_type == candle_mode_e) {
+        use_static_pwm = 1;
+        PWM1_TOP = PWM_TOP_CANDLE;
+    } else if (strobe_type == firework_mode_e) {
+        use_static_pwm = 1;
+        PWM1_TOP = PWM_TOP_FIREWORK;
+    } else {
+        use_static_pwm = 0;
+    }
+#endif
+}
+
 #ifdef USE_STROBE_STATE
 uint8_t strobe_state(Event event, uint16_t arg) {
     static int8_t ramp_direction = 1;
@@ -44,6 +59,13 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         #endif
     }
     #endif
+    // use static PWM in firework mode
+    #if defined(USE_FIREWORK_MODE) && defined(USE_DYN_PWM)
+    if (st == firework_mode_e && event == EV_enter_state) {
+        use_static_pwm = 1;
+        PWM1_TOP = PWM_TOP_FIREWORK;
+    }
+    #endif
 
     if (0) {}  // placeholder
     // init anything which needs to be initialized
@@ -57,18 +79,23 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         #ifdef USE_AUX_RGB_LEDS
         aux_led_reset = 1;
         #endif
+        #ifdef USE_DYN_PWM
+        use_static_pwm = 0;
+        #endif
         return MISCHIEF_MANAGED;
     }
     // 2 clicks: rotate through strobe/flasher modes
     else if (event == EV_2clicks) {
         strobe_type = (st + 1) % NUM_STROBES;
         save_config();
+        strobe_set_dyn_pwm();
         return MISCHIEF_MANAGED;
     }
     // 3 clicks: rotate back through strobe/flasher modes
     else if (event == EV_3clicks) {
         strobe_type = (st - 1 + NUM_STROBES) % NUM_STROBES;
         save_config();
+        strobe_set_dyn_pwm();
         return MISCHIEF_MANAGED;
     }
     // hold: change speed (go faster)

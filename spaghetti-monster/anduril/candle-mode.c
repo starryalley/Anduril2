@@ -113,11 +113,15 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
         #ifdef USE_AUX_RGB_LEDS
         aux_led_reset = 0;
         #endif
+        #ifdef USE_DYN_PWM
+        use_static_pwm = 1;
+        PWM1_TOP = PWM_TOP_CANDLE;
+        #endif
         return MISCHIEF_MANAGED;
     }
     #ifdef USE_SUNSET_TIMER
-    // 2 clicks: cancel timer
-    else if (event == EV_2clicks) {
+    // 2/3 clicks: cancel timer
+    else if (event == EV_2clicks || event == EV_3clicks) {
         // parent state just rotated through strobe/flasher modes,
         // so cancel timer...  in case any time was left over from earlier
         sunset_timer = 0;
