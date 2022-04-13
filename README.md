@@ -25,8 +25,8 @@ kr4-219b (50% FET):
 - aluminum, 9A CC driver with Nichia 219b SW45k
 
 d4sv2-tintramp: (for D4v2 tintramp)
-- aluminum, tintramping with Nichia 219b 2700/4500K
-- aluminum, tintramping with Nichia E21A 2000/5000K
+- aluminum, tint ramping with Nichia 219b 2700/4500K
+- aluminum, tint ramping with Nichia E21A 2000/5000K
 
 
 # Features
@@ -124,6 +124,10 @@ Adjust firework brightness (explosion brightness):
 - `6C`: reset brightness to default (max regulated level, which is MAX_1x7135)
 
 
+## 4H to middle tint
+
+In a tint ramping light, when light is on use `4H` to go to middle tint. (Copied from [4h to go to middle, not in the middle of 3h](https://github.com/mkong1/anduril/pull/34) )
+
 # Configuration changes
 
 - Reordering strobe mode: Candle -> Lightning Storm -> Fireworks -> Bike Flasher -> Party Strobe -> Tactical Strobe. (Candle and Lightning storm are my most used strobe modes, hence why)
@@ -141,13 +145,12 @@ Adjust firework brightness (explosion brightness):
 11C/11H to go to this mode and back to advanced mode. 
 
 In this mode:
-- blink brightness is lowered
 - default brightness in candle/lightning mode is lowered to min
 - max ramp brightness can be only 5 or 10 with button LED configurable off/low/high
 - moonlight can be just lighting up button LED on low or high. Trust me, on high level my amber button LED alone is more than enough in pitch black. (I already have a mode which only turns on button LED on high).
 - The next level after moonlight can be red AUX on high, and then goes yellow on high, white on high, and then the real level 1 on main emitters. (according to my visual comparison with my zebralight, the level 1 on my E21A 2700/2000mix is around 0.1~0.2lm which is still too bright for me).
 - easier control of button LED and AUX LED in this mode
-- disable some other settings which can possibly blind dark adapted eyes.
+- disable some other settings which can possibly blind dark adapted eyes, for example, only allow candle/lightning in strobe modes.
 
 
 # Other useful commits
