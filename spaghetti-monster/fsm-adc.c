@@ -447,21 +447,19 @@ static inline void ADC_temperature_handler() {
     int16_t current_temperature = (measurement>>1) + THERM_CAL_OFFSET + (int16_t)therm_cal_offset - 275;
     static int16_t last_temperature = INT16_MIN;
     if (go_to_standby) {
-        // just compare last temperature and if it doesn't change that much, use current temperature
         if (last_temperature == INT16_MIN)// first measurement
-            temperature = current_temperature;
-        else
-            temperature = (current_temperature + last_temperature)/2;
-        if (abs(current_temperature - last_temperature) > 5) {
-            //redo temperature again TODO: verify this works and is necessary?
+            temperature = last_temperature = current_temperature;
+        else if (abs(current_temperature - last_temperature) > 10) {
+            // changes too much, let's redo temperature again TODO: verify this works and is necessary?
             adc_channel = adc_deferred_enable = 1;
             ADC_on();
+            //temperature = (current_temperature * 2 + last_temperature)/3;
+        } else {
+            temperature = (current_temperature + last_temperature)/2;
+            last_temperature = current_temperature;
         }
-
     } else
         temperature = current_temperature;
-    // save this measurement for averaging in the next time
-    last_temperature = current_temperature;
     #else
     // external sensor
     temperature = EXTERN_TEMP_FORMULA(measurement>>1) + THERM_CAL_OFFSET + (int16_t)therm_cal_offset;
