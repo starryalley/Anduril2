@@ -167,7 +167,10 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
         actual_color = temperature_to_rgb();
         if (!go_to_standby) {
             // during preview, flash current temperature's colors quickly
-            pattern = (arg >> 1) % 3;
+            if (pattern == 1)
+                pattern = (arg >> 4) % 2; // special case for pattern 'low': only alternating between off and low
+            else
+                pattern = (arg >> 2) % 3; // alternating among off, low, high
         }
     }
     #endif
