@@ -124,9 +124,9 @@ Adjust firework brightness (explosion brightness):
 - `6C`: reset brightness to default (max regulated level, which is MAX_1x7135)
 
 
-## 4H to middle tint
+## 8H to middle tint
 
-In a tint ramping light, when light is on use `4H` to go to middle tint. (Copied from [4h to go to middle, not in the middle of 3h](https://github.com/mkong1/anduril/pull/34) )
+In a tint ramping light, when light is on use `8H` to go to middle tint. (Copied from [4h to go to middle, not in the middle of 3h](https://github.com/mkong1/anduril/pull/34) )
 
 # Configuration changes
 

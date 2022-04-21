@@ -96,8 +96,8 @@ uint8_t tint_ramping_state(Event event, uint16_t arg) {
         set_level(actual_level);
         return EVENT_HANDLED;
     }
-    // 4H to go to middle tint
-    else if (event == EV_click4_hold) {
+    // 8H to go to middle tint
+    else if (event == EV_click8_hold) {
       tint = 127;
       set_level(actual_level);
       return EVENT_HANDLED;
