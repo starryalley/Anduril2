@@ -429,6 +429,8 @@ static inline void ADC_temperature_handler() {
 
     // latest 16-bit ADC reading
     uint16_t measurement = adc_smooth[1];
+    // always use raw measurement when we are in sleep
+    if (go_to_standby) measurement = adc_raw[1];
 
     // values stair-step between intervals of 64, with random variations
     // of 1 or 2 in either direction, so if we chop off the last 6 bits
@@ -447,19 +449,20 @@ static inline void ADC_temperature_handler() {
     int16_t current_temperature = (measurement>>1) + THERM_CAL_OFFSET + (int16_t)therm_cal_offset - 275;
     static int16_t last_temperature = INT16_MIN;
     if (go_to_standby) {
-        if (last_temperature == INT16_MIN)// first measurement
+        if (last_temperature == INT16_MIN) { // first measurement
             temperature = last_temperature = current_temperature;
-        else if (abs(current_temperature - last_temperature) > 10) {
+        } else if (abs(current_temperature - last_temperature) > 16) {
             // changes too much, let's redo temperature again TODO: verify this works and is necessary?
             adc_channel = adc_deferred_enable = 1;
             ADC_on();
-            //temperature = (current_temperature * 2 + last_temperature)/3;
         } else {
-            temperature = (current_temperature + last_temperature)/2;
+            temperature = (current_temperature + last_temperature) >> 1;
             last_temperature = current_temperature;
         }
-    } else
+    } else {
         temperature = current_temperature;
+        last_temperature = current_temperature;
+    }
     #else
     // external sensor
     temperature = EXTERN_TEMP_FORMULA(measurement>>1) + THERM_CAL_OFFSET + (int16_t)therm_cal_offset;
