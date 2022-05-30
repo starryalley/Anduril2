@@ -249,9 +249,10 @@ uint8_t lowlevel_aux_color = RGB_RED;
 #define AUX_ON_LOWLEVEL DEFAULT_LEVEL // if level is less than this level we can turn on aux LED
 
 #define LOWLEVEL_AUX_OFF 0        // main emitters on,  aux off,  button low
-#define LOWLEVEL_BUTTON_ON_ONLY 1 // main emitters off, aux off,  button high
-#define LOWLEVEL_AUX_ON_ONLY 2    // main emitters off, aux high, button low
-#define LOWLEVEL_AUX_HIGH 3       // main emitters on,  aux high, button low
+#define LOWLEVEL_AUX_HIGH 1       // main emitters on,  aux high, button low
+#define LOWLEVEL_BUTTON_ON_ONLY 2 // main emitters off, aux off,  button high
+#define LOWLEVEL_BUTTON_LOW_ONLY 3// main emitters off, aux off,  button low (lowest possible light)
+
 #define LOWLEVEL_AUX_MODE_COUNT 4
 uint8_t lowlevel_aux_mode = LOWLEVEL_AUX_OFF;
 #endif
