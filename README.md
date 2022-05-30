@@ -9,24 +9,25 @@ For toyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 Since I plan to only work with my Emisar D4v2s, I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware for my 8 D4v2 (as of Apr 2022)
+This repo contains my own changes to Anduril2 firmware for my 8 D4v2 and 1 DW4 (as of May 2022)
 
 
 kr4-nofet:
-- brass, 7.5A CC driver with Nichia E21A 2000/2700K mix
-- antique brass, unknown driver (probably CC) with Nichia E17A 1850K
+- brass, 7.5A linear driver with Nichia E21A 2000/2700K mix
+- antique brass, 4A linear driver with Nichia E17A 1850K
 
 kr4:
-- aluminum, 5A CC driver with Luminus SST-20 4000K
-- titanium, 5A CC driver with Cree XP-L HI T6 8D 2800K
+- aluminum, 5A linear driver with Luminus SST-20 4000K
+- titanium, 5A linear driver with Cree XP-L HI T6 8D 2800K (ramp floor=4, jump_start_level=31)
+- DW4, 9A linear driver with 16-LED mule of Nichia E21A 4500/2700 mix (#undef USE_AUX_RGB_LEDS)
 
 kr4-219b (50% FET):
-- antique brass, 9A CC driver with Nichia 219b SW35
-- aluminum, 9A CC driver with Nichia 219b SW45k
+- antique brass, 9A linear driver with Nichia 219b SW35
+- aluminum, 9A linear driver with Nichia 219b SW45k
 
 d4sv2-tintramp: (for D4v2 tintramp)
-- aluminum, tint ramping with Nichia 219b 2700/4500K
-- aluminum, tint ramping with Nichia E21A 2000/5000K
+- aluminum, tint ramping 5A+5A linear driver with Nichia 219b 2700/4500K
+- aluminum, tint ramping ?A+?A linear driver with Nichia E21A 2000/5000K
 
 
 # Features
@@ -50,12 +51,12 @@ This setting is after "voltage" mode. Use `7H` from off to loop each mode.
 
 When in lower levels (< DEFAULT_LEVEL), optionally we can turn on AUX LED along with main emitters.
 
-`6C`: in lowest level (ramp floor), allow AUX colour LED to be turned on along with main emitters for possible tint mix. `6H` changes AUX colour from RED to WHITE (total 7 colours).
+`6C`: in lower levels, allow AUX colour LED to be turned on along with main emitters for possible tint mix. `6H` changes AUX colour from RED to WHITE (total 7 colours).
     
-`6C`: in lowest level, cycle through these additional states:
-  - main emitters off, aux off, button high (lowest possible/useful light)
-  - main emitters off, aux high, button low
-  - main emitters on, aux high, button low
+`6C`: in lower levels, cycle through these additional states:
+  - main emitters on, aux high, button low (allow use of AUX LEDs with main emitters)
+  - main emitters off, aux off, button high
+  - main emitters off, aux off, button low (lowest possible/useful light)
   - back to default (main emitters on, aux off, button low)
 
 No extra state is defined and the AUX LED on is temporary (not remembered) so if there is any button event (ramp up for example), AUX LED will be off. If later user enters moonlight, only main emitters will be lit (default). You need to re-enable this through `6C` or `6H`. The current AUX LED colour is remembered until reboot(factory reset).
