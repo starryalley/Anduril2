@@ -164,7 +164,7 @@ void set_level(uint8_t level) {
         level --;
 
         #if PWM_CHANNELS >= 1
-        #ifdef USE_DYN_PWM
+        #if defined(USE_DYN_PWM) && defined(PWM1_LEVELS_STROBE)
         if (use_static_pwm) {
             PWM1_LVL = PWM_GET(pwm1_levels_strobe, level);
         } else {
@@ -185,7 +185,9 @@ void set_level(uint8_t level) {
         #endif
 
         #ifdef USE_DYN_PWM
+            #ifdef PWM1_LEVELS_STROBE
             if (!use_static_pwm) {
+            #endif
                 uint16_t top = PWM_GET(pwm_tops, level);
                 #if defined(PWM1_CNT) && defined(PWM1_PHASE_SYNC)
                 // wait to ensure compare match won't be missed
@@ -214,7 +216,9 @@ void set_level(uint8_t level) {
                     #endif
                     PWM3_TOP = top;
                 #endif
+            #ifdef PWM1_LEVELS_STROBE
             }
+            #endif
         #endif  // ifdef USE_DYN_PWM
         #if defined(PWM1_CNT) && defined(PWM1_PHASE_RESET_ON)
             // force reset phase when turning on from zero

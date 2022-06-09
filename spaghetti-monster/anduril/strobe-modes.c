@@ -24,7 +24,7 @@
 
 
 void strobe_set_dyn_pwm() {
-#ifdef USE_DYN_PWM
+#if defined(USE_DYN_PWM) && defined(PWM_TOP_CANDLE) && defined(PWM_TOP_FIREWORK)
     if (strobe_type == candle_mode_e) {
         use_static_pwm = 1;
         PWM1_TOP = PWM_TOP_CANDLE;
@@ -60,7 +60,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     }
     #endif
     // use static PWM in firework mode
-    #if defined(USE_FIREWORK_MODE) && defined(USE_DYN_PWM)
+    #if defined(USE_FIREWORK_MODE) && defined(USE_DYN_PWM) && defined(PWM_TOP_FIREWORK)
     if (st == firework_mode_e && event == EV_enter_state) {
         use_static_pwm = 1;
         PWM1_TOP = PWM_TOP_FIREWORK;

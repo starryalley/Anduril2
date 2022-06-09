@@ -95,7 +95,9 @@ PROGMEM const PWM_DATATYPE pwm4_levels[] = { PWM4_LEVELS };
 // (different ceiling / frequency at each ramp level)
 #ifdef USE_DYN_PWM
 PROGMEM const PWM_DATATYPE pwm_tops[] = { PWM_TOPS };
+#ifdef PWM1_LEVELS_STROBE
 PROGMEM const PWM_DATATYPE pwm1_levels_strobe[] = { PWM1_LEVELS_STROBE };
+#endif
 // a temporary flag used in candle and other strobe modes to disable DYN PWM
 uint8_t use_static_pwm = 0;
 #endif
