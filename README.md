@@ -9,25 +9,33 @@ For toyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 Since I plan to only work with my Emisar D4v2s, I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware for my 8 D4v2 and 1 DW4 (as of May 2022)
+This repo contains my own changes to Anduril2 firmware for my 8 D4v2, a DW4, a SP10 Pro, and a TS10 (as of Jun 2022).
+
+The following is the built targets used:
 
 
-kr4-nofet:
-- brass, 7.5A linear driver with Nichia E21A 2000/2700K mix
-- antique brass, 4A linear driver with Nichia E17A 1850K
+noctigon-kr4-nofet:
+- D4v2 brass, 7.5A linear driver with Nichia E21A 2000/2700K mix
+- D4v2 antique brass, 4A linear driver with Nichia E17A 1850K
 
-kr4:
-- aluminum, 5A linear driver with Luminus SST-20 4000K
-- titanium, 5A linear driver with Cree XP-L HI T6 8D 2800K (ramp floor=4, jump_start_level=31)
-- DW4, 9A linear driver with 16-LED mule of Nichia E21A 4500/2700 mix (#undef USE_AUX_RGB_LEDS)
+noctigon-kr4:
+- D4v2 aluminum, 5A linear driver with Luminus SST-20 4000K
+- D4v2 titanium, 5A linear driver with Cree XP-L HI T6 8D 2800K (ramp floor=4, jump_start_level=31)
+- DW4 9A linear driver with 16-LED mule of Nichia E21A 4500/2700 mix (for mule, revert `f43796f fsm-misc: use AUX LED to blink digits`)
 
-kr4-219b (50% FET):
-- antique brass, 9A linear driver with Nichia 219b SW35
-- aluminum, 9A linear driver with Nichia 219b SW45k
+noctigon-kr4-219b (50% FET):
+- D4v2 antique brass, 9A linear driver with Nichia 219b SW35
+- D4v2 aluminum, 9A linear driver with Nichia 219b SW45k
 
-d4sv2-tintramp: (for D4v2 tintramp)
-- aluminum, tint ramping 5A+5A linear driver with Nichia 219b 2700/4500K
-- aluminum, tint ramping ?A+?A linear driver with Nichia E21A 2000/5000K
+emisar-d4sv2-tintramp: (for D4v2 tintramp)
+- D4v2 aluminum, tint ramping 5A+5A linear driver with Nichia 219b 2700/4500K
+- D4v2 aluminum, tint ramping ?A+?A linear driver with Nichia E21A 2000/5000K
+
+sonfirn-sp10-pro:
+- Sonfirn SP10 Pro AA/14500
+
+sonfirn-sp36-t1616:
+- Wurkkos TS10 14500
 
 
 # Features
@@ -131,11 +139,12 @@ In a tint ramping light, when light is on use `8H` to go to middle tint. (Copied
 
 # Configuration changes
 
+- Default in Advanced mode
 - Reordering strobe mode: Candle -> Lightning Storm -> Fireworks -> Bike Flasher -> Party Strobe -> Tactical Strobe. (Candle and Lightning storm are my most used strobe modes, hence why)
 - Use 8C instead of 5C for momentary mode (not used often so make it harder to enter)
 - Use 9C in ramp mode to switch ramp style (smooth or discrete)
 - Lower default candle mode amplitude from 32 to 28 so it is a calmer candle light
-- Lower default lightning mode max possible interval from around 8sec to 16sec so it will appear less busy
+- Lower default lightning mode, max possible interval from around 8sec to 16sec so it will appear less busy
 
 
 # Planned modification/features
