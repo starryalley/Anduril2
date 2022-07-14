@@ -8,7 +8,7 @@
 #define USE_INDICATOR_LED_WHILE_RAMPING
 // off mode: high (2)
 // lockout: blinking (3)
-#define INDICATOR_LED_DEFAULT_MODE ((3<<2) + 2)
+#define INDICATOR_LED_DEFAULT_MODE ((3<<4) + 2)
 
 // copied from Emisar D4 ramp
 // ../../bin/level_calc.py 1 65 7135 1 0.8 150

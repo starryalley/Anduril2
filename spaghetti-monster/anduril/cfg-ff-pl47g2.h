@@ -11,7 +11,7 @@
 
 // off mode: low (1)
 // lockout: blinking (3)
-#define INDICATOR_LED_DEFAULT_MODE ((3<<2) + 1)
+#define INDICATOR_LED_DEFAULT_MODE ((3<<4) + 1)
 
 
 #define RAMP_LENGTH 150

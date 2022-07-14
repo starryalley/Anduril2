@@ -12,7 +12,7 @@
 #ifdef INDICATOR_LED_DEFAULT_MODE
 #undef INDICATOR_LED_DEFAULT_MODE
 #endif
-#define INDICATOR_LED_DEFAULT_MODE ((3<<2) + 1)
+#define INDICATOR_LED_DEFAULT_MODE ((3<<4) + 1)
 
 // ramp shape is different than original ROT66
 // 1x7135: 150 lm

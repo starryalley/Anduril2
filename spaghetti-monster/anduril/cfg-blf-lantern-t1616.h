@@ -9,7 +9,7 @@
 #define USE_INDICATOR_LED_WHILE_RAMPING
 // off mode: high (2)
 // lockout: blinking (3)
-#define INDICATOR_LED_DEFAULT_MODE ((3<<2) + 2)
+#define INDICATOR_LED_DEFAULT_MODE ((3<<4) + 2)
 
 // the lantern has two PWM channels, but they drive different sets of emitters
 // (one channel for warm emitters, one channel for cold)

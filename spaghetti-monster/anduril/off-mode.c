@@ -35,7 +35,7 @@ uint8_t off_state(Event event, uint16_t arg) {
         #endif
         set_level(0);
         #ifdef USE_INDICATOR_LED
-        indicator_led(indicator_led_mode & 0x03);
+        indicator_led(indicator_led_mode & 0xf);
         #elif defined(USE_AUX_RGB_LEDS)
         rgb_led_update(rgb_led_off_mode, 0);
         #endif
@@ -52,7 +52,7 @@ uint8_t off_state(Event event, uint16_t arg) {
         if (arg > HOLD_TIMEOUT) {
             go_to_standby = 1;
             #ifdef USE_INDICATOR_LED
-            indicator_led(indicator_led_mode & 0x03);
+            indicator_led(indicator_led_mode & 0xf);
             #elif defined(USE_AUX_RGB_LEDS)
             rgb_led_update(rgb_led_off_mode, arg);
             #endif
@@ -74,9 +74,9 @@ uint8_t off_state(Event event, uint16_t arg) {
         #endif
         #ifdef USE_INDICATOR_LED
         if (voltage < VOLTAGE_LOW_SAFE)
-            indicator_led_update(3, arg);
+            indicator_led_update(4, arg);
         else
-            indicator_led_update(indicator_led_mode, arg);
+            indicator_led_update(indicator_led_mode & 0xf, arg);
         #elif defined(USE_AUX_RGB_LEDS)
         if (voltage < VOLTAGE_LOW_SAFE)
             rgb_led_update(RGB_RED|RGB_BREATH, arg);
@@ -281,7 +281,7 @@ uint8_t off_state(Event event, uint16_t arg) {
     #ifdef USE_INDICATOR_LED
     // 7 clicks: change indicator LED mode
     else if (event == EV_7clicks) {
-        uint8_t mode = (indicator_led_mode & 3) + 1;
+        uint8_t mode = (indicator_led_mode & 0xf) + 1;
         #ifdef TICK_DURING_STANDBY
         mode = mode & 3;
         #else
@@ -290,7 +290,7 @@ uint8_t off_state(Event event, uint16_t arg) {
         #ifdef INDICATOR_LED_SKIP_LOW
         if (mode == 1) { mode ++; }
         #endif
-        indicator_led_mode = (indicator_led_mode & 0b11111100) | mode;
+        indicator_led_mode = (indicator_led_mode & 0xf0) | mode;
         indicator_led(mode);
         save_config();
         return MISCHIEF_MANAGED;
