@@ -36,6 +36,7 @@ Driver pinout:
 #ifndef PWM1_PIN
 #define PWM1_PIN PB1               //
 #define PWM1_LVL TCA0.SINGLE.CMP1  // CMP1 is the output compare register for PB1
+#define PWM1_TOP TCA0.SINGLE.PER
 #endif
 
 // FET channel
@@ -99,7 +100,7 @@ inline void hwdef_setup() {
     // For Phase Correct (Dual Slope) PWM use TCA_SINGLE_WGMODE_DSBOTTOM_gc
     // See the manual for other pins, clocks, configs, portmux, etc
     TCA0.SINGLE.CTRLB = TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_DSBOTTOM_gc;
-    TCA0.SINGLE.PER = 255;
+    PWM1_TOP = 255;
     TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV1_gc | TCA_SINGLE_ENABLE_bm;
 }
 
