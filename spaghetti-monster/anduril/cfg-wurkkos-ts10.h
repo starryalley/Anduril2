@@ -35,3 +35,8 @@
 #undef THERM_FASTER_LEVEL
 #endif
 #define THERM_FASTER_LEVEL 130
+
+// candle mode doesn't have thermal throttling. With TS10 it gets hot very fast.
+// by raising PWM bits here it not only makes candle mode smoother but also safer to use
+#define PWM_TOP_CANDLE 0x3FF // 1023, 10bit PWM, max power is only 25%
+#define PWM_TOP_FIREWORK 0xFF // 255, 8bit PWM, max power is 100%
