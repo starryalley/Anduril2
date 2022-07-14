@@ -59,6 +59,7 @@ Model	Name                          	MCU
 0621	blf-lantern                   	attiny85
 0622	blf-lantern-t1616             	attiny1616
 0631	sofirn-sp10-pro               	attiny1616
+0714	wurkkos-ts10                    attiny1616
 1618	gchart-fet1-t1616             	attiny1616
 
 Duplicates:
