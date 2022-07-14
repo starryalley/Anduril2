@@ -24,29 +24,31 @@
 
 
 #if defined(USE_INDICATOR_LED) && defined(TICK_DURING_STANDBY)
-// beacon-like mode for the indicator LED
-void indicator_blink(uint8_t arg) {
+void indicator_led_update(uint8_t mode, uint8_t arg) {
     // turn off aux LEDs when battery is empty
     if (voltage < VOLTAGE_LOW) { indicator_led(0); return; }
 
-    #ifdef USE_OLD_BLINKING_INDICATOR
+    // beacon-like mode for the indicator LED
+    if ((mode & 0b00000011) == 0b00000011) {
+        #ifdef USE_OLD_BLINKING_INDICATOR
 
-    // basic blink, 1/8th duty cycle
-    if (! (arg & 7)) {
-        indicator_led(2);
+        // basic blink, 1/8th duty cycle
+        if (! (arg & 7)) {
+            indicator_led(2);
+        }
+        else {
+            indicator_led(0);
+        }
+
+        #else
+
+        // fancy blink, set off/low/high levels here:
+        static const uint8_t seq[] = {0, 1, 2, 1,  0, 0, 0, 0,
+                                      0, 0, 1, 0,  0, 0, 0, 0};
+        indicator_led(seq[arg & 15]);
+
+        #endif  // ifdef USE_OLD_BLINKING_INDICATOR
     }
-    else {
-        indicator_led(0);
-    }
-
-    #else
-
-    // fancy blink, set off/low/high levels here:
-    static const uint8_t seq[] = {0, 1, 2, 1,  0, 0, 0, 0,
-                                  0, 0, 1, 0,  0, 0, 0, 0};
-    indicator_led(seq[arg & 15]);
-
-    #endif  // ifdef USE_OLD_BLINKING_INDICATOR
 }
 #endif
 
