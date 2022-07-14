@@ -23,16 +23,29 @@
 #include "strobe-modes.h"
 
 
-void strobe_set_dyn_pwm() {
-#if defined(USE_DYN_PWM) && defined(PWM_TOP_CANDLE) && defined(PWM_TOP_FIREWORK)
-    if (strobe_type == candle_mode_e) {
+static void strobe_set_dyn_pwm(strobe_mode_te type) {
+#if defined(PWM_TOP_CANDLE) && defined(PWM_TOP_FIREWORK)
+    if (type == candle_mode_e) {
+        #ifdef USE_DYN_PWM
         use_static_pwm = 1;
+        #endif
+        #ifdef PWM1_TOP
         PWM1_TOP = PWM_TOP_CANDLE;
-    } else if (strobe_type == firework_mode_e) {
+        #endif
+    } else if (type == firework_mode_e) {
+        #ifdef USE_DYN_PWM
         use_static_pwm = 1;
+        #endif
+        #ifdef PWM1_TOP
         PWM1_TOP = PWM_TOP_FIREWORK;
+        #endif
     } else {
+        #ifdef USE_DYN_PWM
         use_static_pwm = 0;
+        #elif defined(PWM1_TOP)
+        // when not using USE_DYN_PWM, we must revert the TOP back to default
+        PWM1_TOP = PWM_TOP;
+        #endif
     }
 #endif
 }
@@ -60,10 +73,9 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     }
     #endif
     // use static PWM in firework mode
-    #if defined(USE_FIREWORK_MODE) && defined(USE_DYN_PWM) && defined(PWM_TOP_FIREWORK)
+    #if defined(USE_FIREWORK_MODE) && defined(PWM_TOP_FIREWORK)
     if (st == firework_mode_e && event == EV_enter_state) {
-        use_static_pwm = 1;
-        PWM1_TOP = PWM_TOP_FIREWORK;
+        strobe_set_dyn_pwm(st);
     }
     #endif
 
@@ -79,23 +91,21 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         #ifdef USE_AUX_RGB_LEDS
         aux_led_reset = 1;
         #endif
-        #ifdef USE_DYN_PWM
-        use_static_pwm = 0;
-        #endif
+        strobe_set_dyn_pwm(strobe_mode_END);
         return MISCHIEF_MANAGED;
     }
     // 2 clicks: rotate through strobe/flasher modes
     else if (event == EV_2clicks) {
         strobe_type = (st + 1) % NUM_STROBES;
         save_config();
-        strobe_set_dyn_pwm();
+        strobe_set_dyn_pwm(strobe_type);
         return MISCHIEF_MANAGED;
     }
     // 3 clicks: rotate back through strobe/flasher modes
     else if (event == EV_3clicks) {
         strobe_type = (st - 1 + NUM_STROBES) % NUM_STROBES;
         save_config();
-        strobe_set_dyn_pwm();
+        strobe_set_dyn_pwm(strobe_type);
         return MISCHIEF_MANAGED;
     }
     // hold: change speed (go faster)

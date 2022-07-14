@@ -113,9 +113,13 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
         #ifdef USE_AUX_RGB_LEDS
         aux_led_reset = 0;
         #endif
-        #if defined(USE_DYN_PWM) && defined(PWM_TOP_CANDLE)
+        #ifdef PWM_TOP_CANDLE
+        #ifdef USE_DYN_PWM
         use_static_pwm = 1;
+        #endif
+        #ifdef PWM1_TOP
         PWM1_TOP = PWM_TOP_CANDLE;
+        #endif
         #endif
         return MISCHIEF_MANAGED;
     }
