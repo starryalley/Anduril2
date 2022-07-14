@@ -55,6 +55,8 @@ uint8_t blink_digit(uint8_t num) {
     for (; num>0; num--) {
         #if defined(USE_AUX_RGB_LEDS)
         rgb_led_update(RGB_RED|RGB_HIGH, 0);
+        #elif defined(USE_INDICATOR_LED)
+        indicator_led(2);
         #else
         set_level(BLINK_BRIGHTNESS);
         #endif
