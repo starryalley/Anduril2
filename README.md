@@ -7,9 +7,9 @@ For toyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 # What's here
 
-Since I plan to only work with my Emisar D4v2s, I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
+Since I plan to only work with my existing Anduril2 lights (see below list), I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware for my 8 D4v2, a DW4, a SP10 Pro, and a TS10 (as of Jun 2022).
+This repo contains my own changes to Anduril2 firmware for my 8 D4v2, a DW4, a SP10 Pro, and a TS10 (as of Jul, 2022).
 
 The following is the built targets used:
 
@@ -31,10 +31,10 @@ emisar-d4sv2-tintramp: (for D4v2 tintramp)
 - D4v2 aluminum, tint ramping 5A+5A linear driver with Nichia 219b 2700/4500K
 - D4v2 aluminum, tint ramping ?A+?A linear driver with Nichia E21A 2000/5000K
 
-sonfirn-sp10-pro:
+sofirn-sp10-pro:
 - Sonfirn SP10 Pro AA/14500
 
-sonfirn-sp36-t1616:
+wurkkos-ts10:
 - Wurkkos TS10 14500
 
 
@@ -76,9 +76,9 @@ Instead of blinking the main emitter, blink the AUX green LED at high power to i
 Original idea from [here](https://bazaar.launchpad.net/~dnelson1901/flashlight-firmware/flashlight-firmware/revision/267)
 
 
-## Use AUX LED (red to be specific) when blinking numbers (For showing voltage/temperature etc)
+## Use AUX LED (red to be specific) or Indicator LED when blinking numbers (For showing voltage/temperature etc)
 
-It's a bit too harsh when using the main emitters to blink voltage/temperature readout. Use red AUX LED instead. 
+It's a bit too harsh when using the main emitters to blink voltage/temperature readout. Use red AUX LED instead. For lights with indicator LED only (TS10 for example), the indicator LED (high) will be used.
 
 
 ## Strobe mode can cycle back to the previous state by 3C
@@ -109,12 +109,13 @@ Ramp up main emitters output in 1 level using `3C`.
 Use `9C` to switch between smooth and discrete ramp style. Not being used often by me so make it harder to reach.
 
 
-## When it's time to change battery, blink red in standby/lockout mode
+## When it's time to change battery, blink AUX red (or indicator led) in standby/lockout mode
 
-When voltage is < 3.4V when light is off, the off/lockout AUX mode will not activate. Instead, the AUX red LED will blink. Original idea from reddit user [connorkmiec93](https://www.reddit.com/user/connorkmiec93/) at this [post](https://www.reddit.com/r/flashlight/comments/mpj36p/im_doing_a_d4v2_with_anduril_2_giveaway/).
+When voltage is < 3.2V when light is off, the off/lockout AUX mode will not activate. Instead, the AUX red LED will blink. Original idea from reddit user [connorkmiec93](https://www.reddit.com/user/connorkmiec93/) at this [post](https://www.reddit.com/r/flashlight/comments/mpj36p/im_doing_a_d4v2_with_anduril_2_giveaway/).
 
 The blinking is in a pattern called breathing (although it's only low/high mode in AUX LED) so it's less distracting to the original blinking and one can tell the difference to the normal blinking in RED mode.
 
+For lights with the indicator LED, the indicator LED will be used.
 
 ## Fireplace mode (in Candle mode)
 
@@ -162,6 +163,13 @@ In this mode:
 - easier control of button LED and AUX LED in this mode
 - disable some other settings which can possibly blind dark adapted eyes, for example, only allow candle/lightning in strobe modes.
 
+## Child safe mode
+
+12H to go to this mode and back to advanced mode.
+
+In this mode:
+- mostly same with the low power mode but with many other dangerous mode disabled and only allow stepped mode with no other functionality.
+- switch to this mode before handling the light to the kids (or whoever you reckon is)
 
 # Other useful commits
 
@@ -170,7 +178,7 @@ In this mode:
 - [fix ramping in sunset mode](https://github.com/SammysHP/flashlight-firmware/commit/27433bf7589bf35c19bb1d2b5a98341ac402d139)
 - [accurate 16-bit PWM strobe](https://bazaar.launchpad.net/~i-dan-3/flashlight-firmware/pwm-strobe/revision/238)
 - [beacon tower mode](https://budgetlightforum.com/comment/1727142#comment-1727142)
-
+- [Gabriel's Wurkkos TS10 LVP fix](https://code.launchpad.net/~gabe/flashlight-firmware/anduril2): see rev 618,619
 
 # Development environment
 
