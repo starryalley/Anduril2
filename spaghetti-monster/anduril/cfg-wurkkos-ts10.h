@@ -40,3 +40,5 @@
 // by raising PWM bits here it not only makes candle mode smoother but also safer to use
 #define PWM_TOP_CANDLE 0x3FF // 1023, 10bit PWM, max power is only 25%
 #define PWM_TOP_FIREWORK 0xFF // 255, 8bit PWM, max power is 100%
+
+#define USE_LOWPASS_WHILE_ASLEEP
