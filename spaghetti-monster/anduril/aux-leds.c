@@ -27,7 +27,8 @@
 void indicator_led_update(uint8_t mode, uint8_t arg) {
     // turn off aux LEDs when battery is empty
     if (voltage < VOLTAGE_LOW) { indicator_led(0); return; }
-    if (mode <= 2) return;
+    // when mode isn't blinky (mode==3 or 4) let's set indicator again
+    if (mode <= 2) { indicator_led(mode); return; }
 
     // beacon-like mode for the indicator LED
     #ifdef USE_OLD_BLINKING_INDICATOR
