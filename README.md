@@ -55,13 +55,13 @@ Add an additional mode "temperature" in AUX LED mode (for standby/lockout) after
 This setting is after "voltage" mode. Use `7H` from off to loop each mode.
 
 
-## Allow the use of AUX LED in lower levels (< DEFAULT_LEVEL) level (6C/6H while light is on)
+## Allow the use of AUX/Indicator LED in lower levels (< DEFAULT_LEVEL) level (6C/6H while light is on)
 
 When in lower levels (< DEFAULT_LEVEL), optionally we can turn on AUX LED along with main emitters.
 
-`6C`: in lower levels, allow AUX colour LED to be turned on along with main emitters for possible tint mix. `6H` changes AUX colour from RED to WHITE (total 7 colours).
-    
-`6C`: in lower levels, cycle through these additional states:
+`6C`: in lower levels, allow AUX colour LED to be turned on along with main emitters for possible tint mix. `6H` changes AUX colour from RED to WHITE (total 7 colours). 
+
+`6C`: in lower levels, cycle through these additional states (only for AUX LEDs):
   - main emitters on, aux high, button low (allow use of AUX LEDs with main emitters)
   - main emitters off, aux off, button high
   - main emitters off, aux off, button low (lowest possible/useful light)
@@ -69,6 +69,10 @@ When in lower levels (< DEFAULT_LEVEL), optionally we can turn on AUX LED along 
 
 No extra state is defined and the AUX LED on is temporary (not remembered) so if there is any button event (ramp up for example), AUX LED will be off. If later user enters moonlight, only main emitters will be lit (default). You need to re-enable this through `6C` or `6H`. The current AUX LED colour is remembered until reboot(factory reset).
 
+When AUX isn't available but indicator LED is:
+
+`6C`: turn on indicator LED
+`6H`: turn off indicator LED
 
 ## Blink AUX green LED when powered on
 
@@ -121,7 +125,7 @@ For lights with the indicator LED, the indicator LED will be used.
 
 2 additional wobble styles: fireplace_slow and fireplace_fast. Use `4H` to cycle through all 3 wobble styles. This is a saved configuration. 
 
-In candle wobble style (default/stock) we can additional use `7C` to toggle if we want to use aux led to assist in tint mixing. Red or yellow aux LED will light up along with the wobbling light.
+In candle wobble style (default/stock) we can additional use `7C` to toggle if we want to use aux led to assist in tint mixing (if AUX is available). Red or yellow aux LED will light up along with the wobbling light.
 
 
 ## Fireworks mode
