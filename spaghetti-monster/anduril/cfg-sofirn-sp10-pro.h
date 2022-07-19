@@ -4,6 +4,7 @@
 // ATTINY: 1616
 
 #undef BLINK_AT_RAMP_MIDDLE
+#undef BLINK_AT_RAMP_CEIL
 
 #define USE_DYNAMIC_UNDERCLOCKING
 
@@ -52,7 +53,7 @@
 
 // and finally, set the default ramp style to Stepped
 #undef RAMP_STYLE
-#define RAMP_STYLE 1  // 0 = smooth, 1 = stepped
+#define RAMP_STYLE 0  // 0 = smooth, 1 = stepped
 
 // stop panicking at ~30% power
 #define THERM_FASTER_LEVEL 105
@@ -70,4 +71,3 @@
 
 // enable factory reset on 13H without loosening tailcap
 #define USE_SOFT_FACTORY_RESET
-
