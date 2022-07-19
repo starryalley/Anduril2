@@ -548,6 +548,23 @@ uint8_t steady_state(Event event, uint16_t arg) {
             rgb_led_update(RGB_OFF, 0);
         }
     }
+    #elif defined(USE_INDICATOR_LED)
+    // 6H: turn off indicator LED
+    else if (event == EV_click6_hold) {
+        if (0 == (arg & 0x3f)) {
+            if (actual_level <= AUX_ON_LOWLEVEL)
+                indicator_led(0);
+        }
+        return MISCHIEF_MANAGED;
+    }
+    else if (event == EV_click6_hold_release) {
+        return MISCHIEF_MANAGED;
+    }
+    // 6C: turn on indicator LED
+    else if (event == EV_6clicks) {
+        if (actual_level <= AUX_ON_LOWLEVEL)
+            indicator_led(2);
+    }
     #endif
 
     #ifdef USE_RAMP_CONFIG
