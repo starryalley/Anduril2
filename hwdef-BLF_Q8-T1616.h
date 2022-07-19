@@ -22,6 +22,7 @@ Driver pinout:
 #include <avr/io.h>
 
 #define PWM_CHANNELS 2
+#define PWM_TOP 255
 
 #ifndef SWITCH_PIN
 #define SWITCH_PIN     PIN5_bp
@@ -35,15 +36,19 @@ Driver pinout:
 // 7135 channel
 #ifndef PWM1_PIN
 #define PWM1_PIN PB1               //
-#define PWM1_LVL TCA0.SINGLE.CMP1  // CMP1 is the output compare register for PB1
-#define PWM1_TOP TCA0.SINGLE.PER
+#define PWM1_LVL TCA0.SINGLE.CMP1BUF  // CMP1 is the output compare register for PB1
+#define PWM1_TOP TCA0.SINGLE.PERBUF
+#define PWM1_CNT TCA0.SINGLE.CNT
 #endif
 
 // FET channel
 #ifndef PWM2_PIN
 #define PWM2_PIN PB0               //
-#define PWM2_LVL TCA0.SINGLE.CMP0  // CMP0 is the output compare register for PB0
+#define PWM2_LVL TCA0.SINGLE.CMP0BUF  // CMP0 is the output compare register for PB0
 #endif
+
+#define PWM1_PHASE_RESET_OFF
+#define PWM1_PHASE_RESET_ON
 
 // average drop across diode on this hardware
 #ifndef VOLTAGE_FUDGE_FACTOR
@@ -100,7 +105,7 @@ inline void hwdef_setup() {
     // For Phase Correct (Dual Slope) PWM use TCA_SINGLE_WGMODE_DSBOTTOM_gc
     // See the manual for other pins, clocks, configs, portmux, etc
     TCA0.SINGLE.CTRLB = TCA_SINGLE_CMP0EN_bm | TCA_SINGLE_CMP1EN_bm | TCA_SINGLE_WGMODE_DSBOTTOM_gc;
-    PWM1_TOP = 255;
+    PWM1_TOP = PWM_TOP;
     TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV1_gc | TCA_SINGLE_ENABLE_bm;
 }
 
