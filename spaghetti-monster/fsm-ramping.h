@@ -25,7 +25,7 @@
 
 // actual_level: last ramp level set by set_level()
 uint8_t actual_level = 0;
-#ifdef USE_AUX_RGB_LEDS
+#if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
 // if true (default) reset AUX LED (off) when we set_level(),
 //  and button LED will be set according to AUX LED state
 // when false, AUX LED won't get set when set_level() is called or

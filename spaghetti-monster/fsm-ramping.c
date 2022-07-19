@@ -54,7 +54,8 @@ void set_level(uint8_t level) {
         #if defined(USE_INDICATOR_LED) || defined(USE_AUX_RGB_LEDS)
         if (! go_to_standby) {
             #ifdef USE_INDICATOR_LED
-                indicator_led(0);
+                if (aux_led_reset)
+                    indicator_led(0);
             #endif
             #ifdef USE_AUX_RGB_LEDS
                 if (aux_led_reset) {

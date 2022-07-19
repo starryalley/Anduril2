@@ -67,7 +67,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     if (st == candle_mode_e) {
         candle_mode_state(event, arg);
     } else {
-        #ifdef USE_AUX_RGB_LEDS
+        #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
         aux_led_reset = 1;
         #endif
     }
@@ -88,7 +88,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     // 1 click: off
     else if (event == EV_1click) {
         set_state(off_state, 0);
-        #ifdef USE_AUX_RGB_LEDS
+        #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
         aux_led_reset = 1;
         #endif
         strobe_set_dyn_pwm(strobe_mode_END);

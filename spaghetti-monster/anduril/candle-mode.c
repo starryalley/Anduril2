@@ -53,6 +53,9 @@ static inline void reset_parameters() {
         #ifdef USE_AUX_RGB_LEDS
         aux_led_reset = 0;
         rgb_led_update(RGB_RED|RGB_HIGH, 0);
+        #elif defined(USE_INDICATOR_LED)
+        aux_led_reset = 0;
+        indicator_led(2);
         #endif
         break;
     case fireplace_fast_wobble_e:
@@ -65,6 +68,9 @@ static inline void reset_parameters() {
         #ifdef USE_AUX_RGB_LEDS
         aux_led_reset = 0;
         rgb_led_update(RGB_YELLOW|RGB_HIGH, 0);
+        #elif defined(USE_INDICATOR_LED)
+        aux_led_reset = 0;
+        indicator_led(2);
         #endif
         break;
     default:
@@ -77,6 +83,9 @@ static inline void reset_parameters() {
         #ifdef USE_AUX_RGB_LEDS
         aux_led_reset = !candle_use_aux;
         rgb_led_update(RGB_OFF, 0);
+        #elif defined(USE_INDICATOR_LED)
+        aux_led_reset = 1;
+        indicator_led(0);
         #endif
     }
 }
@@ -110,7 +119,7 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
     if (event == EV_enter_state) {
         ramp_direction = 1;
         reset_parameters();
-        #ifdef USE_AUX_RGB_LEDS
+        #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
         aux_led_reset = 0;
         #endif
         #ifdef PWM_TOP_CANDLE
