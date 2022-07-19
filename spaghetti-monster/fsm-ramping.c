@@ -175,7 +175,15 @@ void set_level(uint8_t level) {
         #endif
         #endif
         #if PWM_CHANNELS >= 2
+        #if defined(USE_DYN_PWM) && defined(PWM2_LEVELS_STROBE)
+        if (use_static_pwm) {
+            PWM2_LVL = PWM_GET(pwm2_levels_strobe, level);
+        } else {
+            PWM2_LVL = PWM_GET(pwm2_levels, level);
+        }
+        #else
         PWM2_LVL = PWM_GET(pwm2_levels, level);
+        #endif
         #endif
         #if PWM_CHANNELS >= 3
         PWM3_LVL = PWM_GET(pwm3_levels, level);

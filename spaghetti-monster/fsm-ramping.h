@@ -98,6 +98,9 @@ PROGMEM const PWM_DATATYPE pwm_tops[] = { PWM_TOPS };
 #ifdef PWM1_LEVELS_STROBE
 PROGMEM const PWM_DATATYPE pwm1_levels_strobe[] = { PWM1_LEVELS_STROBE };
 #endif
+#ifdef PWM2_LEVELS_STROBE
+PROGMEM const PWM_DATATYPE pwm2_levels_strobe[] = { PWM2_LEVELS_STROBE };
+#endif
 // a temporary flag used in candle and other strobe modes to disable DYN PWM
 uint8_t use_static_pwm = 0;
 #endif
