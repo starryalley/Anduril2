@@ -104,7 +104,7 @@ inline void bike_flasher_iter();
 
 #ifdef USE_FIREWORK_MODE
 #define MIN_FIREWORK_LEVEL DEFAULT_LEVEL // max is always MAX_LEVEL
-uint8_t firework_brightness = MAX_1x7135;
+uint8_t firework_brightness = RAMP_SMOOTH_CEIL;
 inline void firework_iter();
 #endif
 
