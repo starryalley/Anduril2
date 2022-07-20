@@ -241,6 +241,11 @@ void globals_config_save(uint8_t step, uint8_t value);
 uint8_t globals_config_state(Event event, uint16_t arg);
 #endif
 
+#ifdef USE_SUNSET_TIMER
+uint8_t timer_orig_level = 0;
+void reset_sunset_timer();
+#endif
+
 #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
 #define AUX_ON_LOWLEVEL DEFAULT_LEVEL // if level is less than this level we can turn on aux LED
 #endif

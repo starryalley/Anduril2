@@ -41,6 +41,7 @@ uint8_t sunset_timer_state(Event event, uint16_t arg) {
         if ((sunset_timer > 0) && (sunset_timer < 4)) {
             sunset_timer = 3;
             sunset_timer_peak = 3;
+            sunset_ticks = 0;
         }
     }
     // 5H: add 5m to timer, per second, until released
