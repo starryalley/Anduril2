@@ -414,8 +414,13 @@ void update_tint() {
         warm_PWM = top;
     }
 
-    TINT1_LVL = warm_PWM;
-    TINT2_LVL = cool_PWM;
+    if (brightness == 1) {
+        TINT1_LVL = 0;
+        TINT2_LVL = 0;
+    } else {
+        TINT1_LVL = warm_PWM;
+        TINT2_LVL = cool_PWM;
+    }
 
     // disable the power channel, if relevant
     #ifdef LED_ENABLE_PIN
