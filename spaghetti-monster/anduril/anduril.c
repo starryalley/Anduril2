@@ -205,6 +205,9 @@
 #include "sos-mode.c"
 #endif
 
+#ifdef USE_RAMP_START_MODE
+#include "startup_mode.c"
+#endif
 
 // runs one time at boot, when power is connected
 void setup() {

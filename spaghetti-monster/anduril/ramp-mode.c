@@ -26,6 +26,10 @@
 #include "sunset-timer.h"
 #endif
 
+#ifdef USE_RAMP_START_MODE
+#include "startup_mode.h"
+#endif
+
 #ifdef USE_AUX_RGB_LEDS
 static void set_lowlevel_mode(uint8_t main_level) {
     static uint8_t last_level;
@@ -177,7 +181,11 @@ uint8_t steady_state(Event event, uint16_t arg) {
             memorized_level = arg;
         // use the requested level even if not memorized
         arg = nearest_level(arg);
+        #ifdef USE_RAMP_START_MODE
+        ramp_up_level(arg);
+        #else
         set_level_and_therm_target(arg);
+        #endif
         ramp_direction = 1;
         return MISCHIEF_MANAGED;
     }
@@ -375,6 +383,10 @@ uint8_t steady_state(Event event, uint16_t arg) {
             }
         }
         #endif  // ifdef USE_SET_LEVEL_GRADUALLY
+
+        #ifdef USE_RAMP_START_MODE
+        ramp_up_tick();
+        #endif
         return MISCHIEF_MANAGED;
     }
 
@@ -715,6 +727,9 @@ void globals_config_save(uint8_t step, uint8_t value) {
     #ifdef USE_JUMP_START
     else if (step == 1+jump_start_config_step) { jump_start_level = value; }
     #endif
+    #ifdef USE_RAMP_START_MODE
+    else if (step == 1+ramp_start_mode_config_step) { ramp_start_mode = value; }
+    #endif
 }
 
 uint8_t globals_config_state(Event event, uint16_t arg) {
@@ -793,7 +808,6 @@ void reset_sunset_timer() {
     }
 }
 #endif
-
 
 #endif
 

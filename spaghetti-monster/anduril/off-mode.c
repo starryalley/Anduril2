@@ -26,6 +26,10 @@
 #include "sunset-timer.h"
 #endif
 
+#ifdef USE_RAMP_START_MODE
+#include "startup_mode.h"
+#endif
+
 uint8_t off_state(Event event, uint16_t arg) {
 
     // turn emitter off when entering state
@@ -144,15 +148,18 @@ uint8_t off_state(Event event, uint16_t arg) {
                 #endif
             }
         #endif
+        #ifdef USE_RAMP_START_MODE
+        ramp_up_level(nearest_level(memorized_level));
+        #else
         set_level(nearest_level(memorized_level));
+        #endif
         return MISCHIEF_MANAGED;
     }
     #endif  // if (B_TIMING_ON != B_TIMEOUT_T)
     // 1 click: regular mode
     else if (event == EV_1click) {
         #if (B_TIMING_ON != B_TIMEOUT_T)
-        // brightness was already set; reuse previous value
-        set_state(steady_state, actual_level);
+        set_state(steady_state, nearest_level(memorized_level));
         #else
         // FIXME: B_TIMEOUT_T breaks manual_memory and manual_memory_timer
         //        (need to duplicate manual mem logic here, probably)

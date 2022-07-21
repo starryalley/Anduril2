@@ -107,6 +107,9 @@ void load_config() {
         #ifdef USE_AUX_RGB_LEDS
         candle_use_aux = eeprom[candle_use_aux_e];
         #endif
+        #ifdef USE_RAMP_START_MODE
+        ramp_start_mode = eeprom[ramp_start_mode_e];
+        #endif
         #endif
     }
     #ifdef START_AT_MEMORIZED_LEVEL
@@ -198,6 +201,9 @@ void save_config() {
     eeprom[candle_wobble_style_e] = wobble_style;
     #ifdef USE_AUX_RGB_LEDS
     eeprom[candle_use_aux_e] = candle_use_aux;
+    #endif
+    #ifdef USE_RAMP_START_MODE
+    eeprom[ramp_start_mode_e] = ramp_start_mode;
     #endif
     #endif
     save_eeprom();
