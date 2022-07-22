@@ -197,9 +197,6 @@
 // those oscillations
 //#define USE_LOWPASS_WHILE_ASLEEP
 
-// when in off mode and single click to turn on the light, use can configure different start up behaviour:
-//  0: instant on (default)
-//  1: quickly ramp up to the level (~0.5s or so)
-//  2: fluorescent startup flicker
+// when in off mode and single click to turn on the light, user can configure different start up behaviour
 #define USE_RAMP_START_MODE
 #endif

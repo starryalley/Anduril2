@@ -23,11 +23,16 @@
 #ifndef DEFAULT_RAMP_START_MODE
 #define DEFAULT_RAMP_START_MODE 0
 #endif
-// 0: instant on, 1: ramp up to memorized level, 2: fluorescent startup flicker
+
+// 0: instant on (default)
+// 1: ramp up to memorized level within 0.5sec
+// 2: old fluorescent light flicker
+// 3: lighter flicker and slowly ramp up
 uint8_t ramp_start_mode = DEFAULT_RAMP_START_MODE;
 uint8_t ramp_up_target = 0;
 uint8_t ramp_up_increment = 1;
-
+uint8_t flicker_random = 1;
+uint8_t flicker_index = 0;
 void ramp_up_level(uint8_t lvl);
 void ramp_up_tick();
 
