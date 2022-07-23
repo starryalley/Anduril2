@@ -142,6 +142,51 @@ Adjust firework brightness (explosion brightness):
 
 In a tint ramping light, when light is on use `8H` to go to middle tint. (Copied from [4h to go to middle, not in the middle of 3h](https://github.com/mkong1/anduril/pull/34) )
 
+
+## 2 More indicator LED modes
+
+Idea from [SammysHP's commit](https://github.com/SammysHP/flashlight-firmware/commit/31a2085bffa9b3eda1c240ccb8191ee4ec903352#)
+
+Add mode 4 and mode 5 for low/high blinking. Idea from [here](https://github.com/SammysHP/flashlight-firmware/commit/31a2085bffa9b3eda1c240ccb8191ee4ec903352#)
+
+Modes:
+- 0: off
+- 1: low
+- 2: high
+- 3: blinking (stock Anduril2)
+- 4: blinking low
+- 5: blinking high
+- 6: breathing (user can't select this. Only used for safer low voltage warning)
+
+
+## Start Up Mode
+
+Idea from [this post](https://www.reddit.com/r/flashlight/comments/w417mx/anduril_mode_to_ramp_on_for_05_seconds_or_so/).
+
+
+When doing 1-click from off to turn on the light, there are additionally 3 modes that can be selected through Misc Config Menu (`9H` from off).
+
+- Mode 0: instant on (default)
+- Mode 1: quickly ramp up to memorized level
+- Mode 2: old fluorescent light flickering
+- Mode 3: lighter flickering and slowly ramp up
+
+See [this youtube video](https://www.youtube.com/watch?v=uP6s6mgOBio) for demo.
+
+The Misc Config menu has the following items:
+- `USE_TINT_RAMPING` (if enabled) is the first item (for tint ramping lights)
+- `USE_JUMP_START` (if enabled) is the second item (for lights with jump start enabled)
+- This Start up mode is the third item
+
+Based on different light's config this can be 1st, 2nd or 3rd item in the menu. For D4v2/D4sv2 it is the third, for D4v2/DW4 single channel it's the second. For SP10 pro and TS10 it's the first and only item.
+
+
+## Smooth sunset from SammysHP
+
+Direct copy from [SammysHP](https://github.com/SammysHP)'s [Smooth sunset v2 patches](https://github.com/SammysHP/flashlight-firmware/commits/smooth-sunset-v2) which is awesome.
+
+
+
 # Configuration changes
 
 - Default in Advanced mode
