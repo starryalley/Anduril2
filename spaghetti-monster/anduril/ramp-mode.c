@@ -181,11 +181,7 @@ uint8_t steady_state(Event event, uint16_t arg) {
             memorized_level = arg;
         // use the requested level even if not memorized
         arg = nearest_level(arg);
-        #ifdef USE_RAMP_START_MODE
-        ramp_up_level(arg);
-        #else
         set_level_and_therm_target(arg);
-        #endif
         ramp_direction = 1;
         return MISCHIEF_MANAGED;
     }

@@ -149,7 +149,8 @@ uint8_t off_state(Event event, uint16_t arg) {
             }
         #endif
         #ifdef USE_RAMP_START_MODE
-        ramp_up_level(nearest_level(memorized_level));
+        if (ramp_start_mode == 0)
+            set_level(nearest_level(memorized_level));
         #else
         set_level(nearest_level(memorized_level));
         #endif
@@ -158,12 +159,16 @@ uint8_t off_state(Event event, uint16_t arg) {
     #endif  // if (B_TIMING_ON != B_TIMEOUT_T)
     // 1 click: regular mode
     else if (event == EV_1click) {
+        #ifdef USE_RAMP_START_MODE
+        set_state(steady_state, 0);
+        ramp_up_level(nearest_level(memorized_level));
+        #endif
         #if (B_TIMING_ON != B_TIMEOUT_T)
-        set_state(steady_state, nearest_level(memorized_level));
+        //set_state(steady_state, nearest_level(memorized_level));
         #else
         // FIXME: B_TIMEOUT_T breaks manual_memory and manual_memory_timer
         //        (need to duplicate manual mem logic here, probably)
-        set_state(steady_state, memorized_level);
+        //set_state(steady_state, memorized_level);
         #endif
         return MISCHIEF_MANAGED;
     }
