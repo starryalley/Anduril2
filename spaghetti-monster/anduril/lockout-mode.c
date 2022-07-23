@@ -57,7 +57,7 @@ uint8_t lockout_state(Event event, uint16_t arg) {
     //  even if the user keeps pressing the button)
     #ifdef USE_INDICATOR_LED
     if (event == EV_enter_state) {
-        indicator_led(indicator_led_mode >> 4);
+        indicator_led_update(indicator_led_mode >> 4, 0);
     } else
     #elif defined(USE_AUX_RGB_LEDS)
     if (event == EV_enter_state) {
@@ -68,7 +68,7 @@ uint8_t lockout_state(Event event, uint16_t arg) {
         if (arg > HOLD_TIMEOUT) {
             go_to_standby = 1;
             #ifdef USE_INDICATOR_LED
-            indicator_led(indicator_led_mode >> 4);
+            indicator_led_update(indicator_led_mode >> 4, 0);
             #elif defined(USE_AUX_RGB_LEDS)
             rgb_led_update(rgb_led_lockout_mode, arg);
             #endif
@@ -79,7 +79,7 @@ uint8_t lockout_state(Event event, uint16_t arg) {
     else if (event == EV_sleep_tick) {
         #if defined(USE_INDICATOR_LED)
         if (voltage < VOLTAGE_LOW_SAFE)
-            indicator_led_update(4, arg);
+            indicator_led_update(6, arg);
         else
             indicator_led_update(indicator_led_mode >> 4, arg);
         #elif defined(USE_AUX_RGB_LEDS)
@@ -146,7 +146,7 @@ uint8_t lockout_state(Event event, uint16_t arg) {
         #if defined(USE_INDICATOR_LED)
             uint8_t mode = indicator_led_mode >> 4;
             #ifdef TICK_DURING_STANDBY
-            mode = (mode + 1) & 3;
+            mode = (mode + 1) % 6;
             #else
             mode = (mode + 1) % 3;
             #endif
@@ -154,7 +154,7 @@ uint8_t lockout_state(Event event, uint16_t arg) {
             if (mode == 1) { mode ++; }
             #endif
             indicator_led_mode = (mode << 4) + (indicator_led_mode & 0xf);
-            indicator_led(mode);
+            indicator_led_update(mode, 0);
         #elif defined(USE_AUX_RGB_LEDS)
         #endif
         save_config();

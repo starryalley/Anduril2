@@ -27,34 +27,32 @@
 void indicator_led_update(uint8_t mode, uint8_t arg) {
     // turn off aux LEDs when battery is empty
     if (voltage < VOLTAGE_LOW) { indicator_led(0); return; }
-    // when mode isn't blinky (mode==3 or 4) let's set indicator again
+    mode &= 0xf;
+    
+    // when mode isn't blinky, let's set indicator again
     if (mode <= 2) { indicator_led(mode); return; }
 
-    // beacon-like mode for the indicator LED
-    #ifdef USE_OLD_BLINKING_INDICATOR
+    static const uint8_t seq[] = {0, 1, 2, 1,  0, 0, 0, 0,
+                                  0, 0, 1, 0,  0, 0, 0, 0};
+    static const uint8_t seq_breath[] = {0, 1, 1, 1,  2, 2, 2, 2,
+                                         1, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0};
 
-    // basic blink, 1/8th duty cycle
-    uint8_t mask = (mode == 3) ? 7 : 3;
-    if (! (arg & mask)) {
-        indicator_led(2);
+    uint8_t level = mode;
+    switch (mode) {
+    case 3:
+        // fancy blink, set off/low/high levels here:
+        level = seq[arg & 15];
+        break;
+    case 4:
+    case 5:
+        // blinking low or high
+        level = (arg & 15) ? 0 : mode - 3;
+        break;
+    case 6:
+        level = seq_breath[arg % sizeof(seq_breath)];
+        break;
     }
-    else {
-        indicator_led(0);
-    }
-
-    #else
-
-    // fancy blink, set off/low/high levels here:
-    if (mode == 3) {
-        static const uint8_t seq[] = {0, 1, 2, 1,  0, 0, 0, 0,
-                                    0, 0, 1, 0,  0, 0, 0, 0};
-        indicator_led(seq[arg & 15]);
-    } else if (mode == 4) {
-        static const uint8_t seq_breath[] = {0, 1, 1, 1,  2, 2, 2, 2,
-                                            1, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0};
-        indicator_led(seq_breath[arg % sizeof(seq_breath)]);
-    }
-    #endif  // ifdef USE_OLD_BLINKING_INDICATOR
+    indicator_led(level);
 }
 #endif
 

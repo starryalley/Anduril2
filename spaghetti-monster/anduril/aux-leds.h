@@ -83,12 +83,12 @@ uint8_t rgb_led_off_mode = RGB_LED_OFF_DEFAULT;
 uint8_t rgb_led_lockout_mode = RGB_LED_LOCKOUT_DEFAULT;
 #endif
 
-//#define USE_OLD_BLINKING_INDICATOR
-//#define USE_FANCIER_BLINKING_INDICATOR
 #ifdef USE_INDICATOR_LED
     // bits 4-7 control lockout mode
     // bits 0-3 control "off" mode
-    // modes are: 0=off, 1=low, 2=high, 3=blinking, 4=breathing (if TICK_DURING_STANDBY enabled)
+    // modes are: 0=off, 1=low, 2=high
+    //            (below modes are only enabled if TICK_DURING_STANDBY is defined)
+    //            3=blinking, 4=blinking low, 5=blinking high, 6=breathing
     #ifdef INDICATOR_LED_DEFAULT_MODE
     uint8_t indicator_led_mode = INDICATOR_LED_DEFAULT_MODE;
     #else
@@ -96,7 +96,7 @@ uint8_t rgb_led_lockout_mode = RGB_LED_LOCKOUT_DEFAULT;
         //uint8_t indicator_led_mode = (1<<4) + 2;
         uint8_t indicator_led_mode = (2<<4) + 1;
         #else
-        uint8_t indicator_led_mode = (3<<4) + 1;
+        uint8_t indicator_led_mode = (4<<4) + 1;
         #endif
     #endif
 #endif
