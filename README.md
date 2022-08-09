@@ -1,8 +1,8 @@
 # ToyKeeper's Anduril flashlight firmware fork
 
-This is a clone from [ToyKeeper's Flashlight Firmware](https://code.launchpad.net/flashlight-firmware) from branch [anduril2](https://code.launchpad.net/~toykeeper/flashlight-firmware/anduril2), revision [647](https://bazaar.launchpad.net/~toykeeper/flashlight-firmware/anduril2/revision/647)
+This is a clone from [ToyKeeper's Flashlight Firmware](https://code.launchpad.net/flashlight-firmware) from branch [anduril2](https://code.launchpad.net/~toykeeper/flashlight-firmware/anduril2), revision [652](https://bazaar.launchpad.net/~toykeeper/flashlight-firmware/anduril2/revision/652)
 
-For toyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
+For ToyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 
 # What's here
