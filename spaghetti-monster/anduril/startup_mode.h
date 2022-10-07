@@ -21,7 +21,7 @@
 #define STARTUP_MODE_H
 
 #ifndef DEFAULT_RAMP_START_MODE
-#define DEFAULT_RAMP_START_MODE 0
+#define DEFAULT_RAMP_START_MODE 1
 #endif
 
 // 0: instant on (default)
