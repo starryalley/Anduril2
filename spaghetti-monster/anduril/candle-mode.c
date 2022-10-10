@@ -55,7 +55,7 @@ static inline void reset_parameters() {
         rgb_led_update(RGB_RED|RGB_HIGH, 0);
         #elif defined(USE_INDICATOR_LED)
         aux_led_reset = 0;
-        indicator_led(2);
+        indicator_led(1);
         #endif
         break;
     case fireplace_fast_wobble_e:
@@ -70,7 +70,7 @@ static inline void reset_parameters() {
         rgb_led_update(RGB_YELLOW|RGB_HIGH, 0);
         #elif defined(USE_INDICATOR_LED)
         aux_led_reset = 0;
-        indicator_led(2);
+        indicator_led(1);
         #endif
         break;
     default:
