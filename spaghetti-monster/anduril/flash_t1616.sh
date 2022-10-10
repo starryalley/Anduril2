@@ -5,7 +5,4 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-echo "Erasing..."
-pymcuprog erase -d attiny1616 -t uart -u /dev/tty.usbserial-0001
-echo "Flashing..."
-pymcuprog write -d attiny1616 -t uart -u /dev/tty.usbserial-0001 -f $1 --verify
+avrdude -p attiny1616 -c serialupdi -P /dev/tty.usbserial-0001 -Uflash:w:$1
