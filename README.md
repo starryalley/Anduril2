@@ -145,9 +145,9 @@ In a tint ramping light, when light is on use `8H` to go to middle tint. (Copied
 
 ## 2 More indicator LED modes
 
-Idea from [SammysHP's commit](https://github.com/SammysHP/flashlight-firmware/commit/31a2085bffa9b3eda1c240ccb8191ee4ec903352#)
+Idea from [SammysHP's commit](https://github.com/SammysHP/flashlight-firmware/commits/more-aux-patterns)
 
-Add mode 4 and mode 5 for low/high blinking. Idea from [here](https://github.com/SammysHP/flashlight-firmware/commit/31a2085bffa9b3eda1c240ccb8191ee4ec903352#)
+Add mode 4 and mode 5 for low/high blinking.
 
 Modes:
 - 0: off
@@ -183,7 +183,7 @@ Based on different light's config this can be 1st, 2nd or 3rd item in the menu. 
 
 ## Smooth sunset from SammysHP
 
-Direct copy from [SammysHP](https://github.com/SammysHP)'s [Smooth sunset v2 patches](https://github.com/SammysHP/flashlight-firmware/commits/smooth-sunset-v2) which is awesome.
+Direct copy from [SammysHP](https://github.com/SammysHP)'s [Smooth sunset v2 patches](https://github.com/SammysHP/flashlight-firmware/commits/smooth-sunset-v2) or [smooth sunset](https://github.com/SammysHP/flashlight-firmware/tree/smooth-sunset) which is awesome.
 
 
 
@@ -220,11 +220,10 @@ In this mode:
 - mostly same with the low power mode but with many other dangerous mode disabled and only allow stepped mode with no other functionality.
 - switch to this mode before handling the light to the kids (or whoever you reckon is)
 
-# Other useful commits
+# Other useful branch/commits
 
-- [allow turbo in momentary mode](https://github.com/SammysHP/flashlight-firmware/commit/db7d58aa6d3f47336ace646fc6d4818d86c08956)
-- [more steps to sunset mode](https://github.com/SammysHP/flashlight-firmware/commit/499489bfbc0d0e7501f30a675e58aaa4c36f432e)
-- [fix ramping in sunset mode](https://github.com/SammysHP/flashlight-firmware/commit/27433bf7589bf35c19bb1d2b5a98341ac402d139)
+- [allow turbo in momentary mode](https://github.com/SammysHP/flashlight-firmware/tree/momentary-turbo)
+- [stepped tint ramping](https://github.com/SammysHP/flashlight-firmware/tree/stepped-tint-ramping)
 - [accurate 16-bit PWM strobe](https://bazaar.launchpad.net/~i-dan-3/flashlight-firmware/pwm-strobe/revision/238)
 - [beacon tower mode](https://budgetlightforum.com/comment/1727142#comment-1727142)
 - [Gabriel's Wurkkos TS10 LVP fix](https://code.launchpad.net/~gabe/flashlight-firmware/anduril2): see rev 618,619
