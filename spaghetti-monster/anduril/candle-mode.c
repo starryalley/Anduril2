@@ -167,12 +167,17 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
             candle_mode_brightness --;
         return MISCHIEF_MANAGED;
     }
-    // 4H: set wobble style (main wobble only->main wobble + aux wobble->main still + aux wobble)
+    // 4H: set wobble style
     else if (event == EV_click4_hold) {
         if (0 == (arg & 0x3f)) {
             wobble_style = (wobble_style + 1) % NUM_WOBBLE;
             reset_parameters();
-            blip();
+            if (wobble_style == candle_wobble_e)
+                blip_ms(12);
+            else if (wobble_style == fireplace_slow_wobble_e)
+                blip_ms(96);
+            else if (wobble_style == fireplace_fast_wobble_e)
+                blip_ms(192);
         }
         return MISCHIEF_MANAGED;
     }
