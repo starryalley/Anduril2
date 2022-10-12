@@ -43,6 +43,6 @@ uint8_t candle_use_aux = 0;
 #endif
 
 const int NUM_WOBBLE = wobble_mode_END;
-wobble_mode_te wobble_style = fireplace_fast_wobble_e;//candle_wobble_e;
+wobble_mode_te wobble_style = candle_wobble_e;
 
 #endif
