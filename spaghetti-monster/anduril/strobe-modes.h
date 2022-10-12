@@ -98,7 +98,7 @@ inline void lightning_storm_iter();
 // bike mode config options
 #ifdef USE_BIKE_FLASHER_MODE
 #define MAX_BIKING_LEVEL 120  // should be 127 or less
-uint8_t bike_flasher_brightness = MAX_1x7135;
+uint8_t bike_flasher_brightness = DEFAULT_LEVEL;
 inline void bike_flasher_iter();
 #endif
 

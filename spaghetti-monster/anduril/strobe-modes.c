@@ -269,7 +269,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         #endif
         #ifdef USE_FIREWORK_MODE
         else if (st == firework_mode_e) {
-            firework_brightness = MAX_1x7135;
+            firework_brightness = RAMP_SMOOTH_CEIL;
         }
         #endif
         return MISCHIEF_MANAGED;
