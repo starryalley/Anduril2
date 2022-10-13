@@ -76,17 +76,26 @@ uint8_t off_state(Event event, uint16_t arg) {
             #endif
         }
         #endif
-        #ifdef USE_INDICATOR_LED
-        if (voltage < VOLTAGE_LOW_SAFE)
-            indicator_led_update(6, arg);
-        else
-            indicator_led_update(indicator_led_mode & 0xf, arg);
-        #elif defined(USE_AUX_RGB_LEDS)
-        if (voltage < VOLTAGE_LOW_SAFE)
-            rgb_led_update(RGB_RED|RGB_BREATH, arg);
-        else
-            rgb_led_update(rgb_led_off_mode, arg);
+        
+        #ifdef DUAL_VOLTAGE_FLOOR
+        if (((voltage < VOLTAGE_LOW_SAFE) && (voltage > DUAL_VOLTAGE_FLOOR)) || (voltage < DUAL_VOLTAGE_LOW_LOW_SAFE)) {
+        #else
+        if (voltage < VOLTAGE_LOW_SAFE) {
         #endif
+            #ifdef USE_INDICATOR_LED
+            indicator_led_update(6, arg);
+            #elif defined(USE_AUX_RGB_LEDS)
+            rgb_led_update(RGB_RED|RGB_BREATH, arg);
+            #else
+            if (0 == (arg & 0x1f)) blink_once();
+            #endif
+        } else {
+            #ifdef USE_INDICATOR_LED
+            indicator_led_update(indicator_led_mode & 0xf, arg);
+            #elif defined(USE_AUX_RGB_LEDS)
+            rgb_led_update(rgb_led_off_mode, arg);
+            #endif
+        }
 
         #ifdef USE_AUTOLOCK
             // lock the light after being off for N minutes
