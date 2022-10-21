@@ -9,9 +9,9 @@ For ToyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 Since I plan to only work with my existing Anduril2 lights (see below list), I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware for my 8 D4v2, a DW4, a SP10 Pro, and a TS10 (as of Jul, 2022).
+This repo contains my own changes to Anduril2 firmware for my 8 D4v2, 1 DW4, 3 SP10 Pro, and 2 TS10 (as of Oct, 2022).
 
-The following is the built targets used:
+The following is the build targets used:
 
 
 noctigon-kr4-nofet:
@@ -21,7 +21,7 @@ noctigon-kr4-nofet:
 noctigon-kr4:
 - D4v2 aluminum, 5A linear driver with Luminus SST-20 4000K
 - D4v2 titanium, 5A linear driver with Cree XP-L HI T6 8D 2800K (ramp floor=4, jump_start_level=31)
-- DW4 9A linear driver with 16-LED mule of Nichia E21A 4500/2700 mix (for mule, revert `f43796f fsm-misc: use AUX LED to blink digits`)
+- DW4 9A linear driver with 16-LED mule of Nichia E21A 4500/2700 mix (for mule, add `#define IS_MULE` in config header)
 
 noctigon-kr4-219b (50% FET):
 - D4v2 antique brass, 9A linear driver with Nichia 219b SW35
@@ -74,7 +74,7 @@ When AUX isn't available but indicator LED is:
 `6C`: turn on indicator LED
 `6H`: turn off indicator LED
 
-## Blink AUX green LED when powered on
+## Blink green AUX LED when powered on
 
 Instead of blinking the main emitter, blink the AUX green LED at high power to indicate it's powered on.
 Original idea from [here](https://bazaar.launchpad.net/~dnelson1901/flashlight-firmware/flashlight-firmware/revision/267)
@@ -113,13 +113,13 @@ Ramp up main emitters output in 1 level using `3C`.
 Use `9C` to switch between smooth and discrete ramp style. Not being used often by me so make it harder to reach.
 
 
-## When it's time to change battery, blink AUX red (or indicator led) in standby/lockout mode
+## When it's time to change battery, blink AUX red, indicator, or main LED in standby/lockout mode
 
-When voltage is < 3.2V when light is off, the off/lockout AUX mode will not activate. Instead, the AUX red LED will blink. Original idea from reddit user [connorkmiec93](https://www.reddit.com/user/connorkmiec93/) at this [post](https://www.reddit.com/r/flashlight/comments/mpj36p/im_doing_a_d4v2_with_anduril_2_giveaway/).
+When voltage is < 3.2V (or < 0.9V for AA) when light is off, the off/lockout AUX mode will not activate. Instead, the AUX red LED (or indicator LED for lights with it, or main LED for lights without AUX or indicator) will blink. Original idea from reddit user [connorkmiec93](https://www.reddit.com/user/connorkmiec93/) at this [post](https://www.reddit.com/r/flashlight/comments/mpj36p/im_doing_a_d4v2_with_anduril_2_giveaway/).
 
-The blinking is in a pattern called breathing (although it's only low/high mode in AUX LED) so it's less distracting to the original blinking and one can tell the difference to the normal blinking in RED mode.
+The blinking (of AUX or indicator LED) is in a pattern called breathing (although it's only low/high mode in AUX LED) so it's less distracting to the original blinking and one can tell the difference to the normal blinking in RED mode.
 
-For lights with the indicator LED, the indicator LED will be used.
+For lights without AUX or indicator LED, main LED will be used to blink every ~4 seconds.
 
 ## Fireplace mode (in Candle mode)
 
@@ -186,13 +186,28 @@ Based on different light's config this can be 1st, 2nd or 3rd item in the menu. 
 Direct copy from [SammysHP](https://github.com/SammysHP)'s [Smooth sunset v2 patches](https://github.com/SammysHP/flashlight-firmware/commits/smooth-sunset-v2) or [smooth sunset](https://github.com/SammysHP/flashlight-firmware/tree/smooth-sunset) which is awesome.
 
 
+## Ultra low moon level
+
+Just make level 1 (moon) PWM TOP higher by 4x, hence lower the brightness even more. This is currently enabled in SP10 pro config only.
+
+
+## Configurable candle mode PWM factor
+
+A configurable value is added to the Misc Config menu to make PWM TOP larger, hence the brightness change between levels are minor and the maximum brightness is lower for candle mode. A factor of 0 is the default, which is unchanged from the default Anduril2 behaviour. A factor of 1 is 2x the original PWM TOP, and max brightness is lowered to 1/2. A factor of 2 is 4x the original PWM TOP, and max brightness is lowered to 1/4, and so on.
+
+This is currently enabled in SP10 pro config only so the Misc Config menu has two items:
+
+- The Start up mode (default 1: quickly ramp up to memorized level)
+- Candle mode PWM factor (default 0: unchanged candle mode)
+
+
 
 # Configuration changes
 
 - Default in Advanced mode
 - Reordering strobe mode: Candle -> Lightning Storm -> Fireworks -> Bike Flasher -> Party Strobe -> Tactical Strobe. (Candle and Lightning storm are my most used strobe modes, hence why)
-- Use 8C instead of 5C for momentary mode (not used often so make it harder to enter)
-- Use 9C in ramp mode to switch ramp style (smooth or discrete)
+- Use `8C` instead of `5C` for momentary mode (not used often so make it harder to enter)
+- Use `9C` instead of `3C` in ramp mode to switch ramp style (smooth or discrete)
 - Lower default candle mode amplitude from 32 to 28 so it is a calmer candle light
 - Lower default lightning mode, max possible interval from around 8sec to 16sec so it will appear less busy
 
