@@ -27,7 +27,7 @@
 #endif
 
 #define CANDLE_AMPLITUDE_MAX 60
-#define CANDLE_AMPLITUDE_MIN 10
+#define CANDLE_AMPLITUDE_MIN 3
 
 #define MAX_CANDLE_LEVEL (RAMP_LENGTH-CANDLE_AMPLITUDE-15)
 static uint8_t max_candle_level = MAX_CANDLE_LEVEL;
@@ -129,6 +129,8 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
         #ifdef PWM1_TOP
         PWM1_TOP = PWM_TOP_CANDLE;
         #endif
+        #elif defined(USE_CANDLE_PWM_FACTOR)
+        candle_pwm_multiplier = candle_pwm_factor;
         #endif
         return MISCHIEF_MANAGED;
     }

@@ -105,6 +105,14 @@ PROGMEM const PWM_DATATYPE pwm2_levels_strobe[] = { PWM2_LEVELS_STROBE };
 uint8_t use_static_pwm = 0;
 #endif
 
+#ifdef USE_CANDLE_PWM_FACTOR
+#if !defined(USE_DYN_PWM) || defined(PWM_TOP_CANDLE)
+#error When using USE_CANDLE_PWM_FACTOR, USE_DYN_PWM must be enabled and PWM_TOP_CANDLE must not be defined
+#endif
+uint8_t candle_pwm_factor = 0; // user configurable and saved
+uint8_t candle_pwm_multiplier = 0; // will be set to candle_pwm_factor when candle mode is enabled
+#endif
+
 #ifdef USE_JUMP_START
 #ifndef JUMP_START_TIME
 #define JUMP_START_TIME 8  // in ms, should be 4, 8, or 12

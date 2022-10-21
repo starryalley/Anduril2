@@ -237,6 +237,9 @@ typedef enum {
     #ifdef USE_RAMP_START_MODE
     ramp_start_mode_config_step,
     #endif
+    #ifdef USE_CANDLE_PWM_FACTOR
+    candle_pwm_factor_config_step,
+    #endif
     globals_config_num_steps
 } globals_config_steps_e;
 

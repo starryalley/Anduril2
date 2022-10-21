@@ -47,6 +47,11 @@ static void strobe_set_dyn_pwm(strobe_mode_te type) {
         PWM1_TOP = PWM_TOP;
         #endif
     }
+#elif defined(USE_CANDLE_PWM_FACTOR)
+    if (type == candle_mode_e)
+        candle_pwm_multiplier = candle_pwm_factor;
+    else
+        candle_pwm_multiplier = 0;
 #endif
 }
 

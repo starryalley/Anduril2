@@ -69,3 +69,12 @@
 // 50C for step down
 #undef DEFAULT_THERM_CEIL
 #define DEFAULT_THERM_CEIL 50
+
+#define USE_LOWPASS_WHILE_ASLEEP
+
+// use very dim moon level
+#define ULTRA_LOW_MOON_FACTOR 4
+
+// configure candle mode PWM multiplier in 9H menu
+// it will lower max brightness but candle mode will be smoother
+#define USE_CANDLE_PWM_FACTOR

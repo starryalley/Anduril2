@@ -203,6 +203,14 @@ void set_level(uint8_t level) {
             if (!use_static_pwm) {
             #endif
                 uint16_t top = PWM_GET(pwm_tops, level);
+                #ifdef ULTRA_LOW_MOON_FACTOR
+                if (level == 0) top <<= ULTRA_LOW_MOON_FACTOR;
+                if (top >= 0xffff) top = 0xffff;
+                #endif
+                #ifdef USE_CANDLE_PWM_FACTOR
+                top <<= candle_pwm_multiplier;
+                if (top >= 0xffff) top = 0xffff;
+                #endif
                 #if defined(PWM1_CNT) && defined(PWM1_PHASE_SYNC)
                 // wait to ensure compare match won't be missed
                 // (causes visible flickering when missed, because the counter

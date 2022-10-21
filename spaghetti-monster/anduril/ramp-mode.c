@@ -725,6 +725,12 @@ void globals_config_save(uint8_t step, uint8_t value) {
     #endif
     #ifdef USE_RAMP_START_MODE
     else if (step == 1+ramp_start_mode_config_step) { ramp_start_mode = value; }
+    #ifdef USE_CANDLE_PWM_FACTOR
+    else if (step == 1+candle_pwm_factor_config_step) {
+        // allowed value is 0~4
+        candle_pwm_factor = value > 4 ? 4 : value; 
+    }
+    #endif
     #endif
 }
 

@@ -110,6 +110,9 @@ void load_config() {
         #ifdef USE_RAMP_START_MODE
         ramp_start_mode = eeprom[ramp_start_mode_e];
         #endif
+        #ifdef USE_CANDLE_PWM_FACTOR
+        candle_pwm_factor = eeprom[candle_pwm_factor_e];
+        #endif
         #endif
     }
     #ifdef START_AT_MEMORIZED_LEVEL
@@ -204,6 +207,9 @@ void save_config() {
     #endif
     #ifdef USE_RAMP_START_MODE
     eeprom[ramp_start_mode_e] = ramp_start_mode;
+    #endif
+    #ifdef USE_CANDLE_PWM_FACTOR
+    eeprom[candle_pwm_factor_e] = candle_pwm_factor;
     #endif
     #endif
     save_eeprom();

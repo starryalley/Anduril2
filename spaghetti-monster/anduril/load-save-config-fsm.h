@@ -110,6 +110,9 @@ typedef enum {
     #ifdef USE_RAMP_START_MODE
     ramp_start_mode_e,
     #endif
+    #ifdef USE_CANDLE_PWM_FACTOR
+    candle_pwm_factor_e,
+    #endif
     #endif
     eeprom_indexes_e_END
 } eeprom_indexes_e;
