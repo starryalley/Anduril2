@@ -32,8 +32,7 @@ void ramp_up_level(uint8_t lvl) {
         ramp_up_increment = 0;
         flicker_index = 0;
     } else {
-        // 0 or else: default behaviour: instant on
-        set_level_and_therm_target(lvl);
+        // should not happen
     }
 }
 
