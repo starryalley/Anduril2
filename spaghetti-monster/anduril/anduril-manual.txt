@@ -698,7 +698,9 @@ anywhere else.  These settings are, in order:
   - Tint ramp style:
 
     0 = smooth (blend channels in any proportion)
-    1 = toggle (only one channel active at a time)
+    1 = only middle tint
+    2 = toggle (only one channel active at a time)
+    n = n steps of tint
 
   - Jump Start level:
 
@@ -730,11 +732,11 @@ a moderately high level, because it makes the changes smooth.  Low
 levels have more coarse resolution and will typically change in very 
 visible steps.
 
-At both ends of the tint ramp, there is an "auto tint" mode.  This 
-automatically chooses a tint based on the brightness level...  so it can 
-be warm white while dim, or cool white while bright.  Or vice-versa.  To 
-access this, ramp to the end of the tint range, then keep holding until 
-the light blinks a second time.
+If smooth tint ramping is enabled, at both ends of the tint ramp, there 
+is an "auto tint" mode.  This automatically chooses a tint based on the 
+brightness level...  so it can be warm white while dim, or cool white 
+while bright.  Or vice-versa.  To access this, ramp to the end of the 
+tint range, then keep holding until the light blinks a second time.
 
 The misc config menu also has a setting to choose a tint ramp style.  
 This can be smooth, allowing the user to smoothly blend both channels in 

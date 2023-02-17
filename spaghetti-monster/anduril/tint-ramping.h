@@ -21,9 +21,9 @@
 #define TINT_RAMPING_H
 
 // 0: smooth tint ramp
-// 1: toggle tint only between two extremes
+// 2: toggle tint only between two extremes
 #ifdef TINT_RAMP_TOGGLE_ONLY
-uint8_t tint_style = 1;
+uint8_t tint_style = 2;
 #else
 uint8_t tint_style = 0;
 #endif
@@ -34,6 +34,9 @@ uint8_t manual_memory_tint;
 
 // not actually a mode, more of a fallback under other modes
 uint8_t tint_ramping_state(Event event, uint16_t arg);
+
+// calculate the nearest tint value which would be valid at the moment
+uint8_t nearest_tint_value(const int16_t target);
 
 
 #endif
