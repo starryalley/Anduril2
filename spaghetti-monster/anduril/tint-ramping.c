@@ -80,6 +80,13 @@ uint8_t tint_ramping_state(Event event, uint16_t arg) {
         set_level(actual_level);
         return EVENT_HANDLED;
     }
+    // 5C to go to tint edge (this won't work in candle/lightning/fireworks mode)
+    else if (event == EV_5clicks) {
+        tint = (tint == 1) ? 254 : 1;
+        tint_ramp_direction = (tint == 1) ? 1 : -1;
+        set_level(actual_level);
+        return EVENT_HANDLED;
+    }
     // 8H to go to middle tint
     else if (event == EV_click8_hold) {
       tint = 127;
