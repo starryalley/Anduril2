@@ -63,6 +63,8 @@ void load_config() {
         #ifdef USE_TINT_RAMPING
             tint = eeprom[tint_e];
             tint_style = eeprom[tint_style_e];
+            tint_alt_brightness = eeprom[tint_alt_brightness_e];
+            tint_alt_interval = eeprom[tint_alt_interval_e];
         #endif
         #ifdef USE_JUMP_START
             jump_start_level = eeprom[jump_start_level_e],
@@ -158,6 +160,8 @@ void save_config() {
     #ifdef USE_TINT_RAMPING
         eeprom[tint_e] = tint;
         eeprom[tint_style_e] = tint_style;
+        eeprom[tint_alt_brightness_e] = tint_alt_brightness;
+        eeprom[tint_alt_interval_e] = tint_alt_interval;
     #endif
     #ifdef USE_JUMP_START
         eeprom[jump_start_level_e] = jump_start_level,

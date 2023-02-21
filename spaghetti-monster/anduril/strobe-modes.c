@@ -165,6 +165,15 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         }
         #endif
         
+        #ifdef USE_TINT_RAMPING
+        else if (st == tint_alternating_strobe_e) {
+            tint_alt_brightness += ramp_direction;
+            if (tint_alt_brightness < 2) tint_alt_brightness = 2;
+            else if (tint_alt_brightness > MAX_LEVEL) tint_alt_brightness = MAX_LEVEL;
+            set_level(tint_alt_brightness);
+        }
+        #endif
+
         return MISCHIEF_MANAGED;
     }
     // reverse ramp direction on hold release
@@ -206,6 +215,14 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         }
         #endif
 
+        #ifdef USE_TINT_RAMPING
+        else if (st == tint_alternating_strobe_e) {
+            if (tint_alt_brightness > 2)
+                tint_alt_brightness--;
+            set_level(tint_alt_brightness);
+        }
+        #endif
+
         return MISCHIEF_MANAGED;
     }
     // release hold: save new strobe settings
@@ -231,7 +248,8 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         return MISCHIEF_MANAGED;
     }
     // 4C: turning down busy factor (less busy) of lightning mode,
-    //  or turning down firework brightness by 12
+    //  or turning down firework brightness by 12,
+    //  or decrease tint alternating interval by 0.5 second
     else if (event == EV_4clicks) {
         if (0) {}  // placeholder
         #ifdef USE_LIGHTNING_MODE
@@ -252,10 +270,19 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             blink_once();
         }
         #endif
+        #ifdef USE_TINT_RAMPING
+        else if (st == tint_alternating_strobe_e) {
+            if (tint_alt_interval > TINT_ALT_MIN_INTERVAL)
+                tint_alt_interval--;
+            save_config();
+            blink_once();
+        }
+        #endif
         return MISCHIEF_MANAGED;
     }
     // 5C: turning up busy factor (busier) of lightning mode,
-    //  or turning up firework brightness by 12
+    //  or turning up firework brightness by 12,
+    //  or increasing tint alternating interval by 0.5 second
     else if (event == EV_5clicks) {
         if (0) {}  // placeholder
         #ifdef USE_LIGHTNING_MODE
@@ -272,6 +299,14 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             firework_brightness += 12;
             if (firework_brightness > MAX_LEVEL)
                 firework_brightness = MAX_LEVEL;
+            save_config();
+            blink_once();
+        }
+        #endif
+        #ifdef USE_TINT_RAMPING
+        else if (st == tint_alternating_strobe_e) {
+            if (tint_alt_interval < TINT_ALT_MAX_INTERVAL)
+                tint_alt_interval++;
             save_config();
             blink_once();
         }
@@ -331,6 +366,12 @@ inline void strobe_state_iter() {
         #ifdef USE_FIREWORK_MODE
         case firework_mode_e:
             firework_iter();
+            break;
+        #endif
+
+        #ifdef USE_TINT_RAMPING
+        case tint_alternating_strobe_e:
+            tint_alt_iter();
             break;
         #endif
     }
@@ -496,6 +537,16 @@ inline void firework_iter() {
     // we've reached our max brightness for firework mode, let's explode in the next iteration
     if (firework_stage > firework_brightness)
         firework_stage = firework_stage_count;
+}
+#endif
+
+#ifdef USE_TINT_RAMPING
+inline void tint_alt_iter() {
+    if (is_off) return;
+
+    tint = (tint == 1) ? 254 : 1; 
+    set_level(tint_alt_brightness);
+    nice_delay_ms(500 * tint_alt_interval);
 }
 #endif
 

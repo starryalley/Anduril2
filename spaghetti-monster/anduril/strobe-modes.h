@@ -30,6 +30,9 @@ typedef enum {
     #ifdef USE_TACTICAL_STROBE_MODE
     tactical_strobe_e,
     #endif
+    #ifdef USE_TINT_RAMPING
+    tint_alternating_strobe_e,
+    #endif
     #ifdef USE_CANDLE_MODE
     candle_mode_e,
     #endif
@@ -106,6 +109,14 @@ inline void bike_flasher_iter();
 #define MIN_FIREWORK_LEVEL DEFAULT_LEVEL // max is always MAX_LEVEL
 uint8_t firework_brightness = RAMP_SMOOTH_CEIL;
 inline void firework_iter();
+#endif
+
+#ifdef USE_TINT_RAMPING
+uint8_t tint_alt_brightness = DEFAULT_LEVEL;
+uint8_t tint_alt_interval = 2; // unit is 500ms, so 2 == one second
+#define TINT_ALT_MAX_INTERVAL 20 // 10s
+#define TINT_ALT_MIN_INTERVAL 1  // 0.5s
+inline void tint_alt_iter();
 #endif
 
 #ifdef USE_CANDLE_MODE
