@@ -1,6 +1,6 @@
 # ToyKeeper's Anduril flashlight firmware fork
 
-This is a clone from [ToyKeeper's Flashlight Firmware](https://code.launchpad.net/flashlight-firmware) from branch [anduril2](https://code.launchpad.net/~toykeeper/flashlight-firmware/anduril2), revision [652](https://bazaar.launchpad.net/~toykeeper/flashlight-firmware/anduril2/revision/652)
+This is a clone from [ToyKeeper's Flashlight Firmware](https://code.launchpad.net/flashlight-firmware) from branch [anduril2](https://code.launchpad.net/~toykeeper/flashlight-firmware/anduril2), revision [653](https://bazaar.launchpad.net/~toykeeper/flashlight-firmware/anduril2/revision/653)
 
 For ToyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
@@ -9,33 +9,38 @@ For ToyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 Since I plan to only work with my existing Anduril2 lights (see below list), I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware for my 8 D4v2, a DW4, a SP10 Pro, and a TS10 (as of Jul, 2022).
+This repo contains my own changes to Anduril2 firmware for my several D4v2's, a DW4, a D4K, and some SP10 Pro's and TS10's (as of Feb, 2023).
 
 The following is the built targets used:
 
 
-noctigon-kr4-nofet:
+noctigon-kr4-nofet (`0212`):
 - D4v2 brass, 7.5A linear driver with Nichia E21A 2000/2700K mix
 - D4v2 antique brass, 4A linear driver with Nichia E17A 1850K
 
-noctigon-kr4:
+noctigon-kr4 (`0211`):
 - D4v2 aluminum, 5A linear driver with Luminus SST-20 4000K
 - D4v2 titanium, 5A linear driver with Cree XP-L HI T6 8D 2800K (ramp floor=4, jump_start_level=31)
-- DW4 9A linear driver with 16-LED mule of Nichia E21A 4500/2700 mix (for mule, revert `f43796f fsm-misc: use AUX LED to blink digits`)
+- DW4 9A linear driver with 16-LED mule of Nichia E21A 4500/2700 mix (for mule, define `IS_MULE` in the config header)
 
-noctigon-kr4-219b (50% FET):
+noctigon-kr4-219b (`0214`) (50% FET):
 - D4v2 antique brass, 9A linear driver with Nichia 219b SW35
 - D4v2 aluminum, 9A linear driver with Nichia 219b SW45k
 
-emisar-d4sv2-tintramp: (for D4v2 tintramp)
+emisar-d4sv2-tintramp (`0135`): (for D4v2 tintramp)
 - D4v2 aluminum, tint ramping 5A+5A linear driver with Nichia 219b 2700/4500K
 - D4v2 aluminum, tint ramping ?A+?A linear driver with Nichia E21A 2000/5000K
+- D4K tint ramping 10A+10A linear driver with Osram W2 red and W2 green
 
-sofirn-sp10-pro:
+sofirn-sp10-pro (`0631`):
 - Sonfirn SP10 Pro AA/14500
 
-wurkkos-ts10:
+wurkkos-ts10 (`0714`):
 - Wurkkos TS10 14500
+
+noctigon-dm11-12v (`0273`):
+- D4K with boost driver (as confirmed by [RainbowEucalyptus](https://www.reddit.com/user/RainbowEucalyptus))
+
 
 
 # Features
@@ -74,6 +79,9 @@ When AUX isn't available but indicator LED is:
 `6C`: turn on indicator LED
 `6H`: turn off indicator LED
 
+Note that in newer Hank lights where there is a RGB switch/button LED, if the light comes with front-facing AUX LED, the RGB switch/button LED is wired to the AUX LED so the button LED control (second and third state in `6C`) won't work. This is not a firmware or hardware issue, but rather expected due to how it is. 
+
+
 ## Blink AUX green LED when powered on
 
 Instead of blinking the main emitter, blink the AUX green LED at high power to indicate it's powered on.
@@ -108,9 +116,9 @@ In candle mode, add the following options which are saved:
 
 ## Allow fine ramping up (smallest increment of brightness) using 3C in ramp mode
 
-Ramp up main emitters output in 1 level using `3C`. 
+Ramp up main emitters output in 1 level using `3C`.
 
-Use `9C` to switch between smooth and discrete ramp style. Not being used often by me so make it harder to reach.
+Use `9C` to switch between smooth and discrete ramp style instead. (not being used often so make it harder to reach)
 
 
 ## When it's time to change battery, blink AUX red (or indicator led) in standby/lockout mode
@@ -121,9 +129,15 @@ The blinking is in a pattern called breathing (although it's only low/high mode 
 
 For lights with the indicator LED, the indicator LED will be used.
 
+Note that a similar feature is now implemented in [r654](https://bazaar.launchpad.net/~toykeeper/flashlight-firmware/anduril2/revision/654) that is not yet integrated into this fork as of now.
+
 ## Fireplace mode (in Candle mode)
 
-2 additional wobble styles: fireplace_slow and fireplace_fast. Use `4H` to cycle through all 3 wobble styles. This is a saved configuration. 
+2 additional wobble styles: fireplace_slow and fireplace_fast. Use `4H` to cycle through all 3 wobble styles. This is a saved configuration.
+
+- style 1: Anduril2 stock candle mode (default)
+- style 2: fireplace slow wobble
+- style 3: fireplace fast wobble
 
 In candle wobble style (default/stock) we can additional use `7C` to toggle if we want to use aux led to assist in tint mixing (if AUX is available). Red or yellow aux LED will light up along with the wobbling light.
 
@@ -137,10 +151,20 @@ Adjust firework brightness (explosion brightness):
 - `5C`: increase brightness by 12
 - `6C`: reset brightness to default (max regulated level, which is MAX_1x7135)
 
+For dual channel lights, fireworks mode will randomly choose from the following tint modes when doing the strobes:
+- alternate between channel 1 and 2 when 'exploding'
+- use channel 1 only
+- use channel 2 only
+- randomly choose a tint
 
-## 8H to middle tint
 
-In a tint ramping light, when light is on use `8H` to go to middle tint. (Copied from [4h to go to middle, not in the middle of 3h](https://github.com/mkong1/anduril/pull/34) )
+## 8H to middle tint, 5C to tint edge
+
+In a tint ramping light, use `8H` to go to middle tint. (Copied from [4h to go to middle, not in the middle of 3h](https://github.com/mkong1/anduril/pull/34) )
+
+In addition, there is a shortcut `5C` to go to tint edge. Note that `5C` is for controlling parameters in strobe mode so this shortcut won't work in candle/lightning/firework mode.
+
+Note that when lights are off or locked out, `5C` and `8H` still works but not visible until the emitters are turned on.
 
 
 ## 2 More indicator LED modes
@@ -186,13 +210,28 @@ Based on different light's config this can be 1st, 2nd or 3rd item in the menu. 
 Direct copy from [SammysHP](https://github.com/SammysHP)'s [Smooth sunset v2 patches](https://github.com/SammysHP/flashlight-firmware/commits/smooth-sunset-v2) or [smooth sunset](https://github.com/SammysHP/flashlight-firmware/tree/smooth-sunset) which is awesome.
 
 
+## Stepped tint ramping from SammysHP
+
+Direct copy from [SammysHP](https://github.com/SammysHP)'s [stepped tint ramping](https://github.com/SammysHP/flashlight-firmware/tree/stepped-tint-ramping). Brilliant work there.
+
+
+## Tint Alternating Strobe mode
+
+A tint alternating strobe mode (after tactical strobe) for dual channel lights. It switches between channel 1 and 2 continously with configurable brightness (the usual `1H` and `2H`) and interval (`4C` for decreasing and `5C` for increasing the interval by 0.5 second). The setting (brightness and interval) is saved.
+
+
+## Tint Smooth Ramping Strobe mode
+
+A tint ramping strobe mode (after tint alternating strobe) for dual channel lights. It ramps between both channels repeatedly with configurable brightness (the usual `1H` and `2H`) and pause at each tint step (`4C` for decreasing and `5C` for increasing the interval by 2 microseconds). The setting (brightness and pause) is saved.
+
 
 # Configuration changes
 
 - Default in Advanced mode
-- Reordering strobe mode: Candle -> Lightning Storm -> Fireworks -> Bike Flasher -> Party Strobe -> Tactical Strobe. (Candle and Lightning storm are my most used strobe modes, hence why)
-- Use 8C instead of 5C for momentary mode (not used often so make it harder to enter)
-- Use 9C in ramp mode to switch ramp style (smooth or discrete)
+- Reordering strobe mode: Candle -> Lightning Storm -> Fireworks -> Bike Flasher -> Party Strobe -> Tactical Strobe -> Tint Alternating -> Tint Smooth Ramping (Candle and Lightning storm are my most used strobe modes, hence why)
+- Use `8C` instead of `5C` for momentary mode (not used often so make it harder to enter)
+- Use `9C` in ramp mode to switch ramp style (smooth or discrete)
+- disable BLINK_AT_RAMP_CEIL/MIDDLE (no blink when ramping to middle or ceiling)
 - Lower default candle mode amplitude from 32 to 28 so it is a calmer candle light
 - Lower default lightning mode, max possible interval from around 8sec to 16sec so it will appear less busy
 
@@ -223,7 +262,6 @@ In this mode:
 # Other useful branch/commits
 
 - [allow turbo in momentary mode](https://github.com/SammysHP/flashlight-firmware/tree/momentary-turbo)
-- [stepped tint ramping](https://github.com/SammysHP/flashlight-firmware/tree/stepped-tint-ramping)
 - [accurate 16-bit PWM strobe](https://bazaar.launchpad.net/~i-dan-3/flashlight-firmware/pwm-strobe/revision/238)
 - [beacon tower mode](https://budgetlightforum.com/comment/1727142#comment-1727142)
 - [Gabriel's Wurkkos TS10 LVP fix](https://code.launchpad.net/~gabe/flashlight-firmware/anduril2): see rev 618,619
