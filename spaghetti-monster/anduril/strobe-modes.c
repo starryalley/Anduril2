@@ -22,6 +22,16 @@
 
 #include "strobe-modes.h"
 
+#ifdef USE_STROBE_STATE
+
+#ifdef USE_TINT_RAMPING
+// for accessing tint
+#include "fsm-ramping.h"
+// the tint will be changed in some cases here. This is for restoring the original tint
+uint8_t saved_tint = 128;
+// when user is about to exit the strobe mode, let's stop updating tint after restored saved tint
+uint8_t is_off = 0;
+#endif
 
 static void strobe_set_dyn_pwm(strobe_mode_te type) {
 #if defined(PWM_TOP_CANDLE) && defined(PWM_TOP_FIREWORK)
@@ -31,6 +41,9 @@ static void strobe_set_dyn_pwm(strobe_mode_te type) {
         #endif
         #ifdef PWM1_TOP
         PWM1_TOP = PWM_TOP_CANDLE;
+        #endif
+        #ifdef USE_TINT_RAMPING
+        tint = saved_tint;
         #endif
     } else if (type == firework_mode_e) {
         #ifdef USE_DYN_PWM
@@ -46,11 +59,13 @@ static void strobe_set_dyn_pwm(strobe_mode_te type) {
         // when not using USE_DYN_PWM, we must revert the TOP back to default
         PWM1_TOP = PWM_TOP;
         #endif
+        #ifdef USE_TINT_RAMPING
+        tint = saved_tint;
+        #endif
     }
 #endif
 }
 
-#ifdef USE_STROBE_STATE
 uint8_t strobe_state(Event event, uint16_t arg) {
     static int8_t ramp_direction = 1;
 
@@ -83,10 +98,17 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     // init anything which needs to be initialized
     else if (event == EV_enter_state) {
         ramp_direction = 1;
+        #ifdef USE_TINT_RAMPING
+        is_off = 0;
+        saved_tint = tint;
+        #endif
         return MISCHIEF_MANAGED;
     }
     // 1 click: off
     else if (event == EV_1click) {
+        #ifdef USE_TINT_RAMPING
+        is_off = 1;
+        #endif
         set_state(off_state, 0);
         #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
         aux_led_reset = 1;
@@ -411,12 +433,42 @@ inline void bike_flasher_iter() {
 uint8_t firework_stage = 0;
 uint8_t firework_stage_count = FIREWORK_DEFAULT_STAGE_COUNT;
 uint8_t step_interval = FIREWORK_DEFAULT_INTERVAL;
+#ifdef USE_TINT_RAMPING
+uint8_t tint_mode = 0; // 0: alternate, 1: channel 1 only, 2: channel 2 only, 3: random tint
+uint8_t chosen_tint = 127; // for tint_mode = 3
+#endif
+
+inline void update_firework_tint(uint8_t stage) {
+    #ifdef USE_TINT_RAMPING
+    if (is_off) return;
+    switch (tint_mode) {
+    // alternate both channels
+    case 0:
+        if (stage % 5 == 0)
+            tint = (tint == 1) ? 254 : 1; 
+        break;
+    // channel 1 only
+    case 1:
+        tint = 1;
+        break;
+    // channel 2 only
+    case 2:
+        tint = 254;
+        break;
+    // random tint
+    case 3:
+        tint = chosen_tint;
+        break;
+    }
+    #endif
+}
 // code is copied and modified from factory-reset.c
 inline void firework_iter() {
-    if (firework_stage == firework_stage_count) {
+    if (firework_stage == firework_stage_count) {        
         // explode, and reset stage
         firework_stage = 0;
         for (uint8_t brightness = firework_brightness; brightness > 0; brightness--) {
+            update_firework_tint(firework_stage);
             set_level(brightness);
             nice_delay_ms(step_interval/4);
             set_level((uint16_t)brightness*7/8);
@@ -425,6 +477,12 @@ inline void firework_iter() {
         // off for 1 to 5 seconds
         set_level(0);
         nice_delay_ms(1000 + (pseudo_rand() % 5) * 1000);
+        #ifdef USE_TINT_RAMPING
+        // randomly set a tint mode for the next firework show
+        tint_mode = pseudo_rand() % 4;
+        if (tint_mode == 3) chosen_tint = pseudo_rand() % 254 + 1;
+        update_firework_tint(firework_stage);
+        #endif
         // set next stage count (16 to 64 in increment of 8)
         firework_stage_count = 16 + 8 * (pseudo_rand() % 7);
         return;
