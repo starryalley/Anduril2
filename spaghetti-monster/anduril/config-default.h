@@ -82,9 +82,9 @@
 //  or too short)
 #define MOON_TIMING_HINT  // only applies if B_TIMING_ON == B_PRESS_T
 // short blips while ramping
-#define BLINK_AT_RAMP_MIDDLE
+//#define BLINK_AT_RAMP_MIDDLE
 //#define BLINK_AT_RAMP_FLOOR
-#define BLINK_AT_RAMP_CEIL
+//#define BLINK_AT_RAMP_CEIL
 //#define BLINK_AT_STEPS  // whenever a discrete ramp mode is passed in smooth mode
 
 // Uncomment for Anduril1 "Ramp 2C" behavior:
