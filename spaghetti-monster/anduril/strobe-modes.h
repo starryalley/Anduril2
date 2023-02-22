@@ -32,6 +32,7 @@ typedef enum {
     #endif
     #ifdef USE_TINT_RAMPING
     tint_alternating_strobe_e,
+    tint_smooth_ramp_e,
     #endif
     #ifdef USE_CANDLE_MODE
     candle_mode_e,
@@ -117,6 +118,11 @@ uint8_t tint_alt_interval = 2; // unit is 500ms, so 2 == one second
 #define TINT_ALT_MAX_INTERVAL 20 // 10s
 #define TINT_ALT_MIN_INTERVAL 1  // 0.5s
 inline void tint_alt_iter();
+uint8_t tint_smooth_brightness = DEFAULT_LEVEL;
+uint8_t tint_smooth_pause = 3; // unit is ms. Change tint 1 step after this pause
+#define TINT_SMOOTH_MAX_PAUSE 30
+#define TINT_SMOOTH_MIN_PAUSE 1
+inline void tint_smooth_ramp_iter();
 #endif
 
 #ifdef USE_CANDLE_MODE

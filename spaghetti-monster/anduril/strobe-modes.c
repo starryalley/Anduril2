@@ -30,40 +30,71 @@
 // the tint will be changed in some cases here. This is for restoring the original tint
 uint8_t saved_tint = 128;
 // when user is about to exit the strobe mode, let's stop updating tint after restored saved tint
-uint8_t is_off = 0;
+uint8_t tint_locked = 0;
 #endif
 
-static void strobe_set_dyn_pwm(strobe_mode_te type) {
-#if defined(PWM_TOP_CANDLE) && defined(PWM_TOP_FIREWORK)
-    if (type == candle_mode_e) {
-        #ifdef USE_DYN_PWM
-        use_static_pwm = 1;
-        #endif
-        #ifdef PWM1_TOP
+// enable static PWM
+static inline void set_static_pwm() {
+    #ifdef USE_DYN_PWM
+    use_static_pwm = 1;
+    #endif
+}
+
+// restore tint to the original tint when entering strobe mode
+static inline void restore_tint() {
+    #ifdef USE_TINT_RAMPING
+    tint = saved_tint;
+    tint_locked = 1;
+    #endif
+}
+
+// unset static PWM and restore tint
+static inline void undo_global_setting() {
+    #ifdef USE_DYN_PWM
+    use_static_pwm = 0;
+    #elif defined(PWM1_TOP)
+    // when not using USE_DYN_PWM, we must revert the TOP back to default
+    PWM1_TOP = PWM_TOP;
+    #endif
+    restore_tint();
+}
+
+// for some strobe modes we need to enable/disable some global settings:
+//  tint or dynamic PWM
+static void strobe_global_setup(strobe_mode_te type) {
+    switch(type) {
+    #ifdef USE_CANDLE_MODE
+    case candle_mode_e:
+        set_static_pwm();
+        #if defined(PWM1_TOP) && defined(PWM_TOP_CANDLE)
         PWM1_TOP = PWM_TOP_CANDLE;
         #endif
-        #ifdef USE_TINT_RAMPING
-        tint = saved_tint;
-        #endif
-    } else if (type == firework_mode_e) {
-        #ifdef USE_DYN_PWM
-        use_static_pwm = 1;
-        #endif
-        #ifdef PWM1_TOP
+        restore_tint();
+        break;
+    #endif
+    
+    #ifdef USE_FIREWORK_MODE
+    case firework_mode_e:
+        set_static_pwm();
+        #if defined(PWM1_TOP) && defined(PWM_TOP_FIREWORK)
         PWM1_TOP = PWM_TOP_FIREWORK;
         #endif
-    } else {
-        #ifdef USE_DYN_PWM
-        use_static_pwm = 0;
-        #elif defined(PWM1_TOP)
-        // when not using USE_DYN_PWM, we must revert the TOP back to default
-        PWM1_TOP = PWM_TOP;
-        #endif
         #ifdef USE_TINT_RAMPING
-        tint = saved_tint;
+        tint_locked = 0;
         #endif
+        break;
+    #endif
+    
+    #ifdef USE_TINT_RAMPING
+    case tint_alternating_strobe_e:
+    case tint_smooth_ramp_e:
+        tint_locked = 0;
+        break;
+    #endif
+
+    default:
+        undo_global_setting();
     }
-#endif
 }
 
 uint8_t strobe_state(Event event, uint16_t arg) {
@@ -90,7 +121,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     // use static PWM in firework mode
     #if defined(USE_FIREWORK_MODE) && defined(PWM_TOP_FIREWORK)
     if (st == firework_mode_e && event == EV_enter_state) {
-        strobe_set_dyn_pwm(st);
+        strobe_global_setup(st);
     }
     #endif
 
@@ -99,35 +130,32 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     else if (event == EV_enter_state) {
         ramp_direction = 1;
         #ifdef USE_TINT_RAMPING
-        is_off = 0;
+        tint_locked = 0;
         saved_tint = tint;
         #endif
         return MISCHIEF_MANAGED;
     }
     // 1 click: off
     else if (event == EV_1click) {
-        #ifdef USE_TINT_RAMPING
-        is_off = 1;
-        #endif
         set_state(off_state, 0);
         #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
         aux_led_reset = 1;
         #endif
-        strobe_set_dyn_pwm(strobe_mode_END);
+        undo_global_setting();
         return MISCHIEF_MANAGED;
     }
     // 2 clicks: rotate through strobe/flasher modes
     else if (event == EV_2clicks) {
         strobe_type = (st + 1) % NUM_STROBES;
         save_config();
-        strobe_set_dyn_pwm(strobe_type);
+        strobe_global_setup(strobe_type);
         return MISCHIEF_MANAGED;
     }
     // 3 clicks: rotate back through strobe/flasher modes
     else if (event == EV_3clicks) {
         strobe_type = (st - 1 + NUM_STROBES) % NUM_STROBES;
         save_config();
-        strobe_set_dyn_pwm(strobe_type);
+        strobe_global_setup(strobe_type);
         return MISCHIEF_MANAGED;
     }
     // hold: change speed (go faster)
@@ -171,6 +199,12 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             if (tint_alt_brightness < 2) tint_alt_brightness = 2;
             else if (tint_alt_brightness > MAX_LEVEL) tint_alt_brightness = MAX_LEVEL;
             set_level(tint_alt_brightness);
+        }
+        else if (st == tint_smooth_ramp_e) {
+            tint_smooth_brightness += ramp_direction;
+            if (tint_smooth_brightness < 2) tint_smooth_brightness = 2;
+            else if (tint_smooth_brightness > MAX_LEVEL) tint_smooth_brightness = MAX_LEVEL;
+            set_level(tint_smooth_brightness);
         }
         #endif
 
@@ -220,6 +254,11 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             if (tint_alt_brightness > 2)
                 tint_alt_brightness--;
             set_level(tint_alt_brightness);
+        }
+        else if (st == tint_smooth_ramp_e) {
+            if (tint_smooth_brightness > 2)
+                tint_smooth_brightness--;
+            set_level(tint_smooth_brightness);
         }
         #endif
 
@@ -277,6 +316,12 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             save_config();
             blink_once();
         }
+        else if (st == tint_smooth_ramp_e) {
+            if (tint_smooth_pause > TINT_SMOOTH_MIN_PAUSE)
+                tint_smooth_pause -= 2;
+            save_config();
+            blink_once();
+        }
         #endif
         return MISCHIEF_MANAGED;
     }
@@ -307,6 +352,12 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         else if (st == tint_alternating_strobe_e) {
             if (tint_alt_interval < TINT_ALT_MAX_INTERVAL)
                 tint_alt_interval++;
+            save_config();
+            blink_once();
+        }
+        else if (st == tint_smooth_ramp_e) {
+            if (tint_smooth_pause < TINT_SMOOTH_MAX_PAUSE)
+                tint_smooth_pause += 2;
             save_config();
             blink_once();
         }
@@ -373,6 +424,8 @@ inline void strobe_state_iter() {
         case tint_alternating_strobe_e:
             tint_alt_iter();
             break;
+        case tint_smooth_ramp_e:
+            tint_smooth_ramp_iter();
         #endif
     }
 }
@@ -479,9 +532,9 @@ uint8_t tint_mode = 0; // 0: alternate, 1: channel 1 only, 2: channel 2 only, 3:
 uint8_t chosen_tint = 127; // for tint_mode = 3
 #endif
 
-inline void update_firework_tint(uint8_t stage) {
+inline static void update_firework_tint(uint8_t stage) {
     #ifdef USE_TINT_RAMPING
-    if (is_off) return;
+    if (tint_locked) return;
     switch (tint_mode) {
     // alternate both channels
     case 0:
@@ -542,11 +595,23 @@ inline void firework_iter() {
 
 #ifdef USE_TINT_RAMPING
 inline void tint_alt_iter() {
-    if (is_off) return;
+    if (tint_locked) return;
 
     tint = (tint == 1) ? 254 : 1; 
     set_level(tint_alt_brightness);
     nice_delay_ms(500 * tint_alt_interval);
+}
+
+inline void tint_smooth_ramp_iter() {
+    if (tint_locked) return;
+    
+    static uint8_t tint_step = 1;
+    if (tint == 254) tint_step = -1;
+    else if (tint == 1) tint_step = 1;
+
+    tint += tint_step;
+    set_level(tint_smooth_brightness);
+    nice_delay_ms(tint_smooth_pause);
 }
 #endif
 
