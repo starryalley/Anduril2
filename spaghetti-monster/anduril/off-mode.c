@@ -257,6 +257,35 @@ uint8_t off_state(Event event, uint16_t arg) {
     #endif
 
     #ifdef USE_SIMPLE_UI
+    #ifdef USE_CHILD_UI
+    else if ((event == EV_click12_hold) && (!arg)) {
+        if (child_ui_active) {  // turn off child UI, meaning go back to adv mode
+            blink_some(3);
+            simple_ui_active = child_ui_active = 0;
+            // restore original ramp style (smooth or discrete)
+            ramp_style = saved_ramp_style;
+            save_config();
+        } else {  // configure child UI ramp
+            push_state(child_ui_config_state, 0);
+        }
+        return MISCHIEF_MANAGED;
+    }
+
+    if (child_ui_active) {
+        return EVENT_NOT_HANDLED;
+    }
+    else if (event == EV_12clicks) {
+        blink_some(2);
+        // use simple UI variant: child UI
+        simple_ui_active = child_ui_active = 1;
+        // setting ramp style
+        saved_ramp_style = ramp_style;
+        ramp_style = CHILD_RAMP_STYLE;
+        save_config();
+        return MISCHIEF_MANAGED;
+    }
+    #endif
+
     // 10 clicks, but hold last click: turn simple UI off (or configure it)
     else if ((event == EV_click10_hold) && (!arg)) {
         if (simple_ui_active) {  // turn off simple UI

@@ -53,7 +53,7 @@
 
 // Include a simplified UI for non-enthusiasts?
 #define USE_SIMPLE_UI
-
+#define USE_CHILD_UI
 
 ///// Ramp mode options /////
 

@@ -41,6 +41,12 @@ void load_config() {
         ramp_ceils[2] = eeprom[simple_ui_ceil_e];
         ramp_stepss[2] = eeprom[simple_ui_steps_e];
         simple_ui_active = eeprom[simple_ui_active_e];
+        #ifdef USE_CHILD_UI
+        child_ui_active = eeprom[child_ui_active_e];
+        ramp_floors[3] = eeprom[child_ui_floor_e];
+        ramp_ceils[3] = eeprom[child_ui_ceil_e];
+        saved_ramp_style = eeprom[saved_ramp_style_e];
+        #endif
         #ifdef USE_2C_STYLE_CONFIG
         ramp_2c_style_simple = eeprom[ramp_2c_style_simple_e];
         #endif
@@ -140,6 +146,12 @@ void save_config() {
     eeprom[simple_ui_ceil_e] = ramp_ceils[2];
     eeprom[simple_ui_steps_e] = ramp_stepss[2];
     eeprom[simple_ui_active_e] = simple_ui_active;
+    #ifdef USE_CHILD_UI
+    eeprom[child_ui_active_e] = child_ui_active;
+    eeprom[child_ui_floor_e] = ramp_floors[3];
+    eeprom[child_ui_ceil_e] = ramp_ceils[3];
+    eeprom[saved_ramp_style_e] = saved_ramp_style;
+    #endif
     #ifdef USE_2C_STYLE_CONFIG
     eeprom[ramp_2c_style_simple_e] = ramp_2c_style_simple;
     #endif

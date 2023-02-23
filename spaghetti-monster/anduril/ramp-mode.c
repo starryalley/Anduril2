@@ -623,6 +623,9 @@ void ramp_config_save(uint8_t step, uint8_t value) {
     uint8_t style = ramp_style;
     #ifdef USE_SIMPLE_UI
     if (current_state == simple_ui_config_state)  style = 2;
+    #ifdef USE_CHILD_UI
+    else if (current_state == child_ui_config_state) style = 3;
+    #endif
     #endif
 
     #if defined(USE_SIMPLE_UI) && defined(USE_2C_STYLE_CONFIG)
@@ -670,6 +673,13 @@ uint8_t simple_ui_config_state(Event event, uint16_t arg) {
                              SIMPLE_UI_NUM_MENU_ITEMS,
                              ramp_config_save);
 }
+#ifdef USE_CHILD_UI
+uint8_t child_ui_config_state(Event event, uint16_t arg) {
+    return config_state_base(event, arg,
+                             2, // only floor and ceil settings
+                             ramp_config_save);
+}
+#endif
 #endif
 #endif  // #ifdef USE_RAMP_CONFIG
 
@@ -749,6 +759,9 @@ uint8_t nearest_level(int16_t target) {
     uint8_t num_steps = ramp_stepss[1
     #ifdef USE_SIMPLE_UI
         + simple_ui_active
+    #ifdef USE_CHILD_UI
+        + child_ui_active
+    #endif
     #endif
         ];
     // special case for 1-step ramp... use halfway point between floor and ceiling
@@ -780,6 +793,9 @@ void ramp_update_config() {
     uint8_t which = ramp_style;
     #ifdef USE_SIMPLE_UI
     if (simple_ui_active) { which = 2; }
+    #ifdef USE_CHILD_UI
+    if (child_ui_active) { which = 3; }
+    #endif
     #endif
 
     ramp_floor = ramp_floors[which];

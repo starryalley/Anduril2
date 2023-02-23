@@ -127,6 +127,9 @@ uint8_t ramp_config_state(Event event, uint16_t arg);
 void ramp_config_save(uint8_t step, uint8_t value);
 #ifdef USE_SIMPLE_UI
 uint8_t simple_ui_config_state(Event event, uint16_t arg);
+#ifdef USE_CHILD_UI
+uint8_t child_ui_config_state(Event event, uint16_t arg);
+#endif
 #endif
 #endif
 
@@ -177,6 +180,15 @@ uint8_t manual_memory_timer = DEFAULT_MANUAL_MEMORY_TIMER;
         #endif
         uint8_t ramp_2c_style_simple = DEFAULT_2C_STYLE_SIMPLE;  // 0 = no turbo, 1 = A1 style, 2 = A2 style
     #endif
+    #ifdef USE_CHILD_UI
+    // child specific settings
+    #define CHILD_UI_CEIL  30
+    #define CHILD_UI_STEPS  2
+    #define CHILD_RAMP_STYLE 1 // always use discrete
+    uint8_t child_ui_active = 0;
+    // child UI will overwrite simple UI's ceil/floor when active, so we must save them
+    uint8_t saved_ramp_style = RAMP_STYLE;
+    #endif
 #endif
 // smooth vs discrete ramping
 uint8_t ramp_style = RAMP_STYLE;  // 0 = smooth, 1 = discrete
@@ -208,6 +220,9 @@ uint8_t ramp_floors[] = {
     RAMP_DISCRETE_FLOOR,
     #ifdef USE_SIMPLE_UI
     SIMPLE_UI_FLOOR,
+    #ifdef USE_CHILD_UI
+    SIMPLE_UI_FLOOR,
+    #endif
     #endif
     };
 uint8_t ramp_ceils[] = {
@@ -215,6 +230,9 @@ uint8_t ramp_ceils[] = {
     RAMP_DISCRETE_CEIL,
     #ifdef USE_SIMPLE_UI
     SIMPLE_UI_CEIL,
+    #ifdef USE_CHILD_UI
+    CHILD_UI_CEIL,
+    #endif
     #endif
     };
 uint8_t ramp_stepss[] = {
@@ -222,6 +240,9 @@ uint8_t ramp_stepss[] = {
     RAMP_DISCRETE_STEPS,
     #ifdef USE_SIMPLE_UI
     SIMPLE_UI_STEPS,
+    #ifdef USE_CHILD_UI
+    CHILD_UI_STEPS,
+    #endif
     #endif
     };
 uint8_t ramp_discrete_step_size;  // don't set this
