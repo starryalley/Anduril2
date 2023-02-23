@@ -54,6 +54,14 @@ void blink_once() {
     set_level(brightness);
 }
 
+void blink_some(uint8_t times) {
+    blink_once();
+    for (uint8_t i = 1; i < times; i++) {
+        delay_4ms(100); //about 0.4s
+        blink_once();
+    }
+}
+
 // Just go dark for a moment to indicate to user that something happened
 void blip() {
     blip_ms(12);
