@@ -53,9 +53,9 @@ uint8_t blink_digit(uint8_t num) {
     if (!num) { ontime = 8; num ++; }
 
     for (; num>0; num--) {
-        #if defined(USE_AUX_RGB_LEDS) && !defined(IS_MULE)
+        #if defined(USE_AUX_RGB_LEDS) && !defined(NO_AUX)
         rgb_led_update(RGB_RED|RGB_HIGH, 0);
-        #elif defined(USE_INDICATOR_LED) && !defined(IS_MULE)
+        #elif defined(USE_INDICATOR_LED) && !defined(NO_AUX)
         indicator_led(2);
         #else
         set_level(BLINK_BRIGHTNESS);
