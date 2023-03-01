@@ -550,6 +550,11 @@ uint8_t steady_state(Event event, uint16_t arg) {
         if (actual_level <= AUX_ON_LOWLEVEL) {
             // go to the next auxled mode
             lowlevel_aux_mode = (lowlevel_aux_mode+1) % LOWLEVEL_AUX_MODE_COUNT;
+            #ifdef NO_AUX
+            // skip AUX high mode
+            if (lowlevel_aux_mode == LOWLEVEL_AUX_HIGH)
+                lowlevel_aux_mode++;
+            #endif
             set_lowlevel_mode(actual_level);
         } else {
             // blink in RED to indicate error (we are not within low level threshold so this is ignored)

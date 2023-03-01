@@ -97,7 +97,7 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
     static uint8_t candle_wave3 = 0;
     static uint8_t candle_wave2_speed = 0;
     static uint8_t candle_mode_brightness = 24;
-    #if defined(USE_AUX_RGB_LEDS)
+    #if defined(USE_AUX_RGB_LEDS) && !defined(NO_AUX)
     static uint16_t last_brightness = 0;
     #endif
 
@@ -214,7 +214,7 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
         return MISCHIEF_MANAGED;
     }
     // 7C: toggle candle mode using aux led
-    #ifdef USE_AUX_RGB_LEDS
+    #if defined(USE_AUX_RGB_LEDS) && !defined(NO_AUX)
     else if (event == EV_7clicks) {
         if (wobble_style == candle_wobble_e) {
             candle_use_aux = !candle_use_aux;
@@ -250,7 +250,7 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
         #endif  // ifdef USE_SUNSET_TIMER
 
         set_level(brightness);
-        #if defined(USE_AUX_RGB_LEDS)
+        #if defined(USE_AUX_RGB_LEDS) && !defined(NO_AUX)
         static uint16_t aux_on = 0;
         if (wobble_style == candle_wobble_e && candle_use_aux) {
             if (aux_on && (arg - aux_on < TICKS_PER_SECOND/2)) {

@@ -217,7 +217,7 @@ void setup() {
         // regular e-switch light, no hard clicky power button
 
         // blink green at power-on to let user know power is connected
-        #if defined(USE_AUX_RGB_LEDS)
+        #if defined(USE_AUX_RGB_LEDS) && !defined(NO_AUX)
         rgb_led_update(RGB_GREEN|RGB_HIGH, 0);
         delay_4ms(10);
         rgb_led_update(RGB_OFF, 0);
