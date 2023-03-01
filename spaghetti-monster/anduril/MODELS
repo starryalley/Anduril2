@@ -16,6 +16,8 @@ Model	Name                          	MCU
 0134	emisar-d4sv2-219              	attiny1634
 0135	emisar-d4sv2-tintramp         	attiny1634
 0136	emisar-d4sv2-tintramp-fet     	attiny1634
+0137	emisar-d4sv2-tintramp-noaux    	attiny1634
+0138	emisar-d4sv2-tintramp-fet-noaux attiny1634
 0141	emisar-d18                    	attiny85
 0142	emisar-d18-219                	attiny85
 0211	noctigon-kr4                  	attiny1634
@@ -24,6 +26,10 @@ Model	Name                          	MCU
 0214	noctigon-kr4-219b             	attiny1634
 0215	noctigon-kr4-tintramp         	attiny1634
 0216	noctigon-kr4-12v              	attiny1634
+0217    noctigon-kr4-noaux              attiny1634
+0218	noctigon-kr4-nofet-noaux     	attiny1634
+0219	noctigon-kr4-219-noaux         	attiny1634
+0220	noctigon-kr4-219b-noaux        	attiny1634
 0251	noctigon-k1                   	attiny1634
 0252	noctigon-k1-sbt90             	attiny1634
 0253	noctigon-k1-12v               	attiny1634
@@ -37,6 +43,7 @@ Model	Name                          	MCU
 0272	noctigon-dm11-nofet           	attiny1634
 0273	noctigon-dm11-12v             	attiny1634
 0274	noctigon-dm11-sbt90           	attiny1634
+0275    noctigon-dm11-12v-noaux         attiny1634
 0311	fw3a                          	attiny85
 0312	fw3a-219                      	attiny85
 0313	fw3a-nofet                    	attiny85
