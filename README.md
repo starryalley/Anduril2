@@ -9,7 +9,7 @@ For ToyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 Since I plan to only work with my existing Anduril2 lights (see below list), I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware for my several D4v2's, a DW4, a D4K, and some SP10 Pro's and TS10's (as of Feb, 2023).
+This repo contains my own changes to Anduril2 firmware for my several D4v2's, a DW4, a D4K, and some SP10 Pro's and TS10's (as of Mar, 2023). For other Anduril2 lights that I don't own, I won't be able to test or support. Please file a bug report if you see any issue.
 
 The following is the built targets used:
 
@@ -21,7 +21,9 @@ noctigon-kr4-nofet (`0212`):
 noctigon-kr4 (`0211`):
 - D4v2 aluminum, 5A linear driver with Luminus SST-20 4000K
 - D4v2 titanium, 5A linear driver with Cree XP-L HI T6 8D 2800K (ramp floor=4, jump_start_level=31)
-- DW4 9A linear driver with 16-LED mule of Nichia E21A 4500/2700 mix (for mule, define `IS_MULE` in the config header)
+
+noctigon-kr4-noaux (`0217`):
+- DW4 9A linear driver with 16-LED mule of Nichia E21A 4500/2700 mix
 
 noctigon-kr4-219b (`0214`) (50% FET):
 - D4v2 antique brass, 9A linear driver with Nichia 219b SW35
@@ -40,7 +42,24 @@ wurkkos-ts10 (`0714`):
 
 noctigon-dm11-12v (`0273`):
 - D4K with boost driver (as confirmed by [RainbowEucalyptus](https://www.reddit.com/user/RainbowEucalyptus))
+- KR1 with boost driver (as confirmed by [PlaceboConsumer](https://www.reddit.com/user/PlaceboConsumer))
 
+
+Since I've made use of AUX light a lot in this Anduril2 fork, some functions become dependent on AUX and won't work on lights that do not have AUX. So for mule or lights that do not have AUX (for example, KR1 and D1V2), I have added the following in `MODELS` that has `NO_AUX` defined in the config header:
+
+- emisar-d4sv2-tintramp-noaux (0137)
+- emisar-d4sv2-tintramp-fet-noaux (0138)
+- noctigon-kr4-noaux (0217)
+- noctigon-kr4-nofet-noaux (0218)
+- noctigon-kr4-219-noaux (0219)
+- noctigon-kr4-219b-noaux (0220)
+- noctigon-dm11-12v-noaux (0275)
+
+Use this build instead so the following features/changes is ineffective/reverted:
+- Blink AUX green LED when powered on - blink main emitters instead
+- Use AUX LED to blink numbers (voltage/temperature etc) - blink main emitters instead
+- `6C` when in normal mode - will skip "main emitters on, aux high, button low" mode
+- `7C` in candle mode to turn on AUX along with main emitters
 
 
 # Features
@@ -82,7 +101,7 @@ When AUX isn't available but indicator LED is:
 Note that in newer Hank lights where there is a RGB switch/button LED, if the light comes with front-facing AUX LED, the RGB switch/button LED is wired to the AUX LED so the button LED control (second and third state in `6C`) won't work. This is not a firmware or hardware issue, but rather expected due to how it is. 
 
 
-## Blink AUX green LED when powered on
+## Blink AUX green LED when powered on (if there is AUX)
 
 Instead of blinking the main emitter, blink the AUX green LED at high power to indicate it's powered on.
 Original idea from [here](https://bazaar.launchpad.net/~dnelson1901/flashlight-firmware/flashlight-firmware/revision/267)
@@ -167,7 +186,7 @@ In addition, there is a shortcut `5C` to go to tint edge. Note that `5C` is for 
 Note that when lights are off or locked out, `5C` and `8H` still works but not visible until the emitters are turned on.
 
 
-## 2 More indicator LED modes
+## 2 More indicator LED modes (currently only for TS10 which uses indicator LED as single-colour AUX)
 
 Idea from [SammysHP's commit](https://github.com/SammysHP/flashlight-firmware/commits/more-aux-patterns)
 
@@ -225,6 +244,18 @@ A tint alternating strobe mode (after tactical strobe) for dual channel lights. 
 A tint ramping strobe mode (after tint alternating strobe) for dual channel lights. It ramps between both channels repeatedly with configurable brightness (the usual `1H` and `2H`) and pause at each tint step (`4C` for decreasing and `5C` for increasing the interval by 2 microseconds). The setting (brightness and pause) is saved.
 
 
+## Child Mode (a Simple UI with limited brightness)
+
+There is an additional UI (in addition to Simple and Advanced) that is basically the same as Simple UI but with the following differences (limitations):
+- ramping style is fixed to 2-step discrete ramping (only low and high)
+- only ramp floor and ceil (basically low and high level) can be configured (by `12H` from off in advanced UI)
+- default floor and ceiling level: `RAMP_DISCRETE_FLOOR` and 30
+
+Enter by `12C` from off, exit by `12H` from off.
+
+Switch to this mode before handling the light to the kids.
+
+
 # Configuration changes
 
 - Default in Advanced mode
@@ -249,15 +280,8 @@ In this mode:
 - moonlight can be just lighting up button LED on low or high. Trust me, on high level my amber button LED alone is more than enough in pitch black. (I already have a mode which only turns on button LED on high).
 - The next level after moonlight can be red AUX on high, and then goes yellow on high, white on high, and then the real level 1 on main emitters. (according to my visual comparison with my zebralight, the level 1 on my E21A 2700/2000mix is around 0.1~0.2lm which is still too bright for me).
 - easier control of button LED and AUX LED in this mode
-- disable some other settings which can possibly blind dark adapted eyes, for example, only allow candle/lightning in strobe modes.
+- disable some other settings which can possibly blind dark adapted eyes, for example, only allow candle mode in strobe.
 
-## Child safe mode
-
-12H to go to this mode and back to advanced mode.
-
-In this mode:
-- mostly same with the low power mode but with many other dangerous mode disabled and only allow stepped mode with no other functionality.
-- switch to this mode before handling the light to the kids (or whoever you reckon is)
 
 # Other useful branch/commits
 
