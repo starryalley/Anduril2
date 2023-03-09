@@ -21,10 +21,18 @@
 #ifndef FSM_RAMPING_C
 #define FSM_RAMPING_C
 
+#ifdef USE_RAMP_START_MODE
+#include "startup_mode.h"
+#endif
+
 #ifdef USE_RAMPING
 
 void set_level(uint8_t level) {
     #ifdef USE_JUMP_START
+    // jump start only makes sense when the ramp mode is set to instant on
+    #ifdef USE_RAMP_START_MODE
+    if (ramp_start_mode == 0) {
+    #endif
     // maybe "jump start" the engine, if it's prone to slow starts
     // (pulse the output high for a moment to wake up the power regulator)
     // (only do this when starting from off and going to a low level)
@@ -34,6 +42,9 @@ void set_level(uint8_t level) {
         set_level(jump_start_level);
         delay_4ms(JUMP_START_TIME/4);
     }
+    #ifdef USE_RAMP_START_MODE
+    }
+    #endif
     #endif  // ifdef USE_JUMP_START
 
     actual_level = level;

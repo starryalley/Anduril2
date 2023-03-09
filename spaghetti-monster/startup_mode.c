@@ -1,7 +1,7 @@
 /*
  * startup_mode.c: ramp startup mode
  *
- * Copyright (C) 2022 Mark Kuo
+ * Copyright (C) 2023 Mark Kuo
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
