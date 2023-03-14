@@ -236,7 +236,7 @@ uint8_t off_state(Event event, uint16_t arg) {
     #ifdef USE_LOCKOUT_MODE
     // 4 clicks: soft lockout
     else if (event == EV_4clicks) {
-        blink_once();
+        blink_once_aux();
         set_state(lockout_state, 0);
         return MISCHIEF_MANAGED;
     }

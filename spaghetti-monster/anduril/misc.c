@@ -54,6 +54,21 @@ void blink_once() {
     set_level(brightness);
 }
 
+void blink_once_aux() {
+    #if defined(USE_AUX_RGB_LEDS) && !defined(NO_AUX)
+    rgb_led_update(RGB_GREEN|RGB_HIGH, 0);
+    delay_4ms(10);
+    rgb_led_update(RGB_OFF, 0);
+    #elif defined(USE_INDICATOR_LED) && !defined(NO_AUX)
+    indicator_led(2);
+    delay_4ms(10);
+    indicator_led(0);
+    #else
+    // or fall back to main emitter if we have no AUX LED and no indicator LED
+    blink_once();
+    #endif
+}
+
 void blink_some(uint8_t times) {
     blink_once();
     for (uint8_t i = 1; i < times; i++) {

@@ -102,7 +102,7 @@ uint8_t lockout_state(Event event, uint16_t arg) {
 
     // 3 clicks: exit and turn off
     else if (event == EV_3clicks) {
-        blink_once();
+        blink_once_aux();
         set_state(off_state, 0);
         return MISCHIEF_MANAGED;
     }
