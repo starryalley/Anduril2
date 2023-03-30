@@ -33,6 +33,10 @@ uint8_t saved_tint = 128;
 uint8_t tint_locked = 0;
 #endif
 
+#ifdef USE_TINT_RAMPING
+uint8_t past_edge_counter = 0;
+#endif
+
 // enable static PWM
 static inline void set_static_pwm() {
     #ifdef USE_DYN_PWM
@@ -72,7 +76,7 @@ static void strobe_global_setup(strobe_mode_te type) {
         restore_tint();
         break;
     #endif
-    
+
     #ifdef USE_FIREWORK_MODE
     case firework_mode_e:
         set_static_pwm();
@@ -84,7 +88,7 @@ static void strobe_global_setup(strobe_mode_te type) {
         #endif
         break;
     #endif
-    
+
     #ifdef USE_TINT_RAMPING
     case tint_alternating_strobe_e:
     case tint_smooth_ramp_e:
@@ -192,19 +196,32 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             set_level(bike_flasher_brightness);
         }
         #endif
-        
+
         #ifdef USE_TINT_RAMPING
         else if (st == tint_alternating_strobe_e) {
             tint_alt_brightness += ramp_direction;
             if (tint_alt_brightness < 2) tint_alt_brightness = 2;
-            else if (tint_alt_brightness > MAX_LEVEL) tint_alt_brightness = MAX_LEVEL;
+            else if (tint_alt_brightness > (MAX_LEVEL-20)) tint_alt_brightness = (MAX_LEVEL-20);
             set_level(tint_alt_brightness);
         }
         else if (st == tint_smooth_ramp_e) {
-            tint_smooth_brightness += ramp_direction;
-            if (tint_smooth_brightness < 2) tint_smooth_brightness = 2;
-            else if (tint_smooth_brightness > MAX_LEVEL) tint_smooth_brightness = MAX_LEVEL;
-            set_level(tint_smooth_brightness);
+            if (! arg) {
+                past_edge_counter = 0;  // doesn't start until user hits the edge
+            }
+            if ((tint_smooth_brightness > 2) && (tint_smooth_brightness < (RAMP_SIZE-20))){ //don't go to 1 (unreliable) or over the single channel max
+                tint_smooth_brightness += ramp_direction;
+            }
+            else if ((tint_smooth_brightness == (MAX_LEVEL-20) && (past_edge_counter == 0))){ set_level(RAMP_SIZE-20); nice_delay_ms(20); blip(); nice_delay_ms(20); past_edge_counter++; } ///top of single channel, blink and start the counter
+              if (past_edge_counter < 255) { past_edge_counter++; }
+              if (past_edge_counter == 128) { //blink again to indicate start of both channels
+                  blip();
+              }
+              // if the user kept pressing long enough, go to both chanels always on
+              if ((past_edge_counter > 128) && ((arg % 16) == 0)) { //button was held past the bump, increment every 16 frames since we don't have as far to go
+                if (tint_smooth_brightness < (MAX_LEVEL-1)) { tint_smooth_brightness += ramp_direction; } //don't go up to 150/150 which would just be a solid colour
+                //blip();
+              }
+              set_level(tint_smooth_brightness);
         }
         #endif
 
@@ -539,7 +556,7 @@ inline static void update_firework_tint(uint8_t stage) {
     // alternate both channels
     case 0:
         if (stage % 5 == 0)
-            tint = (tint == 1) ? 254 : 1; 
+            tint = (tint == 1) ? 254 : 1;
         break;
     // channel 1 only
     case 1:
@@ -558,7 +575,7 @@ inline static void update_firework_tint(uint8_t stage) {
 }
 // code is copied and modified from factory-reset.c
 inline void firework_iter() {
-    if (firework_stage == firework_stage_count) {        
+    if (firework_stage == firework_stage_count) {
         // explode, and reset stage
         firework_stage = 0;
         for (uint8_t brightness = firework_brightness; brightness > 0; brightness--) {
@@ -597,14 +614,14 @@ inline void firework_iter() {
 inline void tint_alt_iter() {
     if (tint_locked) return;
 
-    tint = (tint == 1) ? 254 : 1; 
+    tint = (tint == 1) ? 254 : 1;
     set_level(tint_alt_brightness);
     nice_delay_ms(500 * tint_alt_interval);
 }
 
 inline void tint_smooth_ramp_iter() {
     if (tint_locked) return;
-    
+
     static uint8_t tint_step = 1;
     if (tint == 254) tint_step = -1;
     else if (tint == 1) tint_step = 1;
