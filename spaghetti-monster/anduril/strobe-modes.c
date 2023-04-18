@@ -197,13 +197,13 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         else if (st == tint_alternating_strobe_e) {
             tint_alt_brightness += ramp_direction;
             if (tint_alt_brightness < 2) tint_alt_brightness = 2;
-            else if (tint_alt_brightness > MAX_LEVEL) tint_alt_brightness = MAX_LEVEL;
+            else if (tint_alt_brightness > RAMP_SMOOTH_CEIL) tint_alt_brightness = RAMP_SMOOTH_CEIL;
             set_level(tint_alt_brightness);
         }
         else if (st == tint_smooth_ramp_e) {
             tint_smooth_brightness += ramp_direction;
             if (tint_smooth_brightness < 2) tint_smooth_brightness = 2;
-            else if (tint_smooth_brightness > MAX_LEVEL) tint_smooth_brightness = MAX_LEVEL;
+            else if (tint_smooth_brightness > RAMP_SMOOTH_CEIL) tint_smooth_brightness = RAMP_SMOOTH_CEIL;
             set_level(tint_smooth_brightness);
         }
         #endif
