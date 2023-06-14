@@ -62,6 +62,11 @@ uint8_t blink_digit(uint8_t num) {
         #endif
         nice_delay_ms(ontime);
         set_level(0);
+        // in the case of side facing AUX, set_level(0) won't turn off AUX.
+        // Let's do it here.
+        #ifdef USE_AUX_RGB_LEDS_WHILE_ON
+        rgb_led_update(RGB_OFF, 0);
+        #endif
         nice_delay_ms(BLINK_SPEED * 3 / 12);
     }
     return nice_delay_ms(BLINK_SPEED * 8 / 12);
