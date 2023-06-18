@@ -9,10 +9,10 @@ For ToyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 Since I plan to only work with my existing Anduril2 lights (see below list), I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware for my several D4v2's, a DW4, a D4K, and some SP10 Pro's and TS10's (as of Mar, 2023). For other Anduril2 lights that I don't own, I won't be able to test or support. Please file a bug report if you see any issue.
+This repo contains my own changes to Anduril2 firmware for my several D4v2's, a DW4, a D4K, and some SP10 Pro's and TS10's (as of Jun, 2023). For other Anduril2 lights that I don't own, I won't be able to test or support. Please file a bug report if you see any issue.
 
-The following is the built targets used:
 
+## Build targets (which I own):
 
 noctigon-kr4-nofet (`0212`):
 - D4v2 brass, 7.5A linear driver with Nichia E21A 2000/2700K mix
@@ -33,16 +33,32 @@ emisar-d4sv2-tintramp (`0135`): (for D4v2 tintramp)
 - D4v2 aluminum, tint ramping 5A+5A linear driver with Nichia 219b 2700/4500K
 - D4v2 aluminum, tint ramping ?A+?A linear driver with Nichia E21A 2000/5000K
 - D4K tint ramping 10A+10A linear driver with Osram W2 red and W2 green
+- D2 with 519A 5000K dedome and 4000K domed
+
+emisar-d1v2-linear-fet (`0124`):
+- D1v2, SFN60 6500K, 12A linear with FET
 
 sofirn-sp10-pro (`0631`):
-- Sonfirn SP10 Pro AA/14500
+- Sofirn SP10 Pro AA/14500
 
 wurkkos-ts10 (`0714`):
 - Wurkkos TS10 14500
 
+sofirn-lt1s-pro (`0623`): (Not included yet as this is better worked on [Toykeeper's new multi-channel branch](https://bazaar.launchpad.net/~toykeeper/flashlight-firmware/multi-channel/changes) which I haven't got time yet)
+- Sofirn LT1S Pro Lantern
+
+
+## Other build targets (that I don't own):
+
+noctigon-dm11-nofet (`0272`):
+- DM11 with w2 deep blue (as requested by [PlaceboConsumer](https://www.reddit.com/user/PlaceboConsumer))
+
 noctigon-dm11-12v (`0273`):
 - D4K with boost driver (as confirmed by [RainbowEucalyptus](https://www.reddit.com/user/RainbowEucalyptus))
 - KR1 with boost driver (as confirmed by [PlaceboConsumer](https://www.reddit.com/user/PlaceboConsumer))
+
+wurkkos-ts25 (`0715`):
+- TS11/TS25 (as confirmed in [this issue](https://github.com/starryalley/Anduril2/issues/24))
 
 
 Since I've made use of AUX light a lot in this Anduril2 fork, some functions become dependent on AUX and won't work on lights that do not have AUX. So for mule or lights that do not have AUX (for example, KR1 and D1V2), I have added the following in `MODELS` that has `NO_AUX` defined in the config header:
@@ -209,8 +225,8 @@ Idea from [this post](https://www.reddit.com/r/flashlight/comments/w417mx/anduri
 
 When doing 1-click from off to turn on the light, there are additionally 3 modes that can be selected through Misc Config Menu (`9H` from off).
 
-- Mode 0: instant on (default)
-- Mode 1: quickly ramp up to memorized level
+- Mode 0: instant on (default in stock Anduril2)
+- Mode 1: quickly ramp up to memorized level (default in this fork)
 - Mode 2: old fluorescent light flickering
 - Mode 3: lighter flickering and slowly ramp up
 
@@ -221,7 +237,9 @@ The Misc Config menu has the following items:
 - `USE_JUMP_START` (if enabled) is the second item (for lights with jump start enabled)
 - This Start up mode is the third item
 
-Based on different light's config this can be 1st, 2nd or 3rd item in the menu. For D4v2/D4sv2 it is the third, for D4v2/DW4 single channel it's the second. For SP10 pro and TS10 it's the first and only item.
+Based on different light's config this can be 1st, 2nd or 3rd item in the menu. For dual channel with jump start, it is the third. For single channel with jump start, it is the second. For SP10 pro and TS10 it's the first and only item.
+
+Please note that when start up mode is not 0 (instant on), jump start is disabled because it doesn't make sense to have jump start.
 
 
 ## Smooth sunset from SammysHP
