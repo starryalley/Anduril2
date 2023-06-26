@@ -269,8 +269,11 @@ void loop() {
     StatePtr state = current_state;
 
     #ifdef USE_AUX_RGB_LEDS_WHILE_ON
-    // display battery charge on RGB button during use
-    if (! setting_rgb_mode_now) rgb_led_voltage_readout(1);
+    // display battery charge on RGB button during use, based on RGB off setting
+    uint8_t pattern = (rgb_led_off_mode >> 4);
+    if (! setting_rgb_mode_now && pattern > 0) {
+        rgb_led_voltage_readout(pattern >= 2);
+    }
     #endif
 
     if (0) {}  // placeholder
