@@ -111,6 +111,9 @@ void load_config() {
         #ifdef USE_FIREWORK_MODE
         firework_brightness = eeprom[firework_brightness_e];
         #endif
+        #ifdef USE_LIGHTHOUSE_MODE
+        lighthouse_delay = eeprom[lighthouse_delay_e];
+        #endif
         #ifdef USE_CANDLE_MODE
         candle_amplitude = eeprom[candle_amplitude_e];
         wobble_style = eeprom[candle_wobble_style_e];
@@ -215,6 +218,9 @@ void save_config() {
     #endif
     #ifdef USE_FIREWORK_MODE
     eeprom[firework_brightness_e] = firework_brightness;
+    #endif
+    #ifdef USE_LIGHTHOUSE_MODE
+    eeprom[lighthouse_delay_e] = lighthouse_delay;
     #endif
     #ifdef USE_CANDLE_MODE
     eeprom[candle_amplitude_e] = candle_amplitude;

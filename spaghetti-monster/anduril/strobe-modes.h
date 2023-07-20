@@ -43,6 +43,9 @@ typedef enum {
     #ifdef USE_FIREWORK_MODE
     firework_mode_e,
     #endif
+    #ifdef USE_LIGHTHOUSE_MODE
+    lighthouse_mode_e,
+    #endif
     #ifdef USE_BIKE_FLASHER_MODE
     bike_flasher_e,
     #endif
@@ -110,6 +113,15 @@ inline void bike_flasher_iter();
 #define MIN_FIREWORK_LEVEL DEFAULT_LEVEL // max is always MAX_LEVEL
 uint8_t firework_brightness = RAMP_SMOOTH_CEIL;
 inline void firework_iter();
+#endif
+
+#ifdef USE_LIGHTHOUSE_MODE
+uint8_t lighthouse_phase = 0;
+#define LIGHTHOUSE_MAX_DELAY 30
+#define LIGHTHOUSE_MIN_DELAY 0
+#define LIGHTHOUSE_DELAY_DEFAULT 5
+uint8_t lighthouse_delay = LIGHTHOUSE_DELAY_DEFAULT;
+inline void lighthouse_iter();
 #endif
 
 #ifdef USE_TINT_RAMPING

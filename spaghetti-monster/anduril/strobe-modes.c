@@ -289,6 +289,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     // 4C: turning down busy factor (less busy) of lightning mode,
     //  or turning down firework brightness by 12,
     //  or decrease tint alternating interval by 0.5 second
+    //  or decrease lighthouse delay by 1 sec
     else if (event == EV_4clicks) {
         if (0) {}  // placeholder
         #ifdef USE_LIGHTNING_MODE
@@ -305,6 +306,14 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             firework_brightness -= 12;
             if (firework_brightness < MIN_FIREWORK_LEVEL)
                 firework_brightness = MIN_FIREWORK_LEVEL;
+            save_config();
+            blink_once();
+        }
+        #endif
+        #ifdef USE_LIGHTHOUSE_MODE
+        else if (st == lighthouse_mode_e) {
+            if (lighthouse_delay > LIGHTHOUSE_MIN_DELAY)
+                lighthouse_delay--;
             save_config();
             blink_once();
         }
@@ -328,6 +337,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     // 5C: turning up busy factor (busier) of lightning mode,
     //  or turning up firework brightness by 12,
     //  or increasing tint alternating interval by 0.5 second
+    //  or increasing lighthouse delay by 1 sec
     else if (event == EV_5clicks) {
         if (0) {}  // placeholder
         #ifdef USE_LIGHTNING_MODE
@@ -344,6 +354,14 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             firework_brightness += 12;
             if (firework_brightness > MAX_LEVEL)
                 firework_brightness = MAX_LEVEL;
+            save_config();
+            blink_once();
+        }
+        #endif
+        #ifdef USE_LIGHTHOUSE_MODE
+        else if (st == lighthouse_mode_e) {
+            if (lighthouse_delay < LIGHTHOUSE_MAX_DELAY)
+                lighthouse_delay++;
             save_config();
             blink_once();
         }
@@ -366,6 +384,7 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     }
     // 6C: reset lightning busy factor to default,
     //  or reset firework brightness to default
+    //  or reset lighthouse delay to default
     else if (event == EV_6clicks) {
         if (0) {}  // placeholder
         #ifdef USE_LIGHTNING_MODE
@@ -378,6 +397,11 @@ uint8_t strobe_state(Event event, uint16_t arg) {
         #ifdef USE_FIREWORK_MODE
         else if (st == firework_mode_e) {
             firework_brightness = RAMP_SMOOTH_CEIL;
+        }
+        #endif
+        #ifdef USE_LIGHTHOUSE_MODE
+        else if (st == lighthouse_mode_e) {
+            lighthouse_delay = LIGHTHOUSE_DELAY_DEFAULT;
         }
         #endif
         return MISCHIEF_MANAGED;
@@ -417,6 +441,12 @@ inline void strobe_state_iter() {
         #ifdef USE_FIREWORK_MODE
         case firework_mode_e:
             firework_iter();
+            break;
+        #endif
+
+        #ifdef USE_LIGHTHOUSE_MODE
+        case lighthouse_mode_e:
+            lighthouse_iter();
             break;
         #endif
 
@@ -590,6 +620,28 @@ inline void firework_iter() {
     // we've reached our max brightness for firework mode, let's explode in the next iteration
     if (firework_stage > firework_brightness)
         firework_stage = firework_stage_count;
+}
+#endif
+
+#ifdef USE_LIGHTHOUSE_MODE
+// phase is between 0~255, returns MAX_LEVEL at 128 and 1 at both ends
+uint8_t lighthouse_intensity(uint8_t phase) {
+    if (phase > 127)
+        phase = 256 - phase;
+    const uint64_t maxOutput = MAX_LEVEL - 1;
+    // power of 4 (quartic function)
+    return (uint8_t)(maxOutput * phase / 128 * phase / 128 * phase / 128 * phase / 128) + 1;
+}
+
+inline void lighthouse_iter() {
+    uint8_t brightness = lighthouse_intensity(lighthouse_phase++);
+    set_level(brightness);
+    
+    if (lighthouse_phase == 0) {
+        set_level(0);
+        nice_delay_ms(1000 * lighthouse_delay);
+    } else
+        nice_delay_ms(10 + lighthouse_delay);
 }
 #endif
 
