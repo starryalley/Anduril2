@@ -9,7 +9,7 @@ For ToyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 Since I plan to only work with my existing Anduril2 lights (see below list), I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware for my several D4v2's, a DW4, a D4K, and some SP10 Pro's and TS10's (as of Jun, 2023). For other Anduril2 lights that I don't own, I won't be able to test or support. Please file a bug report if you see any issue.
+This repo contains my own changes to Anduril2 firmware for my several D4v2's, a DW4, a D4K, and some SP10 Pro's and TS10's (as of Jul, 2023). For other Anduril2 lights that I don't own, I won't be able to test or support. Please file a bug report if you see any issue.
 
 
 ## Build targets (which I own):
@@ -37,6 +37,12 @@ emisar-d4sv2-tintramp (`0135`): (for D4v2 tintramp)
 
 emisar-d1v2-linear-fet (`0124`):
 - D1v2, SFN60 6500K, 12A linear with FET
+
+emisar-d1v2-no-fet (`0125`):
+- D1v2, W1 green, 5A linear
+
+noctigon-k1-12v (`0253`):
+- D1v2, XHP70.3 5000K, 6V 4A boost driver
 
 sofirn-sp10-pro (`0631`):
 - Sofirn SP10 Pro AA/14500
@@ -179,7 +185,7 @@ In candle wobble style (default/stock) we can additional use `7C` to toggle if w
 
 ## Fireworks mode
 
-There is an additional strobe mode called Fireworks, right after Lightning mode. The main emitters will light up like fireworks. 
+An additional strobe mode called Fireworks, right after Lightning mode. The main emitters will light up like fireworks. 
 
 Adjust firework brightness (explosion brightness):
 - `4C`: decrease brightness by 12
@@ -191,6 +197,20 @@ For dual channel lights, fireworks mode will randomly choose from the following 
 - use channel 1 only
 - use channel 2 only
 - randomly choose a tint
+
+## Lighthouse mode
+
+An additional strobe mode called Lighthouse beacon, right after Fireworks mode. The main emitters will light up periodically like a lighthouse where the intensity rapidly accelerates to turbo (level 150) and then ramps back down to 0 (when it rotates away from the viewer). It will wait for a few seconds (configurable) before doing it again.
+
+Adjust the delay by:
+- `4C`: decrease delay by 1 second (Min: 0 second)
+- `5C`: increase delay by 1 second (Max: 30 seconds)
+- `6C`: reset delay to default (5 seconds)
+
+
+## Bad Fluorescent mode
+
+An additional strobe mode called bad fluorescent, right after Lighthouse beacon mode. The main emitters will flicker continously that simulates a broken fluorescent light. Brightness of the flicker can be adjusted by the usual `1H` and `2H` and is remembered.
 
 
 ## 8H to middle tint, 5C to tint edge
