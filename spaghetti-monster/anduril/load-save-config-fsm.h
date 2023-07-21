@@ -114,6 +114,9 @@ typedef enum {
     #ifdef USE_LIGHTHOUSE_MODE
     lighthouse_delay_e,
     #endif
+    #ifdef USE_BAD_FLUORESCENT_MODE
+    fluoresent_brightness_e,
+    #endif
     #ifdef USE_CANDLE_MODE
     candle_amplitude_e,
     candle_wobble_style_e,

@@ -192,6 +192,14 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             set_level(bike_flasher_brightness);
         }
         #endif
+
+        #ifdef USE_BAD_FLUORESCENT_MODE
+        else if (st == bad_fluorescent_mode_e) {
+            fluoresent_brightness += ramp_direction;
+            if (fluoresent_brightness < 1) fluoresent_brightness = 1;
+            else if (fluoresent_brightness > MAX_LEVEL) fluoresent_brightness = MAX_LEVEL;
+        }
+        #endif
         
         #ifdef USE_TINT_RAMPING
         else if (st == tint_alternating_strobe_e) {
@@ -246,6 +254,13 @@ uint8_t strobe_state(Event event, uint16_t arg) {
             if (bike_flasher_brightness > 2)
                 bike_flasher_brightness --;
             set_level(bike_flasher_brightness);
+        }
+        #endif
+
+        #ifdef USE_BAD_FLUORESCENT_MODE
+        else if (st == bad_fluorescent_mode_e) {
+            if (fluoresent_brightness > 1)
+                fluoresent_brightness--;
         }
         #endif
 
@@ -450,6 +465,12 @@ inline void strobe_state_iter() {
             break;
         #endif
 
+        #ifdef USE_BAD_FLUORESCENT_MODE
+        case bad_fluorescent_mode_e:
+            bad_fluorescent_iter();
+            break;
+        #endif
+
         #ifdef USE_TINT_RAMPING
         case tint_alternating_strobe_e:
             tint_alt_iter();
@@ -642,6 +663,28 @@ inline void lighthouse_iter() {
         nice_delay_ms(1000 * lighthouse_delay);
     } else
         nice_delay_ms(10 + lighthouse_delay);
+}
+#endif
+
+#ifdef USE_BAD_FLUORESCENT_MODE
+inline void bad_fluorescent_iter() {
+    // broken fluorescent
+    // even index: light off, odd index: light on
+    // unit: 10ms or -1 means random number (10~500ms) generated at boot
+    static const int8_t fluorescent_pattern[] = {1,4, -1,2, 5,3, -1,5, 7,27, 1,5, 3,10, -1,20, 3,-1, 2,-1, 10,-1, -1,-1, 1};
+
+    fluoresent_ramp_up_increment++;
+    if ((fluorescent_pattern[fluoresent_flicker_index] == -1 && fluoresent_ramp_up_increment == fluoresent_flicker_random) ||
+        (fluorescent_pattern[fluoresent_flicker_index] == fluoresent_ramp_up_increment)) {
+        fluoresent_flicker_index++;
+        fluoresent_ramp_up_increment = 0;
+        set_level(fluoresent_flicker_index & 1 ? fluoresent_brightness >> (pseudo_rand()&1): 0);
+    }
+    if (fluoresent_flicker_index == sizeof(fluorescent_pattern)) {
+        fluoresent_flicker_index = 0;
+        fluoresent_flicker_random = pseudo_rand()%50 + 1;
+    }
+    nice_delay_ms(10);
 }
 #endif
 

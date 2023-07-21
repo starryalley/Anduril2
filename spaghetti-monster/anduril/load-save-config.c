@@ -114,6 +114,9 @@ void load_config() {
         #ifdef USE_LIGHTHOUSE_MODE
         lighthouse_delay = eeprom[lighthouse_delay_e];
         #endif
+        #ifdef USE_BAD_FLUORESCENT_MODE
+        fluoresent_brightness = eeprom[fluoresent_brightness_e];
+        #endif
         #ifdef USE_CANDLE_MODE
         candle_amplitude = eeprom[candle_amplitude_e];
         wobble_style = eeprom[candle_wobble_style_e];
@@ -221,6 +224,9 @@ void save_config() {
     #endif
     #ifdef USE_LIGHTHOUSE_MODE
     eeprom[lighthouse_delay_e] = lighthouse_delay;
+    #endif
+    #ifdef USE_BAD_FLUORESCENT_MODE
+    eeprom[fluoresent_brightness_e] = fluoresent_brightness;
     #endif
     #ifdef USE_CANDLE_MODE
     eeprom[candle_amplitude_e] = candle_amplitude;

@@ -46,6 +46,9 @@ typedef enum {
     #ifdef USE_LIGHTHOUSE_MODE
     lighthouse_mode_e,
     #endif
+    #ifdef USE_BAD_FLUORESCENT_MODE
+    bad_fluorescent_mode_e,
+    #endif
     #ifdef USE_BIKE_FLASHER_MODE
     bike_flasher_e,
     #endif
@@ -122,6 +125,14 @@ uint8_t lighthouse_phase = 0;
 #define LIGHTHOUSE_DELAY_DEFAULT 5
 uint8_t lighthouse_delay = LIGHTHOUSE_DELAY_DEFAULT;
 inline void lighthouse_iter();
+#endif
+
+#ifdef USE_BAD_FLUORESCENT_MODE
+uint8_t fluoresent_brightness = DEFAULT_LEVEL;
+uint8_t fluoresent_flicker_random = 1;
+uint8_t fluoresent_flicker_index = 0;
+uint8_t fluoresent_ramp_up_increment = 0;
+inline void bad_fluorescent_iter();
 #endif
 
 #ifdef USE_TINT_RAMPING
