@@ -66,20 +66,18 @@ static void set_lowlevel_mode(uint8_t main_level) {
         button_led_set(1); // button low
         #endif
         break;
+#ifdef USE_BUTTON_LED
     case LOWLEVEL_BUTTON_ON_ONLY:
         set_level(0);
         rgb_led_update(RGB_OFF, 0);
-        #ifdef USE_BUTTON_LED
         button_led_set(2); // button led high
-        #endif
         break;
     case LOWLEVEL_BUTTON_LOW_ONLY:
         set_level(0);
         rgb_led_update(RGB_OFF, 0);
-        #ifdef USE_BUTTON_LED
         button_led_set(1); // button led low
-        #endif
         break;
+#endif
     case LOWLEVEL_AUX_OFF:
     default:
         set_level(main_level == 0 ? last_level : main_level);
