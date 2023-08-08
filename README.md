@@ -9,7 +9,7 @@ For ToyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 Since I plan to only work with my existing Anduril2 lights (see below list), I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware for my several D4v2's, a DW4, a D4K, and some SP10 Pro's and TS10's (as of Jul, 2023). For other Anduril2 lights that I don't own, I won't be able to test or support. Please file a bug report if you see any issue.
+This repo contains my own changes to Anduril2 firmware for my several D4v2's, a DW4, a D4K, and some SP10 Pro's and TS10's (as of Aug, 2023). For other Anduril2 lights that I don't own, I won't be able to test or support. Please file a bug report if you see any issue.
 
 
 ## Build targets (which I own):
@@ -115,6 +115,10 @@ When in lower levels (< DEFAULT_LEVEL), optionally we can turn on AUX LED along 
 
 No extra state is defined and the AUX LED on is temporary (not remembered) so if there is any button event (ramp up for example), AUX LED will be off. If later user enters moonlight, only main emitters will be lit (default). You need to re-enable this through `6C` or `6H`. The current AUX LED colour is remembered until reboot(factory reset).
 
+Note that in lights with AUX but without button LED (ex. Wurkkos TS25), there will be just 2 modes in `6C`:
+- main emitter on, aux high
+- main emitter on, aux off (default)
+
 When AUX isn't available but indicator LED is:
 
 `6C`: turn on indicator LED
@@ -154,6 +158,11 @@ In candle mode, add the following options which are saved:
 - `5C`: making candle amplitude bigger (candle in the wind)
 - `6C`: reset to default (which is a bit calmer then the stock one)
 
+Additionally, in lights with just indicator LED (single colour AUX, such as TS10), we can use `7C` to cycle through the indicator LED state in candle mode:
+- default: indicator LED off
+- indicator LED in low
+- indicator LED in high
+
 
 ## Allow fine ramping up (smallest increment of brightness) using 3C in ramp mode
 
@@ -180,7 +189,9 @@ Note that a similar feature is now implemented in [r654](https://bazaar.launchpa
 - style 2: fireplace slow wobble
 - style 3: fireplace fast wobble
 
-In candle wobble style (default/stock) we can additional use `7C` to toggle if we want to use aux led to assist in tint mixing (if AUX is available). Red or yellow aux LED will light up along with the wobbling light.
+In candle wobble style (default/stock) and with AUX LEDs present, we can additional use `7C` to toggle if we want to use aux led to assist in tint mixing. Red or yellow aux LED will light up along with the wobbling light.
+
+For lights with just indicator LED, `7C` is used to cycle through indicator off/low/high.
 
 
 ## Fireworks mode
@@ -198,7 +209,7 @@ For dual channel lights, fireworks mode will randomly choose from the following 
 - use channel 2 only
 - randomly choose a tint
 
-## Lighthouse mode
+## Lighthouse Beacon mode
 
 An additional strobe mode called Lighthouse beacon, right after Fireworks mode. The main emitters will light up periodically like a lighthouse where the intensity rapidly accelerates to turbo (level 150) and then ramps back down to 0 (when it rotates away from the viewer). It will wait for a few seconds (configurable) before doing it again.
 
@@ -208,16 +219,44 @@ Adjust the delay by:
 - `6C`: reset delay to default (5 seconds)
 
 
-## Bad Fluorescent mode
+## Broken Fluorescent mode
 
-An additional strobe mode called bad fluorescent, right after Lighthouse beacon mode. The main emitters will flicker continously that simulates a broken fluorescent light. Brightness of the flicker can be adjusted by the usual `1H` and `2H` and is remembered.
+An additional strobe mode called broken fluorescent, right after Lighthouse beacon mode. The main emitters will flicker continously that simulates a broken fluorescent light. Brightness of the flicker can be adjusted by the usual `1H` and `2H` and is remembered.
+
+
+## Tint Alternating Strobe mode
+
+A tint alternating strobe mode (after tactical strobe) for dual channel lights. It switches between channel 1 and 2 continously with configurable brightness (the usual `1H` and `2H`) and interval (`4C` for decreasing and `5C` for increasing the interval by 0.5 second). The setting (brightness and interval) is saved.
+
+
+## Tint Smooth Ramping Strobe mode
+
+A tint ramping strobe mode (after tint alternating strobe) for dual channel lights. It ramps between both channels repeatedly with configurable brightness (the usual `1H` and `2H`) and pause at each tint step (`4C` for decreasing and `5C` for increasing the interval by 2 microseconds). The setting (brightness and pause) is saved.
+
+
+With the additional strobes I implemented, there are now maximum 10 modes when doing `3H`:
+- Candle mode, with 2 additional wobble styles:
+  - Candle (default Anduril2)
+  - Fireplace slow wobble
+  - Fireplace fast wobble
+- Lightning mode
+- Fireworks mode
+- Lighthouse Beacon mode
+- Broken Fluorescent
+- Bike flasher
+- Party strobe
+- Tactical strobe
+- Tint alternating strobe
+- Tint smooth ramping strobe
+
+Remember we can easily go back to the last mode with `3C`.
 
 
 ## 8H to middle tint, 5C to tint edge
 
 In a tint ramping light, use `8H` to go to middle tint. (Copied from [4h to go to middle, not in the middle of 3h](https://github.com/mkong1/anduril/pull/34) )
 
-In addition, there is a shortcut `5C` to go to tint edge. Note that `5C` is for controlling parameters in strobe mode so this shortcut won't work in candle/lightning/firework mode.
+In addition, there is a shortcut `5C` to go to tint edge. Note that `5C` is for controlling parameters in some strobe modes so this shortcut won't work in candle/lightning/fireworks/lighthouse/tint alternating/tint smooth ramp modes.
 
 Note that when lights are off or locked out, `5C` and `8H` still works but not visible until the emitters are turned on.
 
@@ -272,16 +311,6 @@ Direct copy from [SammysHP](https://github.com/SammysHP)'s [Smooth sunset v2 pat
 Direct copy from [SammysHP](https://github.com/SammysHP)'s [stepped tint ramping](https://github.com/SammysHP/flashlight-firmware/tree/stepped-tint-ramping). Brilliant work there.
 
 
-## Tint Alternating Strobe mode
-
-A tint alternating strobe mode (after tactical strobe) for dual channel lights. It switches between channel 1 and 2 continously with configurable brightness (the usual `1H` and `2H`) and interval (`4C` for decreasing and `5C` for increasing the interval by 0.5 second). The setting (brightness and interval) is saved.
-
-
-## Tint Smooth Ramping Strobe mode
-
-A tint ramping strobe mode (after tint alternating strobe) for dual channel lights. It ramps between both channels repeatedly with configurable brightness (the usual `1H` and `2H`) and pause at each tint step (`4C` for decreasing and `5C` for increasing the interval by 2 microseconds). The setting (brightness and pause) is saved.
-
-
 ## Child Mode (a Simple UI with limited brightness)
 
 There is an additional UI (in addition to Simple and Advanced) that is basically the same as Simple UI but with the following differences (limitations):
@@ -297,7 +326,7 @@ Switch to this mode before handling the light to the kids.
 # Configuration changes
 
 - Default in Advanced mode
-- Reordering strobe mode: Candle -> Lightning Storm -> Fireworks -> Bike Flasher -> Party Strobe -> Tactical Strobe -> Tint Alternating -> Tint Smooth Ramping (Candle and Lightning storm are my most used strobe modes, hence why)
+- Reordering strobe mode: Candle -> Lightning -> Fireworks -> Lighthouse -> Broken Fluorescent -> Bike Flasher -> Party Strobe -> Tactical Strobe -> Tint Alternating -> Tint Smooth Ramping
 - Use `8C` instead of `5C` for momentary mode (not used often so make it harder to enter)
 - Use `9C` in ramp mode to switch ramp style (smooth or discrete)
 - disable BLINK_AT_RAMP_CEIL/MIDDLE (no blink when ramping to middle or ceiling)
@@ -308,7 +337,7 @@ Switch to this mode before handling the light to the kids.
 # Planned modification/features
 
 
-## Low power (night) mode
+## Low power (night) mode (not implemented yet)
 
 11C/11H to go to this mode and back to advanced mode. 
 
