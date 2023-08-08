@@ -123,9 +123,12 @@ typedef enum {
     #ifdef USE_AUX_RGB_LEDS
     candle_use_aux_e,
     #endif
+    #ifdef USE_INDICATOR_LED
+    candle_indicator_mode_e,
+    #endif
+    #endif
     #ifdef USE_RAMP_START_MODE
     ramp_start_mode_e,
-    #endif
     #endif
     eeprom_indexes_e_END
 } eeprom_indexes_e;

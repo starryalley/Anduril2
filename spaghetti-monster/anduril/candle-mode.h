@@ -42,6 +42,11 @@ typedef enum {
 uint8_t candle_use_aux = 0;
 #endif
 
+#ifdef USE_INDICATOR_LED
+// default indicator mode. 0: off, 1: low, 2: high
+uint8_t candle_indicator_mode = 0;
+#endif
+
 const int NUM_WOBBLE = wobble_mode_END;
 wobble_mode_te wobble_style = candle_wobble_e;
 

@@ -55,7 +55,7 @@ static inline void reset_parameters() {
         rgb_led_update(RGB_RED|RGB_HIGH, 0);
         #elif defined(USE_INDICATOR_LED)
         aux_led_reset = 0;
-        indicator_led(1);
+        indicator_led(candle_indicator_mode);
         #endif
         break;
     case fireplace_fast_wobble_e:
@@ -70,7 +70,7 @@ static inline void reset_parameters() {
         rgb_led_update(RGB_YELLOW|RGB_HIGH, 0);
         #elif defined(USE_INDICATOR_LED)
         aux_led_reset = 0;
-        indicator_led(1);
+        indicator_led(candle_indicator_mode);
         #endif
         break;
     default:
@@ -84,8 +84,8 @@ static inline void reset_parameters() {
         aux_led_reset = !candle_use_aux;
         rgb_led_update(RGB_OFF, 0);
         #elif defined(USE_INDICATOR_LED)
-        aux_led_reset = 1;
-        indicator_led(0);
+        aux_led_reset = 0;
+        indicator_led(candle_indicator_mode);
         #endif
     }
 }
@@ -222,6 +222,13 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
             save_config();
             blip();
         }
+    }
+    #elif defined(USE_INDICATOR_LED)
+    else if (event == EV_7clicks) {
+        candle_indicator_mode = (candle_indicator_mode + 1) % 3;
+        indicator_led(candle_indicator_mode);
+        save_config();
+        blip();
     }
     #endif
     // clock tick: animate candle brightness
