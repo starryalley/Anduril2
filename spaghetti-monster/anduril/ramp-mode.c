@@ -560,6 +560,7 @@ uint8_t steady_state(Event event, uint16_t arg) {
             delay_4ms(3);
             rgb_led_update(RGB_OFF, 0);
         }
+        return MISCHIEF_MANAGED;
     }
     #elif defined(USE_INDICATOR_LED)
     // 6H: turn off indicator LED
@@ -577,6 +578,7 @@ uint8_t steady_state(Event event, uint16_t arg) {
     else if (event == EV_6clicks) {
         if (actual_level <= AUX_ON_LOWLEVEL)
             indicator_led(2);
+        return MISCHIEF_MANAGED;
     }
     #endif
 
