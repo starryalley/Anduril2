@@ -88,20 +88,27 @@ Use this build instead so the following features/changes is ineffective/reverted
 
 Disclaimer: Use at your own risk. I'm not responsible for any loss caused by these firmware changes.
 
-## AUX LED can show different colours based on ambient temperature in standby/lockout mode
-
-Add an additional mode "temperature" in AUX LED mode (for standby/lockout) after "voltage". The AUX LED will change colour based on the on-chip temperature reading. 
-  - `<=12C`: pink/purple (red+blue)
-  - `12~16C`: blue
-  - `16-20C`: cyan (green+blue)
-  - `20-25C`: green
-  - `25-28C`: yellow (red+green)
-  - `>28C`: red
-
-This setting is after "voltage" mode. Use `7H` from off to loop each mode.
 
 
-## Allow the use of AUX/Indicator LED in lower levels (< DEFAULT_LEVEL) level (6C/6H while light is on)
+## In ON modes
+
+### Allow fine ramping up (smallest increment of brightness) using 3C in ramp mode
+
+Ramp up main emitters output in 1 level using `3C`.
+
+Use `9C` to switch between smooth and discrete ramp style (not used often, and makes it harder to reach by mistake than default `3C`)
+
+
+### Momentary mode using 8C
+
+Use `8C` to enter momentary mode  (not used often, and makes it harder to reach by mistake than default `5C`)
+
+
+### Smooth sunset from SammysHP
+
+Direct copy from [SammysHP](https://github.com/SammysHP)'s [Smooth sunset v2 patches](https://github.com/SammysHP/flashlight-firmware/commits/smooth-sunset-v2) or [smooth sunset](https://github.com/SammysHP/flashlight-firmware/tree/smooth-sunset) which is awesome.
+
+### Allow the use of AUX/Indicator LED in lower levels (< DEFAULT_LEVEL) level (6C/6H while light is on)
 
 When in lower levels (< DEFAULT_LEVEL), optionally we can turn on AUX LED along with main emitters.
 
@@ -127,31 +134,46 @@ When AUX isn't available but indicator LED is:
 Note that in newer Hank lights where there is a RGB switch/button LED, if the light comes with front-facing AUX LED, the RGB switch/button LED is wired to the AUX LED so the button LED control (second and third state in `6C`) won't work. This is not a firmware or hardware issue, but rather expected due to how it is. 
 
 
-## Blink AUX green LED when powered on (if there is AUX)
+### 8H to middle tint, 5C to tint edge
 
-Instead of blinking the main emitter, blink the AUX green LED at high power to indicate it's powered on.
-Original idea from [here](https://bazaar.launchpad.net/~dnelson1901/flashlight-firmware/flashlight-firmware/revision/267)
+In a tint ramping light, use `8H` to go to middle tint. (Copied from [4h to go to middle, not in the middle of 3h](https://github.com/mkong1/anduril/pull/34) )
 
+In addition, there is a shortcut `5C` to go to tint edge. Note that `5C` is for controlling parameters in some strobe modes so this shortcut won't work in candle/lightning/fireworks/lighthouse/tint alternating/tint smooth ramp modes.
 
-## Use AUX LED (red to be specific) or Indicator LED when blinking numbers (For showing voltage/temperature etc)
-
-It's a bit too harsh when using the main emitters to blink voltage/temperature readout. Use red AUX LED instead. For lights with indicator LED only (TS10 for example), the indicator LED (high) will be used.
+Note that when lights are off or locked out, `5C` and `8H` still works but not visible until the emitters are turned on.
 
 
-## Strobe mode can cycle back to the previous state by 3C
+### Stepped tint ramping from SammysHP
+
+Direct copy from [SammysHP](https://github.com/SammysHP)'s [stepped tint ramping](https://github.com/SammysHP/flashlight-firmware/tree/stepped-tint-ramping). Brilliant work there.
+
+## In STROBE modes
+
+With the additional strobes I implemented, there are now maximum ten modes when doing `3H`:
+1.  [Candle](#more-configurable-candle-mode), with two additional wobble styles:
+  - Candle (default Anduril2)
+  - [Fireplace](#fireplace-mode-(in-candle-mode)) slow wobble
+  - [Fireplace](#fireplace-mode-(in-candle-mode)) fast wobble
+2.  [Lightning](#more-configurable-lightning-mode)
+3.  [Fireworks](#fireworks-mode)
+4.  [Lighthouse Beacon](#lighthouse-beacon-mode)
+5.  [Broken Fluorescent](#broken-fluorescent-mode)
+6.  Bike flasher
+7.  Party strobe
+8.  Tactical strobe
+9.  [Tint alternating strobe](#tint-alternating-strobe-mode)
+10. [Tint smooth ramping strobe](#tint-smooth-ramping-strobe-mode)
+
+Strobe mode is entered via `3H`, and strobes can be cycled using `2C` to go forward and `3C` to go back
+
+
+
+### Strobe mode can cycle back to the previous state by 3C
 
 `2C` is to cycle to the next strobe state. Add `3C` to cycle back to the previous state. The purpose of this is that the most used strobe states are candle and lightning mode. If I'm already at lightning mode but want to go to candle mode, there was no option but to go through the blinding tactical strobe or party mode. While I don't want to disable tactical strobe nor party mode, let's add an option to just go back to the previous state.
 
 
-## More configurable lightning mode 
-
-In lightning mode, add the following options which are saved:
-- `4C`: turn down busy factor so the lightning is less busy (less frequent)
-- `5C`: turn up busy factor so the lightning is busier (more frequent)
-- `6C`: reset to default (which is max 16sec until the next lightning strike, originally it's about 8sec)
-
-
-## More configurable candle mode
+### More configurable candle mode
 
 In candle mode, add the following options which are saved:
 - `4C`: making candle amplitude smaller (candle in sort of a more stillness, calmer)
@@ -164,24 +186,7 @@ Additionally, in lights with just indicator LED (single colour AUX, such as TS10
 - indicator LED in high
 
 
-## Allow fine ramping up (smallest increment of brightness) using 3C in ramp mode
-
-Ramp up main emitters output in 1 level using `3C`.
-
-Use `9C` to switch between smooth and discrete ramp style instead. (not being used often so make it harder to reach)
-
-
-## When it's time to change battery, blink AUX red (or indicator led) in standby/lockout mode
-
-When voltage is < 3.2V when light is off, the off/lockout AUX mode will not activate. Instead, the AUX red LED will blink. Original idea from reddit user [connorkmiec93](https://www.reddit.com/user/connorkmiec93/) at this [post](https://www.reddit.com/r/flashlight/comments/mpj36p/im_doing_a_d4v2_with_anduril_2_giveaway/).
-
-The blinking is in a pattern called breathing (although it's only low/high mode in AUX LED) so it's less distracting to the original blinking and one can tell the difference to the normal blinking in RED mode.
-
-For lights with the indicator LED, the indicator LED will be used.
-
-Note that a similar feature is now implemented in [r654](https://bazaar.launchpad.net/~toykeeper/flashlight-firmware/anduril2/revision/654) that is not yet integrated into this fork as of now.
-
-## Fireplace mode (in Candle mode)
+### Fireplace mode (in Candle mode)
 
 2 additional wobble styles: fireplace_slow and fireplace_fast. Use `4H` to cycle through all 3 wobble styles. This is a saved configuration.
 
@@ -194,7 +199,15 @@ In candle wobble style (default/stock) and with AUX LEDs present, we can additio
 For lights with just indicator LED, `7C` is used to cycle through indicator off/low/high.
 
 
-## Fireworks mode
+### More configurable lightning mode 
+
+In lightning mode, add the following options which are saved:
+- `4C`: turn down busy factor so the lightning is less busy (less frequent)
+- `5C`: turn up busy factor so the lightning is busier (more frequent)
+- `6C`: reset to default (which is max 16sec until the next lightning strike, originally it's about 8sec)
+
+
+### Fireworks mode
 
 An additional strobe mode called Fireworks, right after Lightning mode. The main emitters will light up like fireworks. 
 
@@ -209,9 +222,10 @@ For dual channel lights, fireworks mode will randomly choose from the following 
 - use channel 2 only
 - randomly choose a tint
 
-## Lighthouse Beacon mode
 
-An additional strobe mode called Lighthouse beacon, right after Fireworks mode. The main emitters will light up periodically like a lighthouse where the intensity rapidly accelerates to turbo (level 150) and then ramps back down to 0 (when it rotates away from the viewer). It will wait for a few seconds (configurable) before doing it again.
+### Lighthouse Beacon mode
+
+An additional strobe mode called Lighthouse Beacon, right after Fireworks mode. The main emitters will light up periodically like a lighthouse where the intensity rapidly accelerates to turbo (level 150) and then ramps back down to 0 (when it rotates away from the viewer). It will wait for a few seconds (configurable) before doing it again.
 
 Adjust the delay by:
 - `4C`: decrease delay by 1 second (Min: 0 second)
@@ -219,68 +233,35 @@ Adjust the delay by:
 - `6C`: reset delay to default (5 seconds)
 
 
-## Broken Fluorescent mode
+### Broken Fluorescent mode
 
-An additional strobe mode called broken fluorescent, right after Lighthouse beacon mode. The main emitters will flicker continously that simulates a broken fluorescent light. Brightness of the flicker can be adjusted by the usual `1H` and `2H` and is remembered.
+An additional strobe mode called broken fluorescent, right after Lighthouse Beacon mode. The main emitters will flicker continously that simulates a broken fluorescent light. Brightness of the flicker can be adjusted by the usual `1H` and `2H` and is remembered.
 
 
-## Tint Alternating Strobe mode
+### Tint Alternating Strobe mode
 
 A tint alternating strobe mode (after tactical strobe) for dual channel lights. It switches between channel 1 and 2 continously with configurable brightness (the usual `1H` and `2H`) and interval (`4C` for decreasing and `5C` for increasing the interval by 0.5 second). The setting (brightness and interval) is saved.
 
 
-## Tint Smooth Ramping Strobe mode
+### Tint Smooth Ramping Strobe mode
 
 A tint ramping strobe mode (after tint alternating strobe) for dual channel lights. It ramps between both channels repeatedly with configurable brightness (the usual `1H` and `2H`) and pause at each tint step (`4C` for decreasing and `5C` for increasing the interval by 2 microseconds). The setting (brightness and pause) is saved.
 
 
-With the additional strobes I implemented, there are now maximum 10 modes when doing `3H`:
-- Candle mode, with 2 additional wobble styles:
-  - Candle (default Anduril2)
-  - Fireplace slow wobble
-  - Fireplace fast wobble
-- Lightning mode
-- Fireworks mode
-- Lighthouse Beacon mode
-- Broken Fluorescent
-- Bike flasher
-- Party strobe
-- Tactical strobe
-- Tint alternating strobe
-- Tint smooth ramping strobe
 
-Remember we can easily go back to the last mode with `3C`.
+## In BLINKY/UTILITY modes
+
+### Use AUX LED (red to be specific) or Indicator LED when blinking numbers (For showing voltage/temperature etc)
+
+It's a bit too harsh when using the main emitters to blink voltage/temperature readout. Use red AUX LED instead. For lights with indicator LED only (TS10 for example), the indicator LED (high) will be used.
 
 
-## 8H to middle tint, 5C to tint edge
 
-In a tint ramping light, use `8H` to go to middle tint. (Copied from [4h to go to middle, not in the middle of 3h](https://github.com/mkong1/anduril/pull/34) )
+## In STANDBY/LOCKOUT modes or POWERED OFF
 
-In addition, there is a shortcut `5C` to go to tint edge. Note that `5C` is for controlling parameters in some strobe modes so this shortcut won't work in candle/lightning/fireworks/lighthouse/tint alternating/tint smooth ramp modes.
-
-Note that when lights are off or locked out, `5C` and `8H` still works but not visible until the emitters are turned on.
-
-
-## 2 More indicator LED modes (currently only for TS10 which uses indicator LED as single-colour AUX)
-
-Idea from [SammysHP's commit](https://github.com/SammysHP/flashlight-firmware/commits/more-aux-patterns)
-
-Add mode 4 and mode 5 for low/high blinking.
-
-Modes:
-- 0: off
-- 1: low
-- 2: high
-- 3: blinking (stock Anduril2)
-- 4: blinking low
-- 5: blinking high
-- 6: breathing (user can't select this. Only used for safer low voltage warning)
-
-
-## Start Up Mode
+### Start Up Mode
 
 Idea from [this post](https://www.reddit.com/r/flashlight/comments/w417mx/anduril_mode_to_ramp_on_for_05_seconds_or_so/).
-
 
 When doing 1-click from off to turn on the light, there are additionally 3 modes that can be selected through Misc Config Menu (`9H` from off).
 
@@ -300,15 +281,50 @@ Based on different light's config this can be 1st, 2nd or 3rd item in the menu. 
 
 Please note that when start up mode is not 0 (instant on), jump start is disabled because it doesn't make sense to have jump start.
 
+### Two more indicator LED modes (currently only for TS10 which uses indicator LED as single-colour AUX)
 
-## Smooth sunset from SammysHP
+Idea from [SammysHP's commit](https://github.com/SammysHP/flashlight-firmware/commits/more-aux-patterns)
 
-Direct copy from [SammysHP](https://github.com/SammysHP)'s [Smooth sunset v2 patches](https://github.com/SammysHP/flashlight-firmware/commits/smooth-sunset-v2) or [smooth sunset](https://github.com/SammysHP/flashlight-firmware/tree/smooth-sunset) which is awesome.
+Add mode 4 and mode 5 for low/high blinking.
+
+Modes:
+- 0: off
+- 1: low
+- 2: high
+- 3: blinking (stock Anduril2)
+- 4: blinking low
+- 5: blinking high
+- 6: breathing (user can't select this. Only used for safer low voltage warning)
 
 
-## Stepped tint ramping from SammysHP
+### AUX LED can show different colours based on ambient temperature in standby/lockout mode
 
-Direct copy from [SammysHP](https://github.com/SammysHP)'s [stepped tint ramping](https://github.com/SammysHP/flashlight-firmware/tree/stepped-tint-ramping). Brilliant work there.
+Add an additional mode "temperature" in AUX LED mode (for standby/lockout) after "voltage". The AUX LED will change colour based on the on-chip temperature reading. 
+  - `<=12C`: pink/purple (red+blue)
+  - `12~16C`: blue
+  - `16-20C`: cyan (green+blue)
+  - `20-25C`: green
+  - `25-28C`: yellow (red+green)
+  - `>28C`: red
+
+This setting is after "voltage" mode. Use `7H` from off to loop each mode.
+
+
+### When it's time to change battery, blink AUX red (or indicator led) in standby/lockout mode
+
+When voltage is < 3.2V when light is off, the off/lockout AUX mode will not activate. Instead, the AUX red LED will blink. Original idea from reddit user [connorkmiec93](https://www.reddit.com/user/connorkmiec93/) at this [post](https://www.reddit.com/r/flashlight/comments/mpj36p/im_doing_a_d4v2_with_anduril_2_giveaway/).
+
+The blinking is in a pattern called breathing (although it's only low/high mode in AUX LED) so it's less distracting to the original blinking and one can tell the difference to the normal blinking in RED mode.
+
+For lights with the indicator LED, the indicator LED will be used.
+
+Note that a similar feature is now implemented in [r654](https://bazaar.launchpad.net/~toykeeper/flashlight-firmware/anduril2/revision/654) that is not yet integrated into this fork as of now.
+
+### Blink AUX green LED when powered on (if there is AUX)
+
+Instead of blinking the main emitter, blink the AUX green LED at high power to indicate it's powered on.
+Original idea from [here](https://bazaar.launchpad.net/~dnelson1901/flashlight-firmware/flashlight-firmware/revision/267)
+
 
 
 ## Child Mode (a Simple UI with limited brightness)
@@ -321,6 +337,19 @@ There is an additional UI (in addition to Simple and Advanced) that is basically
 Enter by `12C` from off, exit by `12H` from off.
 
 Switch to this mode before handling the light to the kids.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Configuration changes
