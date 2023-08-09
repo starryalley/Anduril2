@@ -152,8 +152,8 @@ Direct copy from [SammysHP](https://github.com/SammysHP)'s [stepped tint ramping
 With the additional strobes I implemented, there are now maximum ten modes when doing `3H`:
 1.  [Candle](#more-configurable-candle-mode), with two additional wobble styles:
   - Candle (default Anduril2)
-  - [Fireplace](#fireplace-mode-(in-candle-mode)) slow wobble
-  - [Fireplace](#fireplace-mode-(in-candle-mode)) fast wobble
+  - [Fireplace](#fireplace-mode-in-candle-mode) slow wobble
+  - [Fireplace](#fireplace-mode-in-candle-mode) fast wobble
 2.  [Lightning](#more-configurable-lightning-mode)
 3.  [Fireworks](#fireworks-mode)
 4.  [Lighthouse Beacon](#lighthouse-beacon-mode)
