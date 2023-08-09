@@ -9,7 +9,7 @@ For ToyKeeper's binary see [here](http://toykeeper.net/torches/fsm/)
 
 Since I plan to only work with my existing Anduril2 lights (see below list), I've deleted unrelated FW for other flashlights and many more stuffs from the huge repository. Basically I copied the ToyKeeper/ stuff from the original repo and removed unrelated hwdef and configs here.
 
-This repo contains my own changes to Anduril2 firmware for my several D4v2's, a DW4, a D4K, and some SP10 Pro's and TS10's (as of Aug, 2023). For other Anduril2 lights that I don't own, I won't be able to test or support. Please file a bug report if you see any issue.
+This repo contains my own changes to Anduril2 firmware for my several D4v2's, a DW4, a D4K, and some SP10 Pro's and TS10's (as of Aug 2023). For other Anduril2 lights that I don't own, I won't be able to test or support. Please file a bug report if you see any issue.
 
 
 ## Build targets (which I own):
@@ -188,7 +188,7 @@ Additionally, in lights with just indicator LED (single colour AUX, such as TS10
 
 ### Fireplace mode (in Candle mode)
 
-2 additional wobble styles: fireplace_slow and fireplace_fast. Use `4H` to cycle through all 3 wobble styles. This is a saved configuration.
+Two additional wobble styles: fireplace_slow and fireplace_fast. Use `4H` to cycle through all 3 wobble styles. This is a saved configuration.
 
 - style 1: Anduril2 stock candle mode (default)
 - style 2: fireplace slow wobble
