@@ -151,9 +151,9 @@ Direct copy from [SammysHP](https://github.com/SammysHP)'s [stepped tint ramping
 
 With the additional strobes I implemented, there are now maximum ten modes when doing `3H`:
 1.  [Candle](#more-configurable-candle-mode), with two additional wobble styles:
-  - Candle (default Anduril2)
-  - [Fireplace](#fireplace-mode-in-candle-mode) slow wobble
-  - [Fireplace](#fireplace-mode-in-candle-mode) fast wobble
+   - Candle (default Anduril2)
+   - [Fireplace](#fireplace-mode-in-candle-mode) slow wobble
+   - [Fireplace](#fireplace-mode-in-candle-mode) fast wobble
 2.  [Lightning](#more-configurable-lightning-mode)
 3.  [Fireworks](#fireworks-mode)
 4.  [Lighthouse Beacon](#lighthouse-beacon-mode)
@@ -288,13 +288,13 @@ Idea from [SammysHP's commit](https://github.com/SammysHP/flashlight-firmware/co
 Add mode 4 and mode 5 for low/high blinking.
 
 Modes:
-- 0: off
-- 1: low
-- 2: high
-- 3: blinking (stock Anduril2)
-- 4: blinking low
-- 5: blinking high
-- 6: breathing (user can't select this. Only used for safer low voltage warning)
+0. off
+1. low
+2. high
+3. blinking (stock Anduril2)
+4. blinking low
+5. blinking high
+6. breathing (user can't select this. Only used for safer low voltage warning)
 
 
 ### AUX LED can show different colours based on ambient temperature in standby/lockout mode
