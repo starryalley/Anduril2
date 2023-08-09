@@ -51,11 +51,7 @@ static inline void reset_parameters() {
         candle_wave1_depth = candle_wave1_maxdepth * candle_amplitude / 100;
         candle_wave2_depth = candle_wave2_maxdepth * candle_amplitude / 100;
         #ifdef USE_AUX_RGB_LEDS
-        aux_led_reset = 0;
         rgb_led_update(RGB_RED|RGB_HIGH, 0);
-        #elif defined(USE_INDICATOR_LED)
-        aux_led_reset = 0;
-        indicator_led(candle_indicator_mode);
         #endif
         break;
     case fireplace_fast_wobble_e:
@@ -66,11 +62,7 @@ static inline void reset_parameters() {
         candle_wave2_depth = candle_wave2_maxdepth * candle_amplitude / 100;
         candle_wave3_depth = candle_wave3_maxdepth * candle_amplitude / 100;
         #ifdef USE_AUX_RGB_LEDS
-        aux_led_reset = 0;
         rgb_led_update(RGB_YELLOW|RGB_HIGH, 0);
-        #elif defined(USE_INDICATOR_LED)
-        aux_led_reset = 0;
-        indicator_led(candle_indicator_mode);
         #endif
         break;
     default:
@@ -81,11 +73,7 @@ static inline void reset_parameters() {
         candle_wave2_depth = candle_wave2_maxdepth * candle_amplitude / 100;
         candle_wave3_depth = candle_wave3_maxdepth * candle_amplitude / 100;
         #ifdef USE_AUX_RGB_LEDS
-        aux_led_reset = !candle_use_aux;
         rgb_led_update(RGB_OFF, 0);
-        #elif defined(USE_INDICATOR_LED)
-        aux_led_reset = 0;
-        indicator_led(candle_indicator_mode);
         #endif
     }
 }
@@ -119,9 +107,6 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
     if (event == EV_enter_state) {
         ramp_direction = 1;
         reset_parameters();
-        #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
-        aux_led_reset = 0;
-        #endif
         #ifdef PWM_TOP_CANDLE
         #ifdef USE_DYN_PWM
         use_static_pwm = 1;
@@ -226,7 +211,9 @@ uint8_t candle_mode_state(Event event, uint16_t arg) {
     #elif defined(USE_INDICATOR_LED)
     else if (event == EV_7clicks) {
         candle_indicator_mode = (candle_indicator_mode + 1) % 3;
+        #ifdef USE_INDICATOR_LED
         indicator_led(candle_indicator_mode);
+        #endif
         save_config();
         blip();
     }

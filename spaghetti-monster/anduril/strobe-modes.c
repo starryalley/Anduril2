@@ -57,6 +57,10 @@ static inline void undo_global_setting() {
     PWM1_TOP = PWM_TOP;
     #endif
     restore_tint();
+    // always reset aux LED (default behaviour)
+    #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
+    aux_led_reset = 1;
+    #endif
 }
 
 // for some strobe modes we need to enable/disable some global settings:
@@ -70,6 +74,13 @@ static void strobe_global_setup(strobe_mode_te type) {
         PWM1_TOP = PWM_TOP_CANDLE;
         #endif
         restore_tint();
+        // aux LED will not be reset in each set_level in candle mode
+        #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
+        aux_led_reset = 0;
+        #endif
+        #ifdef USE_INDICATOR_LED
+        indicator_led(candle_indicator_mode);
+        #endif
         break;
     #endif
     
@@ -82,6 +93,9 @@ static void strobe_global_setup(strobe_mode_te type) {
         #ifdef USE_TINT_RAMPING
         tint_locked = 0;
         #endif
+        #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
+        aux_led_reset = 1;
+        #endif
         break;
     #endif
     
@@ -89,6 +103,9 @@ static void strobe_global_setup(strobe_mode_te type) {
     case tint_alternating_strobe_e:
     case tint_smooth_ramp_e:
         tint_locked = 0;
+        #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
+        aux_led_reset = 1;
+        #endif
         break;
     #endif
 
@@ -107,21 +124,18 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     momentary_mode = 1;  // 0 = ramping, 1 = strobes
     #endif
 
+    if (event == EV_enter_state) {
+        #ifdef USE_TINT_RAMPING
+        saved_tint = tint;
+        #endif
+        strobe_global_setup(st);
+    }
+
     #ifdef USE_CANDLE_MODE
     // pass all events to candle mode, when it's active
     // (the code is in its own pseudo-state to keep things cleaner)
     if (st == candle_mode_e) {
         candle_mode_state(event, arg);
-    } else {
-        #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
-        aux_led_reset = 1;
-        #endif
-    }
-    #endif
-    // use static PWM in firework mode
-    #if defined(USE_FIREWORK_MODE) && defined(PWM_TOP_FIREWORK)
-    if (st == firework_mode_e && event == EV_enter_state) {
-        strobe_global_setup(st);
     }
     #endif
 
@@ -129,18 +143,11 @@ uint8_t strobe_state(Event event, uint16_t arg) {
     // init anything which needs to be initialized
     else if (event == EV_enter_state) {
         ramp_direction = 1;
-        #ifdef USE_TINT_RAMPING
-        tint_locked = 0;
-        saved_tint = tint;
-        #endif
         return MISCHIEF_MANAGED;
     }
     // 1 click: off
     else if (event == EV_1click) {
         set_state(off_state, 0);
-        #if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
-        aux_led_reset = 1;
-        #endif
         undo_global_setting();
         return MISCHIEF_MANAGED;
     }
