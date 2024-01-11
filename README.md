@@ -1,3 +1,17 @@
+# Jan 2024 Update
+
+I've since moved on to the [new Anduril repo here](https://github.com/starryalley/anduril) which is based on the latest [Toykeeper's Anduril repo on github](https://github.com/ToyKeeper/anduril). This old fork here will probably not be updated and I will slowly move all the features I've done to the new Anduril codebase.
+
+The short story is that the Anduril code has changed a lot, and moved to github. The new multi-channel related code has many conflicts with what I've done here. Currently only a small portion of features are moved to the [new repo](https://github.com/starryalley/anduril):
+
+- temperature AUX mode
+- indicate low battery using AUX breathing mode
+- configurable candle mode with 2 additional wobble styles (fireplace modes)
+- add fireworks, lighthouse, broken fluorescent strobe modes
+
+Please consider using the firmware from the new Anduril if you like what I did here. However expect things to go slowly there. Thanks.
+
+
 # ToyKeeper's Anduril flashlight firmware fork
 
 This is a clone from [ToyKeeper's Flashlight Firmware](https://code.launchpad.net/flashlight-firmware) from branch [anduril2](https://code.launchpad.net/~toykeeper/flashlight-firmware/anduril2), revision [653](https://bazaar.launchpad.net/~toykeeper/flashlight-firmware/anduril2/revision/653)
